@@ -1,5 +1,7 @@
 **/.idea
 **/.vscode
+**/bin
 *.o
 *.elf
 *.d
+*.bin
