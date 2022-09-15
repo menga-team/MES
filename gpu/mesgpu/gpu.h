@@ -2,21 +2,29 @@
 #include <limits.h>
 #include <assert.h>
 
-const uint16_t VGA_OUT_WIDTH = 640;
-const uint16_t VGA_OUT_HEIGHT = 480;
-const uint8_t VGA_OUT_REFRESH_RATE = 60;
+#ifndef MES_GPU_H
+#define MES_GPU_H
 
-const uint16_t BUFFER_WIDTH = VGA_OUT_WIDTH / 4;
-const uint16_t BUFFER_HEIGHT = VGA_OUT_HEIGHT / 4;
-const uint8_t BUFFER_BPP = 3;
-const uint8_t PIXEL_MASK = (1 << BUFFER_BPP) - 1;
+// pixel buffer
+#define VGA_OUT_WIDTH 640
+#define VGA_OUT_HEIGHT 480
+#define VGA_OUT_REFRESH_RATE 60
+#define BUFFER_WIDTH VGA_OUT_WIDTH / 4
+#define BUFFER_HEIGHT VGA_OUT_HEIGHT / 4
+#define BUFFER_BPP 3
+#define PIXEL_MASK (1 << BUFFER_BPP) - 1
 
-const uint8_t H_FRONT_PORCH = 4;
-const uint8_t H_SYNC_PULSE = 24;
-const uint16_t VGA_WHOLE_WIDTH = 200;
-const uint32_t VGA_WHOLE_HEIGHT = 525 * VGA_WHOLE_WIDTH;
-const uint16_t V_FRONT_PORCH = 10 * VGA_WHOLE_WIDTH;
-const uint16_t V_SYNC_PULSE = 2 * VGA_WHOLE_WIDTH;
+// timing
+#define H_DISPLAY_PIXELS 640
+#define H_FRONT_PORCH_PIXELS 16
+#define H_SYNC_PULSE_PIXELS 96
+#define H_BACK_PORCH_PIXELS 48
+#define V_DISPLAY_LINES 480
+#define V_FRONT_PORCH_LINES 10
+#define V_SYNC_PULSE_LINES 2
+#define V_BACK_PORCH_LINES 33
+#define H_WHOLE_LINE_PIXELS H_DISPLAY_PIXELS + H_FRONT_PORCH_PIXELS + H_SYNC_PULSE_PIXELS + H_BACK_PORCH_PIXELS
+#define V_WHOLE_FRAME_LINES V_DISPLAY_LINES + V_FRONT_PORCH_LINES + V_SYNC_PULSE_LINES + V_BACK_PORCH_LINES
 
 uint8_t get_pixel(const void *buffer, uint16_t position) {
         // 3 bytes = 8 pairs of 3bit pixels
@@ -56,3 +64,5 @@ void init() {
         uint32_t *front_buffer = buffer_a;
         uint32_t *back_buffer = buffer_b;
 }
+
+#endif

@@ -4,7 +4,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
 #include <limits.h>
-#include "gpu.c"
+#include "gpu.h"
 
 int main() {
         setup_clock();
@@ -58,15 +58,13 @@ void tim2_isr(void)
                 if(overflow_counter > 0)
                         tick = overflow_counter << (sizeof(uint16_t) * CHAR_BIT) | tick;
 
-                if(tick % BUFFER_WIDTH + H_FRONT_PORCH == 0)
+                if(tick % H_DISPLAY_PIXELS/4 + H_FRONT_PORCH_PIXELS/4 == 0)
                         gpio_clear(GPIOA, GPIO0);
-                if(tick % BUFFER_WIDTH + H_FRONT_PORCH + H_SYNC_PULSE == 0)
+                if(tick % H_DISPLAY_PIXELS/4 + H_FRONT_PORCH_PIXELS/4 + H_SYNC_PULSE_PIXELS/4 == 0)
                         gpio_set(GPIOA, GPIO0);
-
-                if(tick == VGA_OUT_HEIGHT + V_FRONT_PORCH)
+                if(tick == V_DISPLAY_LINES + V_FRONT_PORCH_LINES)
                         gpio_clear(GPIOA, GPIO0);
-
-                if(tick == VGA_OUT_HEIGHT + V_FRONT_PORCH + V_SYNC_PULSE)
+                if(tick == V_DISPLAY_LINES + V_FRONT_PORCH_LINES + V_SYNC_PULSE_LINES)
                         gpio_set(GPIOA, GPIO0);
         }
 }
