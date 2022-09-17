@@ -5,29 +5,40 @@
 #ifndef MES_GPU_H
 #define MES_GPU_H
 
-// pixel buffer
-#define VGA_OUT_WIDTH 640
-#define VGA_OUT_HEIGHT 480
-#define VGA_OUT_REFRESH_RATE 60
-#define BUFFER_WIDTH VGA_OUT_WIDTH / 4
-#define BUFFER_HEIGHT VGA_OUT_HEIGHT / 4
-#define BUFFER_BPP 3
-#define PIXEL_MASK (1 << BUFFER_BPP) - 1
-
-// timing
-#define H_DISPLAY_PIXELS 640
-#define H_FRONT_PORCH_PIXELS 16
-#define H_SYNC_PULSE_PIXELS 96
-#define H_BACK_PORCH_PIXELS 48
-#define V_DISPLAY_LINES 480
-#define V_FRONT_PORCH_LINES 10
+// timings http://tinyvga.com/vga-timing/800x600@56Hz
+// This specific resolution was chosen because it's the most compatible with our hardware.
+#define H_DISPLAY_PIXELS 800
+#define H_FRONT_PORCH_PIXELS 24
+#define H_SYNC_PULSE_PIXELS 72
+#define H_BACK_PORCH_PIXELS 128
+#define V_DISPLAY_LINES 600
+#define V_FRONT_PORCH_LINES 1
 #define V_SYNC_PULSE_LINES 2
-#define V_BACK_PORCH_LINES 33
-#define H_WHOLE_LINE_PIXELS H_DISPLAY_PIXELS + H_FRONT_PORCH_PIXELS + H_SYNC_PULSE_PIXELS + H_BACK_PORCH_PIXELS
-#define V_WHOLE_FRAME_LINES V_DISPLAY_LINES + V_FRONT_PORCH_LINES + V_SYNC_PULSE_LINES + V_BACK_PORCH_LINES
+#define V_BACK_PORCH_LINES 22
+#define H_WHOLE_LINE_PIXELS (H_DISPLAY_PIXELS + H_FRONT_PORCH_PIXELS + H_SYNC_PULSE_PIXELS + H_BACK_PORCH_PIXELS)
+#define V_WHOLE_FRAME_LINES (V_DISPLAY_LINES + V_FRONT_PORCH_LINES + V_SYNC_PULSE_LINES + V_BACK_PORCH_LINES)
+#define V_DISPLAY_LINES_PIXELS (V_DISPLAY_LINES * H_WHOLE_LINE_PIXELS)
+#define V_FRONT_PORCH_LINES_PIXELS (V_FRONT_PORCH_LINES * H_WHOLE_LINE_PIXELS)
+#define V_SYNC_PULSE_LINES_PIXELS (V_SYNC_PULSE_LINES * H_WHOLE_LINE_PIXELS)
+#define V_BACK_PORCH_LINES_PIXELS (V_BACK_PORCH_LINES * H_WHOLE_LINE_PIXELS)
+#define WHOLE_DISPLAY_PIXELS (V_WHOLE_FRAME_LINES*H_WHOLE_LINE_PIXELS)
+#define PIXEL_CLOCK 36000000
+// 0 -> idle low, active high
+// 1 -> idle high, active low
+#define H_POLARITY 1
+#define V_POLARITY 1
+
+// pixel buffer
+#define VGA_OUT_REFRESH_RATE 60
+#define BUFFER_WIDTH (H_DISPLAY_PIXELS / 4)
+#define BUFFER_HEIGHT (V_DISPLAY_LINES / 4)
+#define BUFFER_BPP 3
+#define PIXEL_MASK ((1 << BUFFER_BPP) - 1)
 
 uint8_t get_pixel(const void *buffer, uint16_t position) {
         // 3 bytes = 8 pairs of 3bit pixels
+        // TODO: make the project more scalable by implementing a generic function, together with an optimized one for
+        //  3bpp, for getting/setting pixels. Also concerns `set_pixel`.
         uint32_t bytes = (*(uint32_t *) (buffer + (position / 8) * BUFFER_BPP)) /*& 0x00FFFFFF*/;
         return (bytes >> ((position % 8) * BUFFER_BPP)) & PIXEL_MASK;
 }
@@ -46,11 +57,11 @@ void swap_buffers(uint32_t **front_buffer, uint32_t **back_buffer) {
 }
 
 void init() {
-        // define standard color palette
+        // there are 8 standard colors, so the palette needs to be index-able with at least 3 bits.
+        assert(BUFFER_BPP >= 3);
         // the bits per pixel (bpp) define how large the palette can be.
-        assert(BUFFER_BPP >=
-               3); // there are 8 standard colors, so the palette needs to be index-able with at least 3 bits.
         uint8_t color_palette[1 << BUFFER_BPP]; // 2^BUFFER_BPP
+        // define standard color palette.
         color_palette[0b000] = 0b00000000; // black
         color_palette[0b001] = 0b11111111; // white
         color_palette[0b010] = 0b11100000; // red

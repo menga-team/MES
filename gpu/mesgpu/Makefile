@@ -12,6 +12,16 @@ INCLUDES	= -I../../include
 BUILD_DIR	?= bin
 OPT		?= -Os
 CSTD		?= -std=c99
+OOCD_FILE	= ../../utils/openocd.stlink-stm32fx.cfg
+
+LDFLAGS		+= --specs=rdimon.specs -lc -lrdimon
+
+SEMIHOSTING	?= 1
+
+ifeq ($(SEMIHOSTING),1)
+DEFS		+= -DSEMIHOSTING=1
+endif
+
 # CXXSTD - no default.
 # OOCD_INTERFACE - eg stlink-v2
 # OOCD_TARGET - eg stm32f4x
@@ -47,7 +57,7 @@ GENERATED_BINS = $(PROJECT).elf $(PROJECT).bin $(PROJECT).map $(PROJECT).list $(
 
 TGT_CPPFLAGS += -MD
 TGT_CPPFLAGS += -Wall -Wundef $(INCLUDES)
-TGT_CPPFLAGS += $(INCLUDES) $(OPENCM3_DEFS)
+TGT_CPPFLAGS += $(INCLUDES) $(OPENCM3_DEFS) $(DEFS)
 
 TGT_CFLAGS += $(OPT) $(CSTD) -ggdb3
 TGT_CFLAGS += $(ARCH_FLAGS)
@@ -95,6 +105,7 @@ LDLIBS += -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
 
 all: $(PROJECT).elf $(PROJECT).bin
 flash: $(PROJECT).flash
+oocd: $(PROJECT).oocd
 
 # error if not using linker script generator
 ifeq (,$(DEVICE))
@@ -140,6 +151,21 @@ $(PROJECT).elf: $(OBJS) $(LDSCRIPT) $(LIBDEPS)
 %.flash: %.bin
 	@printf "  FLASH\t$<\n"
 	st-flash write $(*).bin 0x08000000
+
+%.oocd: %.elf
+	@printf "  OOCD\t$<\n"
+ifeq (,$(OOCD_FILE))
+	$(Q)(echo "halt; program $(realpath $(*).elf) verify reset halt" | nc -4 localhost 4444 2>/dev/null) || \
+		$(OOCD) -f interface/$(OOCD_INTERFACE).cfg \
+		-f target/$(OOCD_TARGET).cfg \
+		-c "program $(realpath $(*).elf) verify reset exit" \
+		#$(NULL)
+else
+	$(Q)(echo "halt; program $(realpath $(*).elf) verify reset halt" | nc -4 localhost 4444 2>/dev/null) || \
+		$(OOCD) -f $(OOCD_FILE) \
+		-c "program $(realpath $(*).elf) verify reset exit" \
+		#$(NULL)
+endif
 
 clean:
 	rm -rf $(BUILD_DIR) $(GENERATED_BINS)
