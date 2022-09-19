@@ -10,7 +10,7 @@ ARCH_FLAGS	= -mcpu=cortex-m3 -mlittle-endian -mthumb
 
 INCLUDES	= -I../../include
 BUILD_DIR	?= bin
-OPT		?= -Os
+OPT		?= -O2
 CSTD		?= -std=c99
 OOCD_FILE	= ../../utils/openocd.stlink-stm32fx.cfg
 

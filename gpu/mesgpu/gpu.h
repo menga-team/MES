@@ -5,16 +5,19 @@
 #ifndef MES_GPU_H
 #define MES_GPU_H
 
-// timings http://tinyvga.com/vga-timing/800x600@56Hz
-// This specific resolution was chosen because it's the most compatible with our hardware.
-#define H_DISPLAY_PIXELS 800
-#define H_FRONT_PORCH_PIXELS 24
-#define H_SYNC_PULSE_PIXELS 72
-#define H_BACK_PORCH_PIXELS 128
-#define V_DISPLAY_LINES 600
-#define V_FRONT_PORCH_LINES 1
+// theoretically 800x600@56Hz would be the best resolution because its pixel clock is 36MHz,
+// but unfortunately such resolutions are not widely supported, so we need to stick with 640x480@60.
+// relevant timings:
+// http://tinyvga.com/vga-timing/800x600@56Hz
+// http://tinyvga.com/vga-timing/640x480@60Hz
+#define H_DISPLAY_PIXELS 640
+#define H_FRONT_PORCH_PIXELS 16
+#define H_SYNC_PULSE_PIXELS 96
+#define H_BACK_PORCH_PIXELS 48
+#define V_DISPLAY_LINES 480
+#define V_FRONT_PORCH_LINES 10
 #define V_SYNC_PULSE_LINES 2
-#define V_BACK_PORCH_LINES 22
+#define V_BACK_PORCH_LINES 33
 #define H_WHOLE_LINE_PIXELS (H_DISPLAY_PIXELS + H_FRONT_PORCH_PIXELS + H_SYNC_PULSE_PIXELS + H_BACK_PORCH_PIXELS)
 #define V_WHOLE_FRAME_LINES (V_DISPLAY_LINES + V_FRONT_PORCH_LINES + V_SYNC_PULSE_LINES + V_BACK_PORCH_LINES)
 #define V_DISPLAY_LINES_PIXELS (V_DISPLAY_LINES * H_WHOLE_LINE_PIXELS)
@@ -22,11 +25,11 @@
 #define V_SYNC_PULSE_LINES_PIXELS (V_SYNC_PULSE_LINES * H_WHOLE_LINE_PIXELS)
 #define V_BACK_PORCH_LINES_PIXELS (V_BACK_PORCH_LINES * H_WHOLE_LINE_PIXELS)
 #define WHOLE_DISPLAY_PIXELS (V_WHOLE_FRAME_LINES*H_WHOLE_LINE_PIXELS)
-#define PIXEL_CLOCK 36000000
-// 0 -> idle low, active high
-// 1 -> idle high, active low
-#define H_POLARITY 1
-#define V_POLARITY 1
+#define PIXEL_CLOCK 25175000
+// 0 -> idle high, active low
+// 1 -> idle low, active high
+#define H_SYNC_POLARITY 0
+#define V_SYNC_POLARITY 0
 
 // pixel buffer
 #define VGA_OUT_REFRESH_RATE 60
@@ -35,32 +38,37 @@
 #define BUFFER_BPP 3
 #define PIXEL_MASK ((1 << BUFFER_BPP) - 1)
 
-uint8_t get_pixel(const void *buffer, uint16_t position) {
+// the bits per pixel (bpp) define how large the palette can be.
+uint8_t color_palette[1 << BUFFER_BPP]; // 2^BUFFER_BPP
+
+uint32_t buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))];
+uint32_t buffer_b[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))];
+uint32_t *front_buffer, *back_buffer;
+
+uint8_t gpu_get_pixel(const void *buffer, uint16_t position) {
         // 3 bytes = 8 pairs of 3bit pixels
         // TODO: make the project more scalable by implementing a generic function, together with an optimized one for
-        //  3bpp, for getting/setting pixels. Also concerns `set_pixel`.
+        //  3bpp, for getting/setting pixels. Also concerns `gpu_set_pixel`.
         uint32_t bytes = (*(uint32_t *) (buffer + (position / 8) * BUFFER_BPP)) /*& 0x00FFFFFF*/;
         return (bytes >> ((position % 8) * BUFFER_BPP)) & PIXEL_MASK;
 }
 
-void set_pixel(void *buffer, uint16_t position, uint8_t data) {
+void gpu_set_pixel(void *buffer, uint16_t position, uint8_t data) {
         uint32_t *bytes = (uint32_t *) (buffer + (position / 8) * BUFFER_BPP);
         uint8_t shift = (position % 8) * BUFFER_BPP;
         uint32_t mask = PIXEL_MASK << shift;
         *bytes = (*bytes & ~mask) | (data & PIXEL_MASK) << shift;
 }
 
-void swap_buffers(uint32_t **front_buffer, uint32_t **back_buffer) {
-        uint32_t *swap = *front_buffer;
+void gpu_swap_buffers(void) {
+        uint32_t *swap = front_buffer;
         *front_buffer = *back_buffer;
-        *back_buffer = swap;
+        *back_buffer = *swap;
 }
 
-void init() {
+void gpu_init(void) {
         // there are 8 standard colors, so the palette needs to be index-able with at least 3 bits.
         assert(BUFFER_BPP >= 3);
-        // the bits per pixel (bpp) define how large the palette can be.
-        uint8_t color_palette[1 << BUFFER_BPP]; // 2^BUFFER_BPP
         // define standard color palette.
         color_palette[0b000] = 0b00000000; // black
         color_palette[0b001] = 0b11111111; // white
@@ -70,10 +78,8 @@ void init() {
         color_palette[0b101] = 0b11111100; // yellow
         color_palette[0b110] = 0b11100011; // magenta
         color_palette[0b111] = 0b00011111; // cyan?
-        uint32_t buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))];
-        uint32_t buffer_b[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))];
-        uint32_t *front_buffer = buffer_a;
-        uint32_t *back_buffer = buffer_b;
+        front_buffer = buffer_a;
+        back_buffer = buffer_b;
 }
 
 #endif
