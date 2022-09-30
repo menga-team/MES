@@ -5,6 +5,24 @@
 #ifndef MES_GPU_H
 #define MES_GPU_H
 
+
+// todo maybe? multiple resolutions?
+struct ResolutionConfig {
+    uint32_t pixel_clock;
+
+    bool h_sync_polarity;
+    uint16_t h_display_pixels;
+    uint16_t h_front_porch_pixels;
+    uint16_t h_sync_pulse_pixels;
+    uint16_t h_back_porch_pixels;
+
+    bool v_sync_polarity;
+    uint16_t v_display_lines;
+    uint16_t v_front_porch_lines;
+    uint16_t v_sync_pulse_lines;
+    uint16_t v_back_porch_lines;
+};
+
 // theoretically 800x600@56Hz would be the best resolution because its pixel clock is 36MHz,
 // but unfortunately such resolutions are not widely supported, so we need to stick with 640x480@60.
 // relevant timings:
@@ -33,8 +51,8 @@
 
 // pixel buffer
 #define VGA_OUT_REFRESH_RATE 60
-#define BUFFER_WIDTH (H_DISPLAY_PIXELS / 4)
-#define BUFFER_HEIGHT (V_DISPLAY_LINES / 4)
+#define BUFFER_WIDTH 160
+#define BUFFER_HEIGHT 120
 #define BUFFER_BPP 3
 #define PIXEL_MASK ((1 << BUFFER_BPP) - 1)
 
