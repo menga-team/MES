@@ -5,37 +5,18 @@
 #ifndef MES_GPU_H
 #define MES_GPU_H
 
-
-// todo maybe? multiple resolutions?
-struct ResolutionConfig {
-    uint32_t pixel_clock;
-
-    bool h_sync_polarity;
-    uint16_t h_display_pixels;
-    uint16_t h_front_porch_pixels;
-    uint16_t h_sync_pulse_pixels;
-    uint16_t h_back_porch_pixels;
-
-    bool v_sync_polarity;
-    uint16_t v_display_lines;
-    uint16_t v_front_porch_lines;
-    uint16_t v_sync_pulse_lines;
-    uint16_t v_back_porch_lines;
-};
-
-// theoretically 800x600@56Hz would be the best resolution because its pixel clock is 36MHz,
-// but unfortunately such resolutions are not widely supported, so we need to stick with 640x480@60.
 // relevant timings:
-// http://tinyvga.com/vga-timing/800x600@56Hz
-// http://tinyvga.com/vga-timing/640x480@60Hz
-#define H_DISPLAY_PIXELS 640
-#define H_FRONT_PORCH_PIXELS 16
-#define H_SYNC_PULSE_PIXELS 96
-#define H_BACK_PORCH_PIXELS 48
-#define V_DISPLAY_LINES 480
-#define V_FRONT_PORCH_LINES 10
-#define V_SYNC_PULSE_LINES 2
-#define V_BACK_PORCH_LINES 33
+// http://tinyvga.com/vga-timing/800x600@60Hz
+#define H_DISPLAY_PIXELS 800
+#define H_FRONT_PORCH_PIXELS 40
+#define H_SYNC_PULSE_PIXELS 128
+#define H_BACK_PORCH_PIXELS 88
+
+#define V_DISPLAY_LINES 600
+#define V_FRONT_PORCH_LINES 1
+#define V_SYNC_PULSE_LINES 4
+#define V_BACK_PORCH_LINES 23
+
 #define H_WHOLE_LINE_PIXELS (H_DISPLAY_PIXELS + H_FRONT_PORCH_PIXELS + H_SYNC_PULSE_PIXELS + H_BACK_PORCH_PIXELS)
 #define V_WHOLE_FRAME_LINES (V_DISPLAY_LINES + V_FRONT_PORCH_LINES + V_SYNC_PULSE_LINES + V_BACK_PORCH_LINES)
 #define V_DISPLAY_LINES_PIXELS (V_DISPLAY_LINES * H_WHOLE_LINE_PIXELS)
@@ -43,16 +24,17 @@ struct ResolutionConfig {
 #define V_SYNC_PULSE_LINES_PIXELS (V_SYNC_PULSE_LINES * H_WHOLE_LINE_PIXELS)
 #define V_BACK_PORCH_LINES_PIXELS (V_BACK_PORCH_LINES * H_WHOLE_LINE_PIXELS)
 #define WHOLE_DISPLAY_PIXELS (V_WHOLE_FRAME_LINES*H_WHOLE_LINE_PIXELS)
-#define PIXEL_CLOCK 25175000
+#define PIXEL_CLOCK 40000000
 // 0 -> idle high, active low
 // 1 -> idle low, active high
-#define H_SYNC_POLARITY 0
-#define V_SYNC_POLARITY 0
+#define H_SYNC_POLARITY 1
+#define V_SYNC_POLARITY 1
 
 // pixel buffer
 #define VGA_OUT_REFRESH_RATE 60
-#define BUFFER_WIDTH 160
-#define BUFFER_HEIGHT 120
+#define BUFFER_TO_VIDEO_RATIO 5
+#define BUFFER_WIDTH (H_DISPLAY_PIXELS / BUFFER_TO_VIDEO_RATIO)
+#define BUFFER_HEIGHT (V_DISPLAY_LINES / BUFFER_TO_VIDEO_RATIO)
 #define BUFFER_BPP 3
 #define PIXEL_MASK ((1 << BUFFER_BPP) - 1)
 
@@ -95,7 +77,7 @@ void gpu_init(void) {
         color_palette[0b100] = 0b00000011; // blue
         color_palette[0b101] = 0b11111100; // yellow
         color_palette[0b110] = 0b11100011; // magenta
-        color_palette[0b111] = 0b00011111; // cyan?
+        color_palette[0b111] = 0b00011111; // cyan
         front_buffer = buffer_a;
         back_buffer = buffer_b;
 }

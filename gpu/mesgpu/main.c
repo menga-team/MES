@@ -6,16 +6,14 @@
 #include <mesmath.h>
 #include "gpu.h"
 
-uint16_t line[H_DISPLAY_PIXELS];
-
 int main(void) {
         setup_clock();
         setup_output();
-        start_video();
         gpu_init();
         for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++) {
                 gpu_set_pixel(front_buffer, i, i % 8);
         }
+        start_video();
         while (1);
         return 0;
 }
@@ -25,6 +23,7 @@ static void setup_clock(void) {
 }
 
 static void setup_output(void) {
+        rcc_periph_clock_enable(RCC_AFIO);
         rcc_periph_clock_enable(RCC_GPIOA);
         rcc_periph_clock_enable(RCC_GPIOB);
         rcc_periph_clock_enable(RCC_GPIOC);
@@ -42,58 +41,42 @@ static void setup_output(void) {
 }
 
 static void start_video(void) {
-        rcc_periph_clock_enable(RCC_AFIO);
         // timers are driven by a 72MHz clock
-
         // TIM1 -> Horizontal sync
         rcc_periph_clock_enable(RCC_TIM1);
         rcc_periph_reset_pulse(RST_TIM1);
-
-        /*timer_set_deadtime(TIM1, 10);
-        timer_set_enabled_off_state_in_idle_mode(TIM1);
-        timer_set_enabled_off_state_in_run_mode(TIM1);
-        timer_disable_break(TIM1);
-        timer_set_break_polarity_high(TIM1);
-        timer_disable_break_automatic_output(TIM1);
-        timer_set_break_lock(TIM1, TIM_BDTR_LOCK_OFF);
-        timer_set_oc_slow_mode(TIM1, TIM_OC1);*/
         timer_enable_break_main_output(TIM1);
-
         timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-        // does the timer need to be that fast? maybe we're ok with a lower clock.
-        timer_set_prescaler(TIM1, uround(rcc_apb2_frequency / (PIXEL_CLOCK / 4.0))-1); // 36MHz / (36MHz / (36MHz / 4)) = 9MHz
-        timer_set_period(TIM1, H_WHOLE_LINE_PIXELS / 4);
+        // 0 = 1, so we need to subtract 1 to get the expected result.
+        // tim1 is driven by rcc_apb2_frequency (72MHz)
+        timer_set_prescaler(TIM1, uround(rcc_apb2_frequency / (PIXEL_CLOCK / (double) BUFFER_TO_VIDEO_RATIO)) - 1);
+        timer_set_period(TIM1, H_WHOLE_LINE_PIXELS / 5); // 211 (211.2)
         timer_disable_preload(TIM1);
         timer_continuous_mode(TIM1);
-        /* We are cheating a bit here, we basically abuse the PWM hardware to generate our horizontal pulse, but because
-         the signal can only be aligned at one edge we need to send a longer signal before sending the pulse,
-         that also means that we are sending a longer signal than we actually need in the first iteration.
-         It is crucial to also adapt the VSync timer to this offset.
-         As a solution we start the timer with an already set counter, in this case H_BACK_PORCH_PIXELS. */
-        timer_set_oc_value(TIM1, TIM_OC1, H_SYNC_PULSE_PIXELS / 4);
         timer_set_counter(TIM1, 0);
         timer_enable_oc_preload(TIM1, TIM_OC1);
         timer_enable_oc_output(TIM1, TIM_OC1);
         timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
+        // This OC is responsible for the PWM signal, we are high until we reach OC1.
+        timer_set_oc_value(TIM1, TIM_OC1, H_SYNC_PULSE_PIXELS / BUFFER_TO_VIDEO_RATIO); // 25 (25.6)
         if (H_SYNC_POLARITY) timer_set_oc_polarity_high(TIM1, TIM_OC1);
         else timer_set_oc_polarity_low(TIM1, TIM_OC1);
-
         nvic_enable_irq(NVIC_TIM1_CC_IRQ);
         nvic_set_priority(NVIC_TIM1_CC_IRQ, 0);
-        timer_set_oc_value(TIM1, TIM_OC2,
-                           (H_SYNC_PULSE_PIXELS / 4 + H_BACK_PORCH_PIXELS / 4 + H_DISPLAY_PIXELS / 4));
+        // OC2 is responsible to reset the color, some monitors will base their black voltage level off the voltage
+        // in the back porch, this means we can't send any colors in this period.
+        timer_set_oc_value(TIM1, TIM_OC2, RESET_COLOR);
         timer_enable_irq(TIM1, TIM_DIER_CC2IE);
-        timer_set_oc_value(TIM1, TIM_OC3, (H_SYNC_PULSE_PIXELS / 4 + H_BACK_PORCH_PIXELS / 4));
+        // OC3 will let us know when we can start drawing.
+        timer_set_oc_value(TIM1, TIM_OC3, START_DRAWING);
         timer_enable_irq(TIM1, TIM_DIER_CC3IE);
-
 
         // TIM3 -> Vertical sync
         rcc_periph_clock_enable(RCC_TIM3);
         rcc_periph_reset_pulse(RST_TIM3);
         timer_set_mode(TIM3, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-        // we don't need to be any more precise than a line.
-        timer_set_prescaler(TIM3, (rcc_apb2_frequency / (PIXEL_CLOCK /
-                                                         H_WHOLE_LINE_PIXELS))-1); // 36MHz / (36MHz / (36MHz / 1024)) = 35.156kHz
+        // (+6 is trial and error)
+        timer_set_prescaler(TIM3, uround(rcc_apb2_frequency / (PIXEL_CLOCK / (double) H_WHOLE_LINE_PIXELS)) + 6);
         timer_set_period(TIM3, V_WHOLE_FRAME_LINES);
         timer_disable_preload(TIM3);
         timer_continuous_mode(TIM3);
@@ -104,13 +87,13 @@ static void start_video(void) {
         timer_set_oc_mode(TIM3, TIM_OC1, TIM_OCM_PWM1);
         if (V_SYNC_POLARITY) timer_set_oc_polarity_high(TIM3, TIM_OC1);
         else timer_set_oc_polarity_low(TIM3, TIM_OC1);
-        // TIM4 -> Pixel clock
+
         // enable both counters
-        timer_enable_counter(TIM1);
         timer_enable_counter(TIM3);
+        timer_enable_counter(TIM1);
 }
 
-static void set_color(uint8_t color) {
+static uint16_t get_port_config_for_color(uint8_t color) {
         uint16_t port = 0x0000;
         if ((color & 0b10000000) != 0) port |= RED_PIN_1;
         if ((color & 0b01000000) != 0) port |= RED_PIN_2;
@@ -120,26 +103,43 @@ static void set_color(uint8_t color) {
         if ((color & 0b00000100) != 0) port |= GREEN_PIN_3;
         if ((color & 0b00000010) != 0) port |= BLUE_PIN_1;
         if ((color & 0b00000001) != 0) port |= BLUE_PIN_2;
+        return port;
+}
+
+static void set_color(uint8_t color) {
+        uint16_t port = get_port_config_for_color(color);
         //gpio_port_write(GPIO_COLOR_PORT, port);
         GPIO_BSRR(GPIO_COLOR_PORT) = port;
 }
 
 static void reset_color(void) {
         GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
+}
 
+// framebuffer gets processed into gpio port bitmap array while we're not busy.
+uint16_t line[BUFFER_WIDTH];
+
+static void prepare_scanline() {
+        uint16_t next_line_base =
+                ((TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 2) / BUFFER_TO_VIDEO_RATIO) * BUFFER_WIDTH;
+        // TODO: getting individual pixels is just to slow...
+        //  potentially make a color map (color => gpio port)
+//        for (uint16_t px = 0; px < BUFFER_WIDTH; px++) {
+//                line[px] = get_port_config_for_color(
+//                        color_palette[gpu_get_pixel(front_buffer, next_line_base + px)]
+//                );
+//        }
 }
 
 void tim1_cc_isr(void) {
         if ((TIM_SR(TIM1) & TIM_SR_CC2IF) != 0) {
                 TIM_SR(TIM1) = 0x0000;
                 reset_color();
+                // we have some spare time until the next interrupt ~970ns
+                prepare_scanline();
         } else {
                 TIM_SR(TIM1) = 0x0000;
+                //set_color((TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 1) % 256);
                 GPIO_BSRR(GPIO_COLOR_PORT) = 0xffff;
-                reset_color();
-                //GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
-                //GPIO_BSRR(GPIO_COLOR_PORT) = 0xffff;
-                //reset_color();
-                //GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
         }
 }
