@@ -31,8 +31,8 @@ static void setup_output(void) {
         gpio_set(GPIOC, GPIO13);
         // A8: hsync (yellow cable)
         // A6: vsync (orange cable)
-        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM1_CH1); // PA8
-        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM3_CH1); // PA6
+        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM1_CH1); // PA8
+        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM3_CH1); // PA6
         gpio_set_mode(GPIO_COLOR_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                       RED_PIN_1 | RED_PIN_2 | RED_PIN_3 |
                       GREEN_PIN_1 | GREEN_PIN_2 | GREEN_PIN_3 |
@@ -93,23 +93,9 @@ static void start_video(void) {
         timer_enable_counter(TIM1);
 }
 
-static uint16_t get_port_config_for_color(uint8_t color) {
-        uint16_t port = 0x0000;
-        if ((color & 0b10000000) != 0) port |= RED_PIN_1;
-        if ((color & 0b01000000) != 0) port |= RED_PIN_2;
-        if ((color & 0b00100000) != 0) port |= RED_PIN_3;
-        if ((color & 0b00010000) != 0) port |= GREEN_PIN_1;
-        if ((color & 0b00001000) != 0) port |= GREEN_PIN_2;
-        if ((color & 0b00000100) != 0) port |= GREEN_PIN_3;
-        if ((color & 0b00000010) != 0) port |= BLUE_PIN_1;
-        if ((color & 0b00000001) != 0) port |= BLUE_PIN_2;
-        return port;
-}
-
 static void set_color(uint8_t color) {
         uint16_t port = get_port_config_for_color(color);
-        //gpio_port_write(GPIO_COLOR_PORT, port);
-        GPIO_BSRR(GPIO_COLOR_PORT) = port;
+        GPIO_ODR(GPIO_COLOR_PORT) = port;
 }
 
 static void reset_color(void) {
@@ -131,15 +117,27 @@ static void prepare_scanline() {
 //        }
 }
 
-void tim1_cc_isr(void) {
+uint16_t gradient_temp = 0x0000;
+uint16_t n_line = 0x0000;
+
+void __attribute__((optimize("O3"))) tim1_cc_isr(void) {
         if ((TIM_SR(TIM1) & TIM_SR_CC2IF) != 0) {
                 TIM_SR(TIM1) = 0x0000;
                 reset_color();
                 // we have some spare time until the next interrupt ~970ns
-                prepare_scanline();
+                //prepare_scanline();
+                n_line = (TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 2) / 2;
+                gradient_temp = get_port_config_for_color(
+                        n_line % 256);
+                if (n_line > 255) gradient_temp = 0xffff;
         } else {
                 TIM_SR(TIM1) = 0x0000;
-                //set_color((TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 1) % 256);
-                GPIO_BSRR(GPIO_COLOR_PORT) = 0xffff;
+                //set_color();
+                //GPIO_BSRR(GPIO_COLOR_PORT) = color_palette[gpu_get_pixel(front_buffer, 1)];
+                // maybe with enough optimization we can display pixels from the framebuffer in real time?
+                // this would be the most favorable option, because we get more time for talking with the cpu.
+                for(uint8_t i = 0; i < 16; ++i) {
+                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[gpu_get_pixel(front_buffer, i)];
+                }
         }
 }
