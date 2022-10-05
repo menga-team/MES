@@ -1,0 +1,15 @@
+1. Clock used for timing. May be supplied from CPU or intern.
+
+2. Counter used for counting from 0 to 17. the 18 combinations are used as instructions for the rest of the circuit. it is also hooked up to a flip flop wich takes as input the first bit of the counters oputput. when the counter is at a even number it disables the counter for the duratiopn of one clock cycle. More about that below.
+
+3. logic gate used to recognise the number 18 in binary and reset the counter upon finding it.
+
+4. The output of this and gate determins wether the counter is currently skipping a clock cycle. 
+
+5. this line of and gates is used to interpret the individual bytes.
+
+6. here we get a series of inputs corresponding to the currently selected button and a array of switches representing the actual buttons. If the selected button and the actual button outputs are 1 the output is 1 else 0.
+
+7. before feeding the output of the bit interpretation we check if the counters current number is odd. only then the output is set to 1.
+
+8. this is the final step before the aux port. we set the output to high if any of the bit interpretation, the sync sequence or the counter is skipping a cycle are high  
