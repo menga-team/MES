@@ -133,11 +133,19 @@ void __attribute__((optimize("O3"))) tim1_cc_isr(void) {
         } else {
                 TIM_SR(TIM1) = 0x0000;
                 //set_color();
-                //GPIO_BSRR(GPIO_COLOR_PORT) = color_palette[gpu_get_pixel(front_buffer, 1)];
+//                GPIO_BSRR(GPIO_COLOR_PORT) = gradient_temp;
                 // maybe with enough optimization we can display pixels from the framebuffer in real time?
                 // this would be the most favorable option, because we get more time for talking with the cpu.
-                for(uint8_t i = 0; i < 16; ++i) {
-                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[gpu_get_pixel(front_buffer, i)];
+                for (uint8_t byte_index = 0; byte_index < (uint8_t) (BUFFER_WIDTH / 8); ++byte_index) {
+                        uint32_t bytes = (*(uint32_t *) ((const void *) front_buffer + byte_index * BUFFER_BPP));
+                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (0 * BUFFER_BPP)) & PIXEL_MASK];
+                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (1 * BUFFER_BPP)) & PIXEL_MASK];
+                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (2 * BUFFER_BPP)) & PIXEL_MASK];
+                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (3 * BUFFER_BPP)) & PIXEL_MASK];
+                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (4 * BUFFER_BPP)) & PIXEL_MASK];
+                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (5 * BUFFER_BPP)) & PIXEL_MASK];
+                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (6 * BUFFER_BPP)) & PIXEL_MASK];
+                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (7 * BUFFER_BPP)) & PIXEL_MASK];
                 }
         }
 }
