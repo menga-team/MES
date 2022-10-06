@@ -11,8 +11,17 @@ int main(void) {
         setup_output();
         gpu_init();
         for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++) {
-                gpu_set_pixel(front_buffer, i, i % 8);
+                gpu_set_pixel(front_buffer, i, 0b110);
         }
+        gpu_set_pixel(front_buffer, 0, 0b111);
+        gpu_set_pixel(front_buffer, 1, 0b111);
+        gpu_set_pixel(front_buffer, 2, 0b111);
+        gpu_set_pixel(front_buffer, 3, 0b111);
+        gpu_set_pixel(front_buffer, 4, 0b111);
+        gpu_set_pixel(front_buffer, 5, 0b111);
+        gpu_set_pixel(front_buffer, 6, 0b111);
+        gpu_set_pixel(front_buffer, 7, 0b111);
+
         start_video();
         while (1);
         return 0;
@@ -75,7 +84,7 @@ static void start_video(void) {
         rcc_periph_clock_enable(RCC_TIM3);
         rcc_periph_reset_pulse(RST_TIM3);
         timer_set_mode(TIM3, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-        // (+6 is trial and error)
+        // +6 is trial and error, because our hsync is not perfect we also need to change the vsync up a bit.
         timer_set_prescaler(TIM3, uround(rcc_apb2_frequency / (PIXEL_CLOCK / (double) H_WHOLE_LINE_PIXELS)) + 6);
         timer_set_period(TIM3, V_WHOLE_FRAME_LINES);
         timer_disable_preload(TIM3);
@@ -102,23 +111,7 @@ static void reset_color(void) {
         GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
 }
 
-// framebuffer gets processed into gpio port bitmap array while we're not busy.
-uint16_t line[BUFFER_WIDTH];
-
-static void prepare_scanline() {
-        uint16_t next_line_base =
-                ((TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 2) / BUFFER_TO_VIDEO_RATIO) * BUFFER_WIDTH;
-        // TODO: getting individual pixels is just to slow...
-        //  potentially make a color map (color => gpio port)
-//        for (uint16_t px = 0; px < BUFFER_WIDTH; px++) {
-//                line[px] = get_port_config_for_color(
-//                        color_palette[gpu_get_pixel(front_buffer, next_line_base + px)]
-//                );
-//        }
-}
-
-uint16_t gradient_temp = 0x0000;
-uint16_t n_line = 0x0000;
+uint16_t n_line = 0;
 
 void __attribute__((optimize("O3"))) tim1_cc_isr(void) {
         if ((TIM_SR(TIM1) & TIM_SR_CC2IF) != 0) {
@@ -126,18 +119,12 @@ void __attribute__((optimize("O3"))) tim1_cc_isr(void) {
                 reset_color();
                 // we have some spare time until the next interrupt ~970ns
                 //prepare_scanline();
-                n_line = (TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 2) / 2;
-                gradient_temp = get_port_config_for_color(
-                        n_line % 256);
-                if (n_line > 255) gradient_temp = 0xffff;
+                n_line = (TIM3_CNT);
         } else {
                 TIM_SR(TIM1) = 0x0000;
-                //set_color();
-//                GPIO_BSRR(GPIO_COLOR_PORT) = gradient_temp;
-                // maybe with enough optimization we can display pixels from the framebuffer in real time?
-                // this would be the most favorable option, because we get more time for talking with the cpu.
                 for (uint8_t byte_index = 0; byte_index < (uint8_t) (BUFFER_WIDTH / 8); ++byte_index) {
-                        uint32_t bytes = (*(uint32_t *) ((const void *) front_buffer + byte_index * BUFFER_BPP));
+                        uint32_t bytes = (*(uint32_t *) ((const void *) front_buffer + (n_line * (BUFFER_WIDTH / 8)) +
+                                                         byte_index * BUFFER_BPP));
                         GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (0 * BUFFER_BPP)) & PIXEL_MASK];
                         GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (1 * BUFFER_BPP)) & PIXEL_MASK];
                         GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (2 * BUFFER_BPP)) & PIXEL_MASK];
