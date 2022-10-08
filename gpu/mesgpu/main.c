@@ -93,7 +93,7 @@ void start_video(void) {
         if (H_SYNC_POLARITY) timer_set_oc_polarity_high(TIM1, TIM_OC1);
         else timer_set_oc_polarity_low(TIM1, TIM_OC1);
         nvic_enable_irq(NVIC_TIM1_CC_IRQ);
-        nvic_set_priority(NVIC_TIM1_CC_IRQ, 0);
+        nvic_set_priority(NVIC_TIM1_CC_IRQ, 1);
         // OC2 is responsible to reset the color, some monitors will base their black voltage level off the voltage
         // in the back porch, this means we can't send any colors in this period.
         timer_set_oc_value(TIM1, TIM_OC2, RESET_COLOR);
@@ -119,8 +119,22 @@ void start_video(void) {
         if (V_SYNC_POLARITY) timer_set_oc_polarity_high(TIM3, TIM_OC1);
         else timer_set_oc_polarity_low(TIM3, TIM_OC1);
 
+        // TIM2 -> Pixel clock
+        rcc_periph_clock_enable(RCC_TIM2);
+        rcc_periph_reset_pulse(RST_TIM2);
+        timer_set_mode(TIM2, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+        timer_set_prescaler(TIM2, uround(rcc_apb2_frequency / (PIXEL_CLOCK / (double) BUFFER_TO_VIDEO_RATIO)) - 1);
+        timer_set_period(TIM2, 2);
+        timer_disable_preload(TIM2);
+        timer_continuous_mode(TIM2);
+        timer_set_counter(TIM2, 0);
+        timer_enable_irq(TIM2, TIM_DIER_UIE);
+        nvic_enable_irq(NVIC_TIM2_IRQ);
+        nvic_set_priority(NVIC_TIM2_IRQ, 0);
+
         // enable both counters
         timer_enable_counter(TIM3);
+//        timer_enable_counter(TIM2);
         timer_enable_counter(TIM1);
 }
 
@@ -131,6 +145,10 @@ void set_color(uint8_t color) {
 
 void reset_color(void) {
         GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
+}
+
+void tim2_isr(void) {
+        TIM_SR(TIM2) = 0x0000;
 }
 
 void __attribute__((optimize("O2"))) tim1_cc_isr(void) {
@@ -163,23 +181,95 @@ void __attribute__((optimize("O2"))) tim1_cc_isr(void) {
 //                                        + (pxs_index * BUFFER_BPP)
 //                                );
                 // TODO: macro?
+                //  EDIT: definitely
                 uint32_t pxs = *(uint32_t *) (line + (0 * BUFFER_BPP));
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
                 pxs = *(uint32_t *) (line + (1 * BUFFER_BPP));
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
+                __asm volatile("nop");
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
                 pxs = *(uint32_t *) (line + (2 * BUFFER_BPP));
                 GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
