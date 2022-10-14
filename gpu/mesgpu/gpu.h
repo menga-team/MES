@@ -63,8 +63,8 @@ uint16_t color_palette[1 << BUFFER_BPP]; // 2^BUFFER_BPP
 #define BUFFER_A_ADDRESS 0x20000000
 #define BUFFER_B_ADDRESS 0x20001c20
 
-uint32_t __attribute__((section (".buffer_a"))) buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))];
-uint32_t __attribute__((section (".buffer_b"))) buffer_b[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))];
+uint32_t __attribute__((section (".buffer_a"))) buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))] __attribute__((aligned(32)));
+uint32_t __attribute__((section (".buffer_b"))) buffer_b[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))] __attribute__((aligned(32)));
 uint32_t *front_buffer, *back_buffer;
 
 uint16_t get_port_config_for_color(uint8_t color) {
