@@ -6,6 +6,7 @@
 
 uint16_t buffer_line = 0;
 const void *line;
+uint32_t scan_line[20];
 
 void setup_clock(void);
 

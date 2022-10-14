@@ -54,7 +54,7 @@
 
 // (-4 is trial and error)
 #define RESET_COLOR ((H_SYNC_PULSE_PIXELS / 5 + H_BACK_PORCH_PIXELS / 5 + H_DISPLAY_PIXELS / 5) - 4) // 202-4 (203.2)
-#define START_DRAWING ((H_SYNC_PULSE_PIXELS / 5 + H_BACK_PORCH_PIXELS / 5) - 5) // 42-5 (43.2)
+#define START_DRAWING ((H_SYNC_PULSE_PIXELS / 5 + H_BACK_PORCH_PIXELS / 5) - 7) // 42-7 (43.2)
 
 // the bits per pixel (bpp) define how large the palette can be.
 // colorid => port
