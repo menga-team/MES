@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="50" unitdist="mil" unit="mil" style="dots" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -64,6 +64,7 @@
 <layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
 <layer number="56" name="wert" color="7" fill="1" visible="no" active="no"/>
 <layer number="57" name="tCAD" color="7" fill="1" visible="no" active="no"/>
+<layer number="58" name="bCAD" color="7" fill="1" visible="no" active="no"/>
 <layer number="59" name="tCarbon" color="7" fill="1" visible="no" active="no"/>
 <layer number="60" name="bCarbon" color="7" fill="1" visible="no" active="no"/>
 <layer number="88" name="SimResults" color="9" fill="1" visible="yes" active="yes"/>
@@ -92,8 +93,13 @@
 <layer number="111" name="AC_COMP1" color="14" fill="1" visible="yes" active="yes"/>
 <layer number="112" name="AC_Comp2" color="9" fill="1" visible="yes" active="yes"/>
 <layer number="113" name="ReferenceLS" color="7" fill="1" visible="no" active="no"/>
+<layer number="114" name="Route14" color="7" fill="1" visible="no" active="no"/>
+<layer number="115" name="Route15" color="7" fill="1" visible="no" active="no"/>
 <layer number="116" name="Patch_BOT" color="9" fill="4" visible="yes" active="yes"/>
+<layer number="117" name="mPads" color="7" fill="1" visible="no" active="no"/>
 <layer number="118" name="Rect_Pads" color="7" fill="1" visible="no" active="no"/>
+<layer number="119" name="mUnrouted" color="7" fill="1" visible="no" active="no"/>
+<layer number="120" name="mDimension" color="7" fill="1" visible="no" active="no"/>
 <layer number="121" name="_tsilk" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="122" name="_bsilk" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="123" name="tTestmark" color="7" fill="1" visible="yes" active="yes"/>
@@ -103,15 +109,38 @@
 <layer number="127" name="_tValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="128" name="_bValues" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="129" name="Mask" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="130" name="mbStop" color="7" fill="1" visible="no" active="no"/>
 <layer number="131" name="tAdjust" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="132" name="bAdjust" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="133" name="mtFinish" color="7" fill="1" visible="no" active="no"/>
+<layer number="134" name="mbFinish" color="7" fill="1" visible="no" active="no"/>
+<layer number="135" name="mtGlue" color="7" fill="1" visible="no" active="no"/>
+<layer number="136" name="mbGlue" color="7" fill="1" visible="no" active="no"/>
+<layer number="137" name="mtTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="138" name="mbTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="139" name="mtKeepout" color="7" fill="1" visible="no" active="no"/>
+<layer number="140" name="mbKeepout" color="7" fill="1" visible="no" active="no"/>
+<layer number="141" name="mtRestrict" color="7" fill="1" visible="no" active="no"/>
+<layer number="142" name="mbRestrict" color="7" fill="1" visible="no" active="no"/>
+<layer number="143" name="mvRestrict" color="7" fill="1" visible="no" active="no"/>
 <layer number="144" name="Drill_legend" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="145" name="mHoles" color="7" fill="1" visible="no" active="no"/>
+<layer number="146" name="mMilling" color="7" fill="1" visible="no" active="no"/>
+<layer number="147" name="mMeasures" color="7" fill="1" visible="no" active="no"/>
+<layer number="148" name="mDocument" color="7" fill="1" visible="no" active="no"/>
+<layer number="149" name="mReference" color="7" fill="1" visible="no" active="no"/>
 <layer number="150" name="Notes" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="151" name="HeatSink" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="152" name="_bDocu" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="153" name="FabDoc1" color="6" fill="1" visible="no" active="no"/>
 <layer number="154" name="FabDoc2" color="2" fill="1" visible="no" active="no"/>
 <layer number="155" name="FabDoc3" color="7" fill="15" visible="no" active="no"/>
+<layer number="191" name="mNets" color="7" fill="1" visible="no" active="no"/>
+<layer number="192" name="mBusses" color="7" fill="1" visible="no" active="no"/>
+<layer number="193" name="mPins" color="7" fill="1" visible="no" active="no"/>
+<layer number="194" name="mSymbols" color="7" fill="1" visible="no" active="no"/>
+<layer number="195" name="mNames" color="7" fill="1" visible="no" active="no"/>
+<layer number="196" name="mValues" color="7" fill="1" visible="no" active="no"/>
 <layer number="199" name="Contour" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="200" name="200bmp" color="1" fill="10" visible="no" active="no"/>
 <layer number="201" name="201bmp" color="2" fill="1" visible="no" active="no"/>
@@ -6555,188 +6584,117 @@ Höhe): 12 mm, wenn man den Draht noch dazurechnet ca. 14 mm.</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="con-kycon" urn="urn:adsk.eagle:library:157">
-<description>&lt;b&gt;Connector from KYCON, Inc&lt;/b&gt;&lt;p&gt;
-1810 Little Orchard Street,&lt;br&gt;
-San Jose,&lt;br&gt;
-CA 95125 (408)494-0330&lt;br&gt;
-&lt;author&gt;Created by librarian@cadsoft.de&lt;/autor&gt;</description>
+<library name="Connector_USB" urn="urn:adsk.eagle:library:27510300">
+<description>&lt;b&gt;USB Connectors TypeA, B, C, MiniB, MicroB</description>
 <packages>
-<package name="KUSBVX-BS1N" urn="urn:adsk.eagle:footprint:7676/1" library_version="2">
-<description>&lt;b&gt;USB B-type Receptacle&lt;/b&gt; Vertical, 4 Position, Through Hole&lt;p&gt;
-Source: Sibalco Kycon KUSBVX-BS1N-xxx.pdf</description>
-<wire x1="-5.925" y1="6.405" x2="5.925" y2="6.405" width="0.2032" layer="21"/>
-<wire x1="5.925" y1="6.405" x2="5.925" y2="-4.695" width="0.2032" layer="21"/>
-<wire x1="-5.925" y1="-4.695" x2="-5.925" y2="6.405" width="0.2032" layer="21"/>
-<wire x1="-5.925" y1="-4.695" x2="5.925" y2="-4.695" width="0.2032" layer="21"/>
-<wire x1="2.8715" y1="5.9445" x2="-2.8715" y2="5.9445" width="0.2032" layer="21"/>
-<wire x1="2.8715" y1="5.9445" x2="3.6271" y2="5.6422" width="0.2032" layer="21" curve="-43.609095"/>
-<wire x1="3.6271" y1="5.6422" x2="4.7354" y2="4.5339" width="0.2032" layer="21"/>
-<wire x1="4.7354" y1="4.5339" x2="5.1385" y2="3.5264" width="0.2032" layer="21" curve="-46.385418"/>
-<wire x1="5.1385" y1="3.5264" x2="5.1385" y2="2.4685" width="0.2032" layer="21"/>
-<wire x1="4.7858" y1="1.9143" x2="5.0881" y2="1.9143" width="0.2032" layer="21"/>
-<wire x1="5.0881" y1="1.9143" x2="5.1385" y2="2.4685" width="0.2032" layer="21" curve="169.607414"/>
-<wire x1="4.7354" y1="1.9143" x2="4.7354" y2="3.6775" width="0.2032" layer="21"/>
-<wire x1="4.7354" y1="3.6775" x2="4.4836" y2="4.2317" width="0.2032" layer="21" curve="48.86809"/>
-<wire x1="4.4836" y1="4.2317" x2="3.3753" y2="5.34" width="0.2032" layer="21"/>
-<wire x1="3.3753" y1="5.34" x2="2.8715" y2="5.5415" width="0.2032" layer="21" curve="53.107366"/>
-<wire x1="4.7354" y1="1.9143" x2="4.4332" y2="1.9143" width="0.2032" layer="21"/>
-<wire x1="4.4332" y1="1.9143" x2="4.4332" y2="-1.2594" width="0.2032" layer="21"/>
-<wire x1="4.4332" y1="-1.2594" x2="5.0881" y2="-1.2594" width="0.2032" layer="21"/>
-<wire x1="5.0881" y1="-1.2594" x2="5.1385" y2="-1.7632" width="0.2032" layer="21" curve="-168.57431"/>
-<wire x1="5.1385" y1="-1.7632" x2="5.1385" y2="-2.8211" width="0.2032" layer="21"/>
-<wire x1="5.1385" y1="-2.8211" x2="4.3828" y2="-3.5768" width="0.2032" layer="21" curve="-90"/>
-<wire x1="4.282" y1="-3.1738" x2="-4.282" y2="-3.1738" width="0.2032" layer="21"/>
-<wire x1="4.282" y1="-3.1738" x2="4.7354" y2="-2.7204" width="0.2032" layer="21" curve="90"/>
-<wire x1="4.7354" y1="-2.7204" x2="4.7354" y2="-1.3098" width="0.2032" layer="21"/>
-<wire x1="-2.7204" y1="2.67" x2="2.7707" y2="2.67" width="0.2032" layer="51"/>
-<wire x1="2.7707" y1="2.67" x2="2.7707" y2="-0.3023" width="0.2032" layer="21"/>
-<wire x1="2.7707" y1="-0.3023" x2="-2.7204" y2="-0.3023" width="0.2032" layer="51"/>
-<wire x1="-2.7204" y1="-0.3023" x2="-2.7204" y2="2.67" width="0.2032" layer="21"/>
-<wire x1="-2.7204" y1="2.67" x2="-2.1662" y2="2.267" width="0.2032" layer="21"/>
-<wire x1="-2.1662" y1="2.267" x2="2.2166" y2="2.267" width="0.2032" layer="51"/>
-<wire x1="2.2166" y1="2.267" x2="2.2166" y2="0.1008" width="0.2032" layer="21"/>
-<wire x1="2.2166" y1="0.1008" x2="-2.1662" y2="0.1008" width="0.2032" layer="51"/>
-<wire x1="-2.1662" y1="0.1008" x2="-2.1662" y2="2.267" width="0.2032" layer="21"/>
-<wire x1="-2.7204" y1="-0.3023" x2="-2.1662" y2="0.1008" width="0.2032" layer="21"/>
-<wire x1="2.7707" y1="-0.3023" x2="2.2166" y2="0.1008" width="0.2032" layer="21"/>
-<wire x1="2.7707" y1="2.67" x2="2.2166" y2="2.267" width="0.2032" layer="21"/>
-<wire x1="-2.8715" y1="5.9445" x2="-3.6271" y2="5.6422" width="0.2032" layer="21" curve="43.609095"/>
-<wire x1="-3.6271" y1="5.6422" x2="-4.7354" y2="4.5339" width="0.2032" layer="21"/>
-<wire x1="-4.7354" y1="4.5339" x2="-5.1385" y2="3.5264" width="0.2032" layer="21" curve="46.385418"/>
-<wire x1="-5.1385" y1="3.5264" x2="-5.1385" y2="2.4685" width="0.2032" layer="21"/>
-<wire x1="-4.7858" y1="1.9143" x2="-5.0881" y2="1.9143" width="0.2032" layer="21"/>
-<wire x1="-5.0881" y1="1.9143" x2="-5.1385" y2="2.4685" width="0.2032" layer="21" curve="-169.607414"/>
-<wire x1="-4.7354" y1="1.9143" x2="-4.7354" y2="3.6775" width="0.2032" layer="21"/>
-<wire x1="-4.7354" y1="3.6775" x2="-4.4836" y2="4.2317" width="0.2032" layer="21" curve="-48.86809"/>
-<wire x1="-4.4836" y1="4.2317" x2="-3.3753" y2="5.34" width="0.2032" layer="21"/>
-<wire x1="-3.3753" y1="5.34" x2="-2.8715" y2="5.5415" width="0.2032" layer="21" curve="-53.107366"/>
-<wire x1="-2.8715" y1="5.5415" x2="2.8715" y2="5.5415" width="0.2032" layer="21"/>
-<wire x1="-4.7354" y1="1.9143" x2="-4.4332" y2="1.9143" width="0.2032" layer="21"/>
-<wire x1="-4.4332" y1="1.9143" x2="-4.4332" y2="-1.2594" width="0.2032" layer="21"/>
-<wire x1="-4.4332" y1="-1.2594" x2="-5.0881" y2="-1.2594" width="0.2032" layer="21"/>
-<wire x1="-5.0881" y1="-1.2594" x2="-5.1385" y2="-1.7632" width="0.2032" layer="21" curve="168.57431"/>
-<wire x1="-5.1385" y1="-1.7632" x2="-5.1385" y2="-2.8211" width="0.2032" layer="21"/>
-<wire x1="-5.1385" y1="-2.8211" x2="-4.3828" y2="-3.5768" width="0.2032" layer="21" curve="90"/>
-<wire x1="-4.3828" y1="-3.5768" x2="4.3828" y2="-3.5768" width="0.2032" layer="21"/>
-<wire x1="-4.282" y1="-3.1738" x2="-4.7354" y2="-2.7204" width="0.2032" layer="21" curve="-90"/>
-<wire x1="-4.7354" y1="-2.7204" x2="-4.7354" y2="-1.3098" width="0.2032" layer="21"/>
-<pad name="1" x="1.25" y="2.7" drill="0.9" diameter="1.4224"/>
-<pad name="2" x="-1.25" y="2.7" drill="0.9" diameter="1.4224"/>
-<pad name="3" x="-1.25" y="-0.5" drill="0.9" diameter="1.4224"/>
-<pad name="4" x="1.25" y="-0.5" drill="0.9" diameter="1.4224"/>
-<pad name="M1" x="-6.02" y="0" drill="2.3" diameter="2.7"/>
-<pad name="M2" x="6.02" y="0" drill="2.3" diameter="2.7"/>
-<text x="-6" y="7" size="1.27" layer="25">&gt;NAME</text>
-<text x="-6" y="-6.5" size="1.27" layer="27">&gt;VALUE</text>
-<text x="1.5" y="1.5" size="0.6096" layer="21" font="vector">1</text>
-<text x="-1" y="1.5" size="0.6096" layer="21" font="vector">2</text>
-<text x="-1.75" y="0.25" size="0.6096" layer="21" font="vector">3</text>
-<text x="0.5" y="0.25" size="0.6096" layer="21" font="vector">4</text>
-<rectangle x1="-1.7632" y1="2.67" x2="-0.7053" y2="3.879" layer="51"/>
-<rectangle x1="0.7557" y1="2.67" x2="1.8136" y2="3.879" layer="51"/>
-<rectangle x1="-1.7632" y1="-1.5113" x2="-0.7053" y2="-0.3023" layer="51"/>
-<rectangle x1="0.7557" y1="-1.5113" x2="1.8136" y2="-0.3023" layer="51"/>
+<package name="61729-1011BLF" urn="urn:adsk.eagle:footprint:27659477/1" library_version="17">
+<text x="0" y="9" size="1.270759375" layer="25" align="center">&gt;NAME</text>
+<text x="0" y="7.5" size="1.27003125" layer="27" align="center">&gt;VALUE</text>
+<pad name="SH1" x="-6.02" y="0" drill="2.3"/>
+<pad name="SH2" x="6.02" y="0" drill="2.3"/>
+<pad name="2" x="-1.25" y="4.71" drill="0.92"/>
+<pad name="3" x="-1.25" y="2.71" drill="0.92"/>
+<pad name="1" x="1.25" y="4.71" drill="0.92" shape="square"/>
+<pad name="4" x="1.25" y="2.71" drill="0.92"/>
+<wire x1="-6.1" y1="5.72" x2="-6.1" y2="-10.28" width="0.127" layer="51"/>
+<wire x1="-6.1" y1="-10.28" x2="6.1" y2="-10.28" width="0.127" layer="51"/>
+<wire x1="6.1" y1="-10.28" x2="6.1" y2="5.72" width="0.127" layer="51"/>
+<wire x1="6.1" y1="5.72" x2="-6.1" y2="5.72" width="0.127" layer="51"/>
+<wire x1="-6.1" y1="2.54" x2="-6.1" y2="5.72" width="0.127" layer="21"/>
+<wire x1="-6.1" y1="5.72" x2="6.1" y2="5.72" width="0.127" layer="21"/>
+<wire x1="6.1" y1="5.72" x2="6.1" y2="2.54" width="0.127" layer="21"/>
+<wire x1="-6.1" y1="-2.54" x2="-6.1" y2="-10.28" width="0.127" layer="21"/>
+<wire x1="-6.1" y1="-10.28" x2="6.1" y2="-10.28" width="0.127" layer="21"/>
+<wire x1="6.1" y1="-10.28" x2="6.1" y2="-2.54" width="0.127" layer="21"/>
+<wire x1="-6.35" y1="5.97" x2="6.35" y2="5.97" width="0.05" layer="39"/>
+<wire x1="6.35" y1="5.97" x2="6.35" y2="1.9" width="0.05" layer="39"/>
+<wire x1="6.35" y1="1.9" x2="7.9" y2="1.9" width="0.05" layer="39"/>
+<wire x1="7.9" y1="1.9" x2="7.9" y2="-1.9" width="0.05" layer="39"/>
+<wire x1="7.9" y1="-1.9" x2="6.35" y2="-1.9" width="0.05" layer="39"/>
+<wire x1="6.35" y1="-1.9" x2="6.35" y2="-10.53" width="0.05" layer="39"/>
+<wire x1="6.35" y1="-10.53" x2="-6.35" y2="-10.53" width="0.05" layer="39"/>
+<wire x1="-6.35" y1="-10.53" x2="-6.35" y2="-1.9" width="0.05" layer="39"/>
+<wire x1="-6.35" y1="-1.9" x2="-7.9" y2="-1.9" width="0.05" layer="39"/>
+<wire x1="-7.9" y1="-1.9" x2="-7.9" y2="1.9" width="0.05" layer="39"/>
+<wire x1="-7.9" y1="1.9" x2="-6.35" y2="1.9" width="0.05" layer="39"/>
+<wire x1="-6.35" y1="1.9" x2="-6.35" y2="5.97" width="0.05" layer="39"/>
+<circle x="1.25" y="6.25" radius="0.1" width="0.2" layer="21"/>
 </package>
 </packages>
 <packages3d>
-<package3d name="KUSBVX-BS1N" urn="urn:adsk.eagle:package:7681/1" type="box" library_version="2">
-<description>USB B-type Receptacle Vertical, 4 Position, Through Hole
-Source: Sibalco Kycon KUSBVX-BS1N-xxx.pdf</description>
+<package3d name="61729-1011BLF" urn="urn:adsk.eagle:package:27659501/2" type="model" library_version="17">
 <packageinstances>
-<packageinstance name="KUSBVX-BS1N"/>
+<packageinstance name="61729-1011BLF"/>
 </packageinstances>
 </package3d>
 </packages3d>
 <symbols>
-<symbol name="USB" urn="urn:adsk.eagle:symbol:7674/1" library_version="2">
-<wire x1="-0.635" y1="5.588" x2="-2.159" y2="5.588" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="5.588" x2="-2.159" y2="5.08" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="5.08" x2="-2.159" y2="4.572" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="4.572" x2="-0.635" y2="4.572" width="0.254" layer="94"/>
-<wire x1="-0.635" y1="3.048" x2="-2.159" y2="3.048" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="3.048" x2="-2.159" y2="2.54" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="2.54" x2="-2.159" y2="2.032" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="2.032" x2="-0.635" y2="2.032" width="0.254" layer="94"/>
-<wire x1="-0.635" y1="0.508" x2="-2.159" y2="0.508" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="0.508" x2="-2.159" y2="0" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="0" x2="-2.159" y2="-0.508" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="-0.508" x2="-0.635" y2="-0.508" width="0.254" layer="94"/>
-<wire x1="-0.635" y1="-2.032" x2="-2.159" y2="-2.032" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="-2.032" x2="-2.159" y2="-2.54" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="-2.54" x2="-2.159" y2="-3.048" width="0.254" layer="94"/>
-<wire x1="-2.159" y1="-3.048" x2="-0.635" y2="-3.048" width="0.254" layer="94"/>
-<wire x1="-2.54" y1="-5.08" x2="-1.905" y2="-5.08" width="0.127" layer="94"/>
-<wire x1="-1.524" y1="-5.08" x2="-0.762" y2="-5.08" width="0.127" layer="94"/>
-<wire x1="-0.254" y1="-5.08" x2="0.508" y2="-5.08" width="0.127" layer="94"/>
-<wire x1="0.508" y1="-5.08" x2="0.508" y2="-4.572" width="0.127" layer="94"/>
-<wire x1="0.508" y1="4.826" x2="0.508" y2="5.334" width="0.127" layer="94"/>
-<wire x1="0.508" y1="5.842" x2="0.508" y2="6.35" width="0.127" layer="94"/>
-<wire x1="0.508" y1="6.35" x2="0" y2="6.35" width="0.127" layer="94"/>
-<wire x1="-0.635" y1="6.35" x2="-1.27" y2="6.35" width="0.127" layer="94"/>
-<wire x1="-1.905" y1="6.35" x2="-2.54" y2="6.35" width="0.127" layer="94"/>
-<wire x1="-2.54" y1="6.35" x2="-2.54" y2="5.588" width="0.127" layer="94"/>
-<wire x1="-2.54" y1="4.572" x2="-2.54" y2="3.048" width="0.127" layer="94"/>
-<wire x1="-2.54" y1="2.032" x2="-2.54" y2="0.508" width="0.127" layer="94"/>
-<wire x1="-2.54" y1="-0.508" x2="-2.54" y2="-2.032" width="0.127" layer="94"/>
-<wire x1="-2.54" y1="-3.048" x2="-2.54" y2="-5.08" width="0.127" layer="94"/>
-<wire x1="2.032" y1="-2.413" x2="4.572" y2="-2.413" width="0.1998" layer="94"/>
-<wire x1="4.572" y1="-2.413" x2="4.572" y2="-1.778" width="0.1998" layer="94"/>
-<wire x1="4.572" y1="-1.778" x2="4.953" y2="-1.778" width="0.1998" layer="94"/>
-<wire x1="4.953" y1="-1.778" x2="4.953" y2="2.032" width="0.1998" layer="94"/>
-<wire x1="4.953" y1="2.032" x2="4.572" y2="2.032" width="0.1998" layer="94"/>
-<wire x1="4.572" y1="2.032" x2="4.572" y2="2.794" width="0.1998" layer="94"/>
-<wire x1="4.572" y1="2.794" x2="2.032" y2="2.794" width="0.1998" layer="94"/>
-<wire x1="0.508" y1="3.556" x2="0.508" y2="4.064" width="0.127" layer="94"/>
-<wire x1="0.508" y1="2.286" x2="0.508" y2="2.794" width="0.127" layer="94"/>
-<wire x1="0.508" y1="1.016" x2="0.508" y2="1.524" width="0.127" layer="94"/>
-<wire x1="0.508" y1="-0.254" x2="0.508" y2="0.254" width="0.127" layer="94"/>
-<wire x1="0.508" y1="-1.524" x2="0.508" y2="-1.016" width="0.127" layer="94"/>
-<wire x1="0.508" y1="-2.794" x2="0.508" y2="-2.286" width="0.127" layer="94"/>
-<wire x1="0.508" y1="-4.064" x2="0.508" y2="-3.556" width="0.127" layer="94"/>
-<wire x1="2.032" y1="2.794" x2="2.032" y2="2.032" width="0.1998" layer="94"/>
-<wire x1="2.032" y1="2.032" x2="1.651" y2="2.032" width="0.1998" layer="94"/>
-<wire x1="1.651" y1="2.032" x2="1.651" y2="-1.778" width="0.1998" layer="94"/>
-<wire x1="1.651" y1="-1.778" x2="2.032" y2="-1.778" width="0.1998" layer="94"/>
-<wire x1="2.032" y1="-1.778" x2="2.032" y2="-2.413" width="0.1998" layer="94"/>
-<wire x1="-2.54" y1="-2.54" x2="-2.159" y2="-2.54" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="0" x2="-2.159" y2="0" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="2.54" x2="-2.159" y2="2.54" width="0.1524" layer="94"/>
-<wire x1="-2.54" y1="5.08" x2="-2.159" y2="5.08" width="0.1524" layer="94"/>
-<text x="1.27" y="5.588" size="1.778" layer="95">&gt;NAME</text>
-<text x="1.27" y="-5.842" size="1.778" layer="96">&gt;VALUE</text>
-<text x="3.937" y="-1.397" size="1.27" layer="94" rot="R90">USB</text>
-<pin name="1" x="-5.08" y="5.08" visible="pad" length="short" direction="pas" swaplevel="1"/>
-<pin name="2" x="-5.08" y="2.54" visible="pad" length="short" direction="pas" swaplevel="1"/>
-<pin name="3" x="-5.08" y="0" visible="pad" length="short" direction="pas" swaplevel="1"/>
-<pin name="4" x="-5.08" y="-2.54" visible="pad" length="short" direction="pas" swaplevel="1"/>
-<pin name="S2" x="0" y="-7.62" visible="off" length="short" direction="pas" swaplevel="2" rot="R90"/>
-<pin name="S1" x="-2.54" y="-7.62" visible="off" length="short" direction="pas" swaplevel="2" rot="R90"/>
+<symbol name="USB_4N" urn="urn:adsk.eagle:symbol:27659483/1" library_version="17">
+<wire x1="-7.62" y1="10.16" x2="7.62" y2="10.16" width="0.254" layer="94"/>
+<wire x1="7.62" y1="10.16" x2="7.62" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="7.62" y1="-10.16" x2="-7.62" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="-7.62" y1="-10.16" x2="-7.62" y2="10.16" width="0.254" layer="94"/>
+<wire x1="1.46" y1="0" x2="1.96" y2="0" width="0.254" layer="94"/>
+<wire x1="1.96" y1="0" x2="2.46" y2="0" width="0.254" layer="94"/>
+<wire x1="2.46" y1="0" x2="3.96" y2="1.5" width="0.254" layer="94"/>
+<wire x1="3.96" y1="1.5" x2="4.96" y2="1.5" width="0.254" layer="94"/>
+<wire x1="2.46" y1="0" x2="6.46" y2="0" width="0.254" layer="94"/>
+<wire x1="1.96" y1="0" x2="3.46" y2="-1.5" width="0.254" layer="94"/>
+<wire x1="5.96" y1="0.5" x2="6.46" y2="0" width="0.254" layer="94"/>
+<wire x1="6.46" y1="0" x2="5.96" y2="-0.5" width="0.254" layer="94"/>
+<wire x1="3.46" y1="-1.5" x2="4.96" y2="-1.5" width="0.254" layer="94"/>
+<wire x1="5.96" y1="0.5" x2="5.96" y2="-0.5" width="0.254" layer="94"/>
+<text x="0" y="12.7" size="1.778" layer="95" align="center">&gt;NAME</text>
+<text x="0" y="-12.7" size="1.778" layer="96" align="center">&gt;VALUE</text>
+<pin name="VCC" x="-10.16" y="7.62" length="short" direction="pwr"/>
+<pin name="D-" x="-10.16" y="5.08" length="short"/>
+<pin name="D+" x="-10.16" y="2.54" length="short"/>
+<pin name="GND" x="-10.16" y="0" length="short" direction="pwr"/>
+<pin name="SHIELD1" x="-10.16" y="-5.08" length="short" direction="sup"/>
+<pin name="SHIELD2" x="-10.16" y="-7.62" length="short" direction="sup"/>
+<circle x="0.96" y="0" radius="0.3" width="0.5" layer="94"/>
+<circle x="5.46" y="1.5" radius="0.3" width="0.5" layer="94"/>
+<rectangle x1="4.96" y1="-2" x2="5.96" y2="-1" layer="94"/>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="KUSBVX-BS1N" urn="urn:adsk.eagle:component:7686/2" prefix="X" library_version="2">
-<description>&lt;b&gt;USB B-type Receptacle&lt;/b&gt; Vertical, 4 Position, Through Hole&lt;p&gt;
-Source: Sibalco Kycon KUSBVX-BS1N-xxx.pdf</description>
+<deviceset name="61729-1011" urn="urn:adsk.eagle:component:27659503/4" prefix="J" library_version="17">
+<description>USB(2.0) Type-B, RCPT, 4POS, THT-R/A
+
+&lt;br&gt;&lt;a href="https://www.amphenol-icc.com/media/wysiwyg/files/drawing/61729.pdf"&gt;Datasheet&lt;/a&gt;</description>
 <gates>
-<gate name="G$1" symbol="USB" x="0" y="0"/>
+<gate name="G$1" symbol="USB_4N" x="0" y="0"/>
 </gates>
 <devices>
-<device name="" package="KUSBVX-BS1N">
+<device name="" package="61729-1011BLF">
 <connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-<connect gate="G$1" pin="3" pad="3"/>
-<connect gate="G$1" pin="4" pad="4"/>
-<connect gate="G$1" pin="S1" pad="M1"/>
-<connect gate="G$1" pin="S2" pad="M2"/>
+<connect gate="G$1" pin="D+" pad="3"/>
+<connect gate="G$1" pin="D-" pad="2"/>
+<connect gate="G$1" pin="GND" pad="4"/>
+<connect gate="G$1" pin="SHIELD1" pad="SH1"/>
+<connect gate="G$1" pin="SHIELD2" pad="SH2"/>
+<connect gate="G$1" pin="VCC" pad="1"/>
 </connects>
 <package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:7681/1"/>
+<package3dinstance package3d_urn="urn:adsk.eagle:package:27659501/2"/>
 </package3dinstances>
 <technologies>
 <technology name="">
-<attribute name="POPULARITY" value="0" constant="no"/>
+<attribute name="CATEGORY" value="Connector" constant="no"/>
+<attribute name="CONTACTS" value="4" constant="no"/>
+<attribute name="CURRENT_RATING" value="1A" constant="no"/>
+<attribute name="DESCRIPTION" value="CONN RCPT USB2.0 TYPEB 4POS R/A" constant="no"/>
+<attribute name="GENDER" value="Receptacle" constant="no"/>
+<attribute name="MANUFACTURER" value="Amphenol ICC (FCI)" constant="no"/>
+<attribute name="MOUNT_TYPE" value="R/A" constant="no"/>
+<attribute name="MPN" value="61729-1011BLF" constant="no"/>
+<attribute name="OPERATING_TEMP" value="-55°C to 85°C " constant="no"/>
+<attribute name="PART_STATUS" value="Active" constant="no"/>
+<attribute name="ROHS_COMPLIANT" value="RoHS Compliant" constant="no"/>
+<attribute name="SERIES" value="61729" constant="no"/>
+<attribute name="SUB-CATEGORY" value="USB" constant="no"/>
+<attribute name="TYPE" value="USB-B" constant="no"/>
+<attribute name="VOLTAGE_RATING" value="" constant="no"/>
 </technology>
 </technologies>
 </device>
@@ -6778,9 +6736,6 @@ Source: Sibalco Kycon KUSBVX-BS1N-xxx.pdf</description>
 <part name="U$49" library="deto" deviceset="GND" device=""/>
 <part name="NOT_01" library="74xx-eu" library_urn="urn:adsk.eagle:library:85" deviceset="74*04" device="D" package3d_urn="urn:adsk.eagle:package:1010/2" technology="HC"/>
 <part name="AND_01" library="74xx-eu" library_urn="urn:adsk.eagle:library:85" deviceset="74*08" device="D" package3d_urn="urn:adsk.eagle:package:1010/2" technology="HC"/>
-<part name="GND3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="GND4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
-<part name="X1" library="con-kycon" library_urn="urn:adsk.eagle:library:157" deviceset="KUSBVX-BS1N" device="" package3d_urn="urn:adsk.eagle:package:7681/1"/>
 <part name="R12" library="deto" deviceset="R" device="2" value="Ferrit"/>
 <part name="C9" library="deto" deviceset="C" device="1" value="100nF"/>
 <part name="+3V1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
@@ -6790,6 +6745,7 @@ Source: Sibalco Kycon KUSBVX-BS1N-xxx.pdf</description>
 <part name="+3V3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
 <part name="+3V4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
 <part name="+3V5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
+<part name="J1" library="Connector_USB" library_urn="urn:adsk.eagle:library:27510300" deviceset="61729-1011" device="" package3d_urn="urn:adsk.eagle:package:27659501/2"/>
 </parts>
 <sheets>
 <sheet>
@@ -7162,16 +7118,6 @@ Source: Sibalco Kycon KUSBVX-BS1N-xxx.pdf</description>
 <attribute name="NAME" x="108.204" y="152.781" size="1.778" layer="95"/>
 <attribute name="VALUE" x="108.204" y="147.701" size="1.778" layer="96"/>
 </instance>
-<instance part="GND3" gate="1" x="237.49" y="142.24" smashed="yes">
-<attribute name="VALUE" x="233.68" y="139.7" size="1.778" layer="96"/>
-</instance>
-<instance part="GND4" gate="1" x="240.03" y="142.24" smashed="yes">
-<attribute name="VALUE" x="240.03" y="139.7" size="1.778" layer="96"/>
-</instance>
-<instance part="X1" gate="G$1" x="240.03" y="154.94" smashed="yes">
-<attribute name="NAME" x="241.3" y="160.528" size="1.778" layer="95"/>
-<attribute name="VALUE" x="241.3" y="149.098" size="1.778" layer="96"/>
-</instance>
 <instance part="R12" gate="G$1" x="220.98" y="163.83" smashed="yes" rot="R180">
 <attribute name="NAME" x="218.44" y="163.5125" size="0.8128" layer="95" rot="R180"/>
 <attribute name="VALUE" x="223.2025" y="164.1475" size="0.8128" layer="96" rot="R180"/>
@@ -7186,11 +7132,15 @@ Source: Sibalco Kycon KUSBVX-BS1N-xxx.pdf</description>
 <instance part="GND6" gate="1" x="213.36" y="147.32" smashed="yes">
 <attribute name="VALUE" x="210.82" y="144.78" size="1.778" layer="96"/>
 </instance>
-<instance part="GND5" gate="1" x="232.41" y="147.32" smashed="yes">
-<attribute name="VALUE" x="229.87" y="144.78" size="1.778" layer="96"/>
+<instance part="GND5" gate="1" x="232.41" y="142.24" smashed="yes">
+<attribute name="VALUE" x="229.87" y="139.7" size="1.778" layer="96"/>
 </instance>
 <instance part="+3V2" gate="G$1" x="25.4" y="163.83" smashed="yes">
 <attribute name="VALUE" x="22.86" y="158.75" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="J1" gate="G$1" x="245.11" y="156.21" smashed="yes">
+<attribute name="NAME" x="245.11" y="168.91" size="1.778" layer="95" align="center"/>
+<attribute name="VALUE" x="245.11" y="143.51" size="1.778" layer="96" align="center"/>
 </instance>
 </instances>
 <busses>
@@ -7225,29 +7175,9 @@ Source: Sibalco Kycon KUSBVX-BS1N-xxx.pdf</description>
 <junction x="99.06" y="143.51"/>
 </segment>
 <segment>
-<pinref part="GND4" gate="1" pin="GND"/>
-<wire x1="240.03" y1="147.32" x2="240.03" y2="144.78" width="0.1524" layer="91"/>
-<pinref part="X1" gate="G$1" pin="S2"/>
-</segment>
-<segment>
-<pinref part="GND3" gate="1" pin="GND"/>
-<wire x1="237.49" y1="147.32" x2="237.49" y2="144.78" width="0.1524" layer="91"/>
-<pinref part="X1" gate="G$1" pin="S1"/>
-</segment>
-<segment>
 <pinref part="C9" gate="G$1" pin="1"/>
 <wire x1="213.36" y1="149.86" x2="213.36" y2="151.13" width="0.1524" layer="91"/>
 <pinref part="GND6" gate="1" pin="GND"/>
-</segment>
-<segment>
-<wire x1="232.41" y1="149.86" x2="232.41" y2="152.4" width="0.1524" layer="91"/>
-<pinref part="X1" gate="G$1" pin="4"/>
-<wire x1="232.41" y1="152.4" x2="234.95" y2="152.4" width="0.1524" layer="91"/>
-<pinref part="X1" gate="G$1" pin="3"/>
-<wire x1="234.95" y1="154.94" x2="232.41" y2="154.94" width="0.1524" layer="91"/>
-<wire x1="232.41" y1="154.94" x2="232.41" y2="152.4" width="0.1524" layer="91"/>
-<junction x="232.41" y="152.4"/>
-<pinref part="GND5" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="+3.3V" class="0">
@@ -7293,18 +7223,32 @@ Source: Sibalco Kycon KUSBVX-BS1N-xxx.pdf</description>
 </net>
 <net name="N$1" class="0">
 <segment>
-<pinref part="X1" gate="G$1" pin="1"/>
-<wire x1="232.41" y1="160.02" x2="234.95" y2="160.02" width="0.1524" layer="91"/>
-<wire x1="232.41" y1="160.02" x2="232.41" y2="163.83" width="0.1524" layer="91"/>
 <pinref part="R12" gate="G$1" pin="1"/>
-<wire x1="232.41" y1="163.83" x2="226.06" y2="163.83" width="0.1524" layer="91"/>
+<wire x1="234.95" y1="163.83" x2="226.06" y2="163.83" width="0.1524" layer="91"/>
+<pinref part="J1" gate="G$1" pin="VCC"/>
 </segment>
 </net>
 <net name="SIGNAL_OUT" class="0">
 <segment>
-<pinref part="X1" gate="G$1" pin="2"/>
-<wire x1="234.95" y1="157.48" x2="232.41" y2="157.48" width="0.1524" layer="91"/>
-<label x="232.41" y="157.48" size="0.8128" layer="95" rot="R180" xref="yes"/>
+<wire x1="234.95" y1="158.75" x2="232.41" y2="158.75" width="0.1524" layer="91"/>
+<label x="232.41" y="158.75" size="0.8128" layer="95" rot="R180" xref="yes"/>
+<pinref part="J1" gate="G$1" pin="D+"/>
+</segment>
+</net>
+<net name="SHIELD1" class="0">
+<segment>
+<wire x1="232.41" y1="144.78" x2="232.41" y2="148.59" width="0.1524" layer="91"/>
+<wire x1="232.41" y1="148.59" x2="232.41" y2="151.13" width="0.1524" layer="91"/>
+<wire x1="232.41" y1="151.13" x2="234.95" y2="151.13" width="0.1524" layer="91"/>
+<wire x1="234.95" y1="156.21" x2="232.41" y2="156.21" width="0.1524" layer="91"/>
+<wire x1="232.41" y1="156.21" x2="232.41" y2="151.13" width="0.1524" layer="91"/>
+<junction x="232.41" y="151.13"/>
+<pinref part="GND5" gate="1" pin="GND"/>
+<pinref part="J1" gate="G$1" pin="GND"/>
+<pinref part="J1" gate="G$1" pin="SHIELD1"/>
+<pinref part="J1" gate="G$1" pin="SHIELD2"/>
+<wire x1="232.41" y1="148.59" x2="234.95" y2="148.59" width="0.1524" layer="91"/>
+<junction x="232.41" y="148.59"/>
 </segment>
 </net>
 </nets>
