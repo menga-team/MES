@@ -1,19 +1,24 @@
 #include <stdint.h>
 #include <libopencm3/stm32/gpio.h>
 
-
 #ifndef MES_MAIN_H
 #define MES_MAIN_H
 
-static void setup_clock(void);
+uint16_t buffer_line = 0;
+const void *line;
+uint32_t scan_line[20];
 
-static void setup_output(void);
+void setup_clock(void);
 
-static void start_video(void);
+void setup_output(void);
 
-static void set_color(uint8_t color);
+void setup_video(void);
 
-static void reset_color(void);
+void start_video(void);
+
+void set_color(uint8_t color);
+
+void reset_color(void);
 
 int main(void);
 

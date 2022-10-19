@@ -10,28 +10,17 @@ int main(void) {
         setup_clock();
         setup_output();
         gpu_init();
-        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++) {
-                gpu_set_pixel(front_buffer, i, 0b110);
-        }
-        gpu_set_pixel(front_buffer, 0, 0b111);
-        gpu_set_pixel(front_buffer, 1, 0b111);
-        gpu_set_pixel(front_buffer, 2, 0b111);
-        gpu_set_pixel(front_buffer, 3, 0b111);
-        gpu_set_pixel(front_buffer, 4, 0b111);
-        gpu_set_pixel(front_buffer, 5, 0b111);
-        gpu_set_pixel(front_buffer, 6, 0b111);
-        gpu_set_pixel(front_buffer, 7, 0b111);
-
+        setup_video();
         start_video();
         while (1);
         return 0;
 }
 
-static void setup_clock(void) {
+void setup_clock(void) {
         rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
 }
 
-static void setup_output(void) {
+void setup_output(void) {
         rcc_periph_clock_enable(RCC_AFIO);
         rcc_periph_clock_enable(RCC_GPIOA);
         rcc_periph_clock_enable(RCC_GPIOB);
@@ -49,7 +38,15 @@ static void setup_output(void) {
         reset_color();
 }
 
-static void start_video(void) {
+void setup_video(void) {
+        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
+                gpu_set_pixel(buffer_a, i, i % 8);
+        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
+                gpu_set_pixel(buffer_b, i, i + (i / 3) % 8);
+//        gpu_swap_buffers();
+}
+
+void start_video(void) {
         // timers are driven by a 72MHz clock
         // TIM1 -> Horizontal sync
         rcc_periph_clock_enable(RCC_TIM1);
@@ -71,7 +68,7 @@ static void start_video(void) {
         if (H_SYNC_POLARITY) timer_set_oc_polarity_high(TIM1, TIM_OC1);
         else timer_set_oc_polarity_low(TIM1, TIM_OC1);
         nvic_enable_irq(NVIC_TIM1_CC_IRQ);
-        nvic_set_priority(NVIC_TIM1_CC_IRQ, 0);
+        nvic_set_priority(NVIC_TIM1_CC_IRQ, 1);
         // OC2 is responsible to reset the color, some monitors will base their black voltage level off the voltage
         // in the back porch, this means we can't send any colors in this period.
         timer_set_oc_value(TIM1, TIM_OC2, RESET_COLOR);
@@ -86,7 +83,7 @@ static void start_video(void) {
         timer_set_mode(TIM3, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
         // +6 is trial and error, because our hsync is not perfect we also need to change the vsync up a bit.
         timer_set_prescaler(TIM3, uround(rcc_apb2_frequency / (PIXEL_CLOCK / (double) H_WHOLE_LINE_PIXELS)) + 6);
-        timer_set_period(TIM3, V_WHOLE_FRAME_LINES);
+        timer_set_period(TIM3, V_WHOLE_FRAME_LINES - 1);
         timer_disable_preload(TIM3);
         timer_continuous_mode(TIM3);
         timer_set_oc_value(TIM3, TIM_OC1, V_SYNC_PULSE_LINES);
@@ -97,42 +94,63 @@ static void start_video(void) {
         if (V_SYNC_POLARITY) timer_set_oc_polarity_high(TIM3, TIM_OC1);
         else timer_set_oc_polarity_low(TIM3, TIM_OC1);
 
+        // TIM2 -> Pixel clock
+        rcc_periph_clock_enable(RCC_TIM2);
+        rcc_periph_reset_pulse(RST_TIM2);
+        timer_set_mode(TIM2, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+        timer_set_prescaler(TIM2, uround(rcc_apb2_frequency / (PIXEL_CLOCK / (double) BUFFER_TO_VIDEO_RATIO)) - 1);
+        timer_set_period(TIM2, 2);
+        timer_disable_preload(TIM2);
+        timer_continuous_mode(TIM2);
+        timer_set_counter(TIM2, 0);
+        timer_enable_irq(TIM2, TIM_DIER_UIE);
+
         // enable both counters
         timer_enable_counter(TIM3);
+//        timer_enable_counter(TIM2);
         timer_enable_counter(TIM1);
 }
 
-static void set_color(uint8_t color) {
+void set_color(uint8_t color) {
         uint16_t port = get_port_config_for_color(color);
         GPIO_ODR(GPIO_COLOR_PORT) = port;
 }
 
-static void reset_color(void) {
+void reset_color(void) {
         GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
 }
 
-uint16_t n_line = 0;
+void tim2_isr(void) {
+        TIM_SR(TIM2) = 0x0000;
+}
 
-void __attribute__((optimize("O3"))) tim1_cc_isr(void) {
+uint32_t pxs;
+const void *adr;
+
+void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
         if ((TIM_SR(TIM1) & TIM_SR_CC2IF) != 0) {
                 TIM_SR(TIM1) = 0x0000;
                 reset_color();
                 // we have some spare time until the next interrupt ~970ns
-                //prepare_scanline();
-                n_line = (TIM3_CNT);
+                buffer_line = (TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 1) / 5;
+                if (buffer_line >= BUFFER_HEIGHT) buffer_line = 0;
+                //line = (const void *) front_buffer + (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
+                // this is faster than using the pointer (or is it???)
+                switch ((uint32_t) front_buffer) {
+                        case BUFFER_A_ADDRESS:
+                                line = (const void *) BUFFER_A_ADDRESS +
+                                       (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
+                                break;
+                        case BUFFER_B_ADDRESS:
+                                line = (const void *) BUFFER_B_ADDRESS +
+                                       (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
+                }
+                for (uint8_t i = 0; i < 20; ++i) {
+                        scan_line[i] = *(uint32_t *) (line + (i * BUFFER_BPP));
+                }
         } else {
                 TIM_SR(TIM1) = 0x0000;
-                for (uint8_t byte_index = 0; byte_index < (uint8_t) (BUFFER_WIDTH / 8); ++byte_index) {
-                        uint32_t bytes = (*(uint32_t *) ((const void *) front_buffer + (n_line * (BUFFER_WIDTH / 8)) +
-                                                         byte_index * BUFFER_BPP));
-                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                        GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(bytes >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                }
+
+#include "scanline.inc"
         }
 }

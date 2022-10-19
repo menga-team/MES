@@ -1,0 +1,5 @@
+Bauteile:
+- AND:  7408
+- MUX:  74151
+- NOT:  7404
+- CLOCK:74590
