@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="50" unitdist="mil" unit="mil" style="dots" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -6584,124 +6584,6 @@ Höhe): 12 mm, wenn man den Draht noch dazurechnet ca. 14 mm.</description>
 </deviceset>
 </devicesets>
 </library>
-<library name="Connector_USB" urn="urn:adsk.eagle:library:27510300">
-<description>&lt;b&gt;USB Connectors TypeA, B, C, MiniB, MicroB</description>
-<packages>
-<package name="61729-1011BLF" urn="urn:adsk.eagle:footprint:27659477/1" library_version="17">
-<text x="0" y="9" size="1.270759375" layer="25" align="center">&gt;NAME</text>
-<text x="0" y="7.5" size="1.27003125" layer="27" align="center">&gt;VALUE</text>
-<pad name="SH1" x="-6.02" y="0" drill="2.3"/>
-<pad name="SH2" x="6.02" y="0" drill="2.3"/>
-<pad name="2" x="-1.25" y="4.71" drill="0.92"/>
-<pad name="3" x="-1.25" y="2.71" drill="0.92"/>
-<pad name="1" x="1.25" y="4.71" drill="0.92" shape="square"/>
-<pad name="4" x="1.25" y="2.71" drill="0.92"/>
-<wire x1="-6.1" y1="5.72" x2="-6.1" y2="-10.28" width="0.127" layer="51"/>
-<wire x1="-6.1" y1="-10.28" x2="6.1" y2="-10.28" width="0.127" layer="51"/>
-<wire x1="6.1" y1="-10.28" x2="6.1" y2="5.72" width="0.127" layer="51"/>
-<wire x1="6.1" y1="5.72" x2="-6.1" y2="5.72" width="0.127" layer="51"/>
-<wire x1="-6.1" y1="2.54" x2="-6.1" y2="5.72" width="0.127" layer="21"/>
-<wire x1="-6.1" y1="5.72" x2="6.1" y2="5.72" width="0.127" layer="21"/>
-<wire x1="6.1" y1="5.72" x2="6.1" y2="2.54" width="0.127" layer="21"/>
-<wire x1="-6.1" y1="-2.54" x2="-6.1" y2="-10.28" width="0.127" layer="21"/>
-<wire x1="-6.1" y1="-10.28" x2="6.1" y2="-10.28" width="0.127" layer="21"/>
-<wire x1="6.1" y1="-10.28" x2="6.1" y2="-2.54" width="0.127" layer="21"/>
-<wire x1="-6.35" y1="5.97" x2="6.35" y2="5.97" width="0.05" layer="39"/>
-<wire x1="6.35" y1="5.97" x2="6.35" y2="1.9" width="0.05" layer="39"/>
-<wire x1="6.35" y1="1.9" x2="7.9" y2="1.9" width="0.05" layer="39"/>
-<wire x1="7.9" y1="1.9" x2="7.9" y2="-1.9" width="0.05" layer="39"/>
-<wire x1="7.9" y1="-1.9" x2="6.35" y2="-1.9" width="0.05" layer="39"/>
-<wire x1="6.35" y1="-1.9" x2="6.35" y2="-10.53" width="0.05" layer="39"/>
-<wire x1="6.35" y1="-10.53" x2="-6.35" y2="-10.53" width="0.05" layer="39"/>
-<wire x1="-6.35" y1="-10.53" x2="-6.35" y2="-1.9" width="0.05" layer="39"/>
-<wire x1="-6.35" y1="-1.9" x2="-7.9" y2="-1.9" width="0.05" layer="39"/>
-<wire x1="-7.9" y1="-1.9" x2="-7.9" y2="1.9" width="0.05" layer="39"/>
-<wire x1="-7.9" y1="1.9" x2="-6.35" y2="1.9" width="0.05" layer="39"/>
-<wire x1="-6.35" y1="1.9" x2="-6.35" y2="5.97" width="0.05" layer="39"/>
-<circle x="1.25" y="6.25" radius="0.1" width="0.2" layer="21"/>
-</package>
-</packages>
-<packages3d>
-<package3d name="61729-1011BLF" urn="urn:adsk.eagle:package:27659501/2" type="model" library_version="17">
-<packageinstances>
-<packageinstance name="61729-1011BLF"/>
-</packageinstances>
-</package3d>
-</packages3d>
-<symbols>
-<symbol name="USB_4N" urn="urn:adsk.eagle:symbol:27659483/1" library_version="17">
-<wire x1="-7.62" y1="10.16" x2="7.62" y2="10.16" width="0.254" layer="94"/>
-<wire x1="7.62" y1="10.16" x2="7.62" y2="-10.16" width="0.254" layer="94"/>
-<wire x1="7.62" y1="-10.16" x2="-7.62" y2="-10.16" width="0.254" layer="94"/>
-<wire x1="-7.62" y1="-10.16" x2="-7.62" y2="10.16" width="0.254" layer="94"/>
-<wire x1="1.46" y1="0" x2="1.96" y2="0" width="0.254" layer="94"/>
-<wire x1="1.96" y1="0" x2="2.46" y2="0" width="0.254" layer="94"/>
-<wire x1="2.46" y1="0" x2="3.96" y2="1.5" width="0.254" layer="94"/>
-<wire x1="3.96" y1="1.5" x2="4.96" y2="1.5" width="0.254" layer="94"/>
-<wire x1="2.46" y1="0" x2="6.46" y2="0" width="0.254" layer="94"/>
-<wire x1="1.96" y1="0" x2="3.46" y2="-1.5" width="0.254" layer="94"/>
-<wire x1="5.96" y1="0.5" x2="6.46" y2="0" width="0.254" layer="94"/>
-<wire x1="6.46" y1="0" x2="5.96" y2="-0.5" width="0.254" layer="94"/>
-<wire x1="3.46" y1="-1.5" x2="4.96" y2="-1.5" width="0.254" layer="94"/>
-<wire x1="5.96" y1="0.5" x2="5.96" y2="-0.5" width="0.254" layer="94"/>
-<text x="0" y="12.7" size="1.778" layer="95" align="center">&gt;NAME</text>
-<text x="0" y="-12.7" size="1.778" layer="96" align="center">&gt;VALUE</text>
-<pin name="VCC" x="-10.16" y="7.62" length="short" direction="pwr"/>
-<pin name="D-" x="-10.16" y="5.08" length="short"/>
-<pin name="D+" x="-10.16" y="2.54" length="short"/>
-<pin name="GND" x="-10.16" y="0" length="short" direction="pwr"/>
-<pin name="SHIELD1" x="-10.16" y="-5.08" length="short" direction="sup"/>
-<pin name="SHIELD2" x="-10.16" y="-7.62" length="short" direction="sup"/>
-<circle x="0.96" y="0" radius="0.3" width="0.5" layer="94"/>
-<circle x="5.46" y="1.5" radius="0.3" width="0.5" layer="94"/>
-<rectangle x1="4.96" y1="-2" x2="5.96" y2="-1" layer="94"/>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="61729-1011" urn="urn:adsk.eagle:component:27659503/4" prefix="J" library_version="17">
-<description>USB(2.0) Type-B, RCPT, 4POS, THT-R/A
-
-&lt;br&gt;&lt;a href="https://www.amphenol-icc.com/media/wysiwyg/files/drawing/61729.pdf"&gt;Datasheet&lt;/a&gt;</description>
-<gates>
-<gate name="G$1" symbol="USB_4N" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="61729-1011BLF">
-<connects>
-<connect gate="G$1" pin="D+" pad="3"/>
-<connect gate="G$1" pin="D-" pad="2"/>
-<connect gate="G$1" pin="GND" pad="4"/>
-<connect gate="G$1" pin="SHIELD1" pad="SH1"/>
-<connect gate="G$1" pin="SHIELD2" pad="SH2"/>
-<connect gate="G$1" pin="VCC" pad="1"/>
-</connects>
-<package3dinstances>
-<package3dinstance package3d_urn="urn:adsk.eagle:package:27659501/2"/>
-</package3dinstances>
-<technologies>
-<technology name="">
-<attribute name="CATEGORY" value="Connector" constant="no"/>
-<attribute name="CONTACTS" value="4" constant="no"/>
-<attribute name="CURRENT_RATING" value="1A" constant="no"/>
-<attribute name="DESCRIPTION" value="CONN RCPT USB2.0 TYPEB 4POS R/A" constant="no"/>
-<attribute name="GENDER" value="Receptacle" constant="no"/>
-<attribute name="MANUFACTURER" value="Amphenol ICC (FCI)" constant="no"/>
-<attribute name="MOUNT_TYPE" value="R/A" constant="no"/>
-<attribute name="MPN" value="61729-1011BLF" constant="no"/>
-<attribute name="OPERATING_TEMP" value="-55°C to 85°C " constant="no"/>
-<attribute name="PART_STATUS" value="Active" constant="no"/>
-<attribute name="ROHS_COMPLIANT" value="RoHS Compliant" constant="no"/>
-<attribute name="SERIES" value="61729" constant="no"/>
-<attribute name="SUB-CATEGORY" value="USB" constant="no"/>
-<attribute name="TYPE" value="USB-B" constant="no"/>
-<attribute name="VOLTAGE_RATING" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 </libraries>
 <attributes>
 </attributes>
@@ -6745,7 +6627,6 @@ Höhe): 12 mm, wenn man den Draht noch dazurechnet ca. 14 mm.</description>
 <part name="+3V3" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
 <part name="+3V4" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
 <part name="+3V5" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="+3V3" device=""/>
-<part name="J1" library="Connector_USB" library_urn="urn:adsk.eagle:library:27510300" deviceset="61729-1011" device="" package3d_urn="urn:adsk.eagle:package:27659501/2"/>
 </parts>
 <sheets>
 <sheet>
@@ -7138,10 +7019,6 @@ Höhe): 12 mm, wenn man den Draht noch dazurechnet ca. 14 mm.</description>
 <instance part="+3V2" gate="G$1" x="25.4" y="163.83" smashed="yes">
 <attribute name="VALUE" x="22.86" y="158.75" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="J1" gate="G$1" x="245.11" y="156.21" smashed="yes">
-<attribute name="NAME" x="245.11" y="168.91" size="1.778" layer="95" align="center"/>
-<attribute name="VALUE" x="245.11" y="143.51" size="1.778" layer="96" align="center"/>
-</instance>
 </instances>
 <busses>
 </busses>
@@ -7178,6 +7055,17 @@ Höhe): 12 mm, wenn man den Draht noch dazurechnet ca. 14 mm.</description>
 <pinref part="C9" gate="G$1" pin="1"/>
 <wire x1="213.36" y1="149.86" x2="213.36" y2="151.13" width="0.1524" layer="91"/>
 <pinref part="GND6" gate="1" pin="GND"/>
+</segment>
+<segment>
+<wire x1="232.41" y1="144.78" x2="232.41" y2="148.59" width="0.1524" layer="91"/>
+<wire x1="232.41" y1="148.59" x2="232.41" y2="151.13" width="0.1524" layer="91"/>
+<wire x1="232.41" y1="151.13" x2="234.95" y2="151.13" width="0.1524" layer="91"/>
+<wire x1="234.95" y1="156.21" x2="232.41" y2="156.21" width="0.1524" layer="91"/>
+<wire x1="232.41" y1="156.21" x2="232.41" y2="151.13" width="0.1524" layer="91"/>
+<junction x="232.41" y="151.13"/>
+<pinref part="GND5" gate="1" pin="GND"/>
+<wire x1="232.41" y1="148.59" x2="234.95" y2="148.59" width="0.1524" layer="91"/>
+<junction x="232.41" y="148.59"/>
 </segment>
 </net>
 <net name="+3.3V" class="0">
@@ -7225,30 +7113,12 @@ Höhe): 12 mm, wenn man den Draht noch dazurechnet ca. 14 mm.</description>
 <segment>
 <pinref part="R12" gate="G$1" pin="1"/>
 <wire x1="234.95" y1="163.83" x2="226.06" y2="163.83" width="0.1524" layer="91"/>
-<pinref part="J1" gate="G$1" pin="VCC"/>
 </segment>
 </net>
 <net name="SIGNAL_OUT" class="0">
 <segment>
 <wire x1="234.95" y1="158.75" x2="232.41" y2="158.75" width="0.1524" layer="91"/>
 <label x="232.41" y="158.75" size="0.8128" layer="95" rot="R180" xref="yes"/>
-<pinref part="J1" gate="G$1" pin="D+"/>
-</segment>
-</net>
-<net name="SHIELD1" class="0">
-<segment>
-<wire x1="232.41" y1="144.78" x2="232.41" y2="148.59" width="0.1524" layer="91"/>
-<wire x1="232.41" y1="148.59" x2="232.41" y2="151.13" width="0.1524" layer="91"/>
-<wire x1="232.41" y1="151.13" x2="234.95" y2="151.13" width="0.1524" layer="91"/>
-<wire x1="234.95" y1="156.21" x2="232.41" y2="156.21" width="0.1524" layer="91"/>
-<wire x1="232.41" y1="156.21" x2="232.41" y2="151.13" width="0.1524" layer="91"/>
-<junction x="232.41" y="151.13"/>
-<pinref part="GND5" gate="1" pin="GND"/>
-<pinref part="J1" gate="G$1" pin="GND"/>
-<pinref part="J1" gate="G$1" pin="SHIELD1"/>
-<pinref part="J1" gate="G$1" pin="SHIELD2"/>
-<wire x1="232.41" y1="148.59" x2="234.95" y2="148.59" width="0.1524" layer="91"/>
-<junction x="232.41" y="148.59"/>
 </segment>
 </net>
 </nets>
