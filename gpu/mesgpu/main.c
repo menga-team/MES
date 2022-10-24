@@ -44,31 +44,6 @@ void setup_video(void) {
         for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
                 gpu_set_pixel(buffer_b, i, i + (i / 3) % 8);
 //        gpu_swap_buffers();
-//        gpu_set_pixel(front_buffer, 0, 0b111);
-//        gpu_set_pixel(front_buffer, 1, 0b111);
-//        gpu_set_pixel(front_buffer, 2, 0b111);
-//        gpu_set_pixel(front_buffer, 3, 0b111);
-//        gpu_set_pixel(front_buffer, 4, 0b111);
-//        gpu_set_pixel(front_buffer, 5, 0b111);
-//        gpu_set_pixel(front_buffer, 6, 0b111);
-//        gpu_set_pixel(front_buffer, 7, 0b111);
-//        gpu_set_pixel(front_buffer, 15, 0b010);
-//        gpu_set_pixel(front_buffer, 16, 0b111);
-//        gpu_set_pixel(front_buffer, BUFFER_WIDTH - 1, 0b101);
-//
-//        gpu_set_pixel(front_buffer, BUFFER_WIDTH * 6 - 1, 0b010);
-//        for (uint16_t i = 0; i < 8; i++)
-//                gpu_set_pixel(front_buffer, 16 + i, i);
-//
-//        for (uint16_t i = 1; i < BUFFER_WIDTH; i++)
-//                gpu_set_pixel(front_buffer, (i * BUFFER_WIDTH) - 17, i % 8);
-
-//        uint32_t pxs =
-//                *(uint32_t *) (
-//                        (const void *) front_buffer
-//                        + (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP)
-//                        + (pxs_index * BUFFER_BPP)
-//                );
 }
 
 void start_video(void) {
@@ -129,8 +104,6 @@ void start_video(void) {
         timer_continuous_mode(TIM2);
         timer_set_counter(TIM2, 0);
         timer_enable_irq(TIM2, TIM_DIER_UIE);
-        nvic_enable_irq(NVIC_TIM2_IRQ);
-        nvic_set_priority(NVIC_TIM2_IRQ, 0);
 
         // enable both counters
         timer_enable_counter(TIM3);
@@ -151,14 +124,17 @@ void tim2_isr(void) {
         TIM_SR(TIM2) = 0x0000;
 }
 
-void __attribute__((optimize("O2"))) tim1_cc_isr(void) {
+uint32_t pxs;
+const void *adr;
+
+void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
         if ((TIM_SR(TIM1) & TIM_SR_CC2IF) != 0) {
                 TIM_SR(TIM1) = 0x0000;
                 reset_color();
                 // we have some spare time until the next interrupt ~970ns
                 buffer_line = (TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 1) / 5;
                 if (buffer_line >= BUFFER_HEIGHT) buffer_line = 0;
-//                line = (const void *) front_buffer + (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
+                //line = (const void *) front_buffer + (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
                 // this is faster than using the pointer (or is it???)
                 switch ((uint32_t) front_buffer) {
                         case BUFFER_A_ADDRESS:
@@ -169,271 +145,12 @@ void __attribute__((optimize("O2"))) tim1_cc_isr(void) {
                                 line = (const void *) BUFFER_B_ADDRESS +
                                        (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
                 }
+                for (uint8_t i = 0; i < 20; ++i) {
+                        scan_line[i] = *(uint32_t *) (line + (i * BUFFER_BPP));
+                }
         } else {
                 TIM_SR(TIM1) = 0x0000;
-                if (buffer_line % 2 == 0)
-                        return;
-//                for (uint8_t pxs_index = 0; pxs_index < (uint8_t) (BUFFER_WIDTH / 8); ++pxs_index) {
-//                        uint32_t pxs =
-//                                *(uint32_t *) (
-//                                        (const void *) front_buffer
-//                                        + (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP)
-//                                        + (pxs_index * BUFFER_BPP)
-//                                );
-                // TODO: macro?
-                //  EDIT: definitely
-                uint32_t pxs = *(uint32_t *) (line + (0 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (1 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                __asm volatile("nop");
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (2 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (3 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (4 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (5 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (6 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (7 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (8 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (9 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (10 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (11 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (12 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (13 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (14 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (15 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (16 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (17 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (18 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
-                pxs = *(uint32_t *) (line + (19 * BUFFER_BPP));
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (0 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (1 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (2 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (3 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (4 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (5 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (6 * BUFFER_BPP)) & PIXEL_MASK];
-                GPIO_ODR(GPIO_COLOR_PORT) = color_palette[(pxs >> (7 * BUFFER_BPP)) & PIXEL_MASK];
 
-//                }
+#include "scanline.inc"
         }
 }
