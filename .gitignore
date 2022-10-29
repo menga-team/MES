@@ -1,6 +1,7 @@
 **/.idea
 **/.vscode
 **/bin
+**/target
 *.o
 *.elf
 *.d

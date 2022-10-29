@@ -16,7 +16,7 @@ SECTIONS
         KEEP(*(.buffer_a))
     } >ram
 
-    .buffer_a_block 0x20001c20 (NOLOAD) : {
+    .buffer_b_block 0x20001c20 (NOLOAD) : {
         KEEP(*(.buffer_b))
     } >ram
 

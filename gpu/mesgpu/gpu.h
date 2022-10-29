@@ -65,6 +65,7 @@ uint16_t color_palette[1 << BUFFER_BPP]; // 2^BUFFER_BPP
 
 uint32_t __attribute__((section (".buffer_a"))) buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))] __attribute__((aligned(32)));
 uint32_t __attribute__((section (".buffer_b"))) buffer_b[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))] __attribute__((aligned(32)));
+//#include "blocks.inc"
 uint32_t *front_buffer, *back_buffer;
 
 uint16_t get_port_config_for_color(uint8_t color) {
@@ -83,12 +84,12 @@ uint16_t get_port_config_for_color(uint8_t color) {
 uint8_t gpu_get_pixel(const void *buffer, uint16_t position) {
         // 3 bytes = 8 pairs of 3bit pixels
         uint32_t bytes = (*(uint32_t *) (buffer + (position / 8) * BUFFER_BPP)) /*& 0x00FFFFFF*/;
-        return (bytes >> ((position % 8) * BUFFER_BPP)) & PIXEL_MASK;
+        return (bytes >> ((7 - (position % 8)) * BUFFER_BPP)) & PIXEL_MASK;
 }
 
 void gpu_set_pixel(void *buffer, uint16_t position, uint8_t data) {
         uint32_t *bytes = (uint32_t *) (buffer + (position / 8) * BUFFER_BPP);
-        uint8_t shift = (position % 8) * BUFFER_BPP;
+        uint8_t shift = (7 - (position % 8)) * BUFFER_BPP;
         uint32_t mask = PIXEL_MASK << shift;
         *bytes = (*bytes & ~mask) | ((data & PIXEL_MASK) << shift);
 }

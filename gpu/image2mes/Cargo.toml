@@ -1,0 +1,10 @@
+[package]
+name = "image2mes"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+png = "0.17.6"
+structopt = "0.3"
+anyhow = "1.0.66"
+bitvec = "1"

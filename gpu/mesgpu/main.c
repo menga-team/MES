@@ -43,6 +43,34 @@ void setup_video(void) {
                 gpu_set_pixel(buffer_a, i, i % 8);
         for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
                 gpu_set_pixel(buffer_b, i, i + (i / 3) % 8);
+        color_palette[1] = get_port_config_for_color(101);
+        color_palette[2] = get_port_config_for_color(169);
+        color_palette[3] = get_port_config_for_color(205);
+        color_palette[4] = get_port_config_for_color(173);
+        color_palette[5] = get_port_config_for_color(242);
+        color_palette[6] = get_port_config_for_color(214);
+        color_palette[7] = get_port_config_for_color(255);
+
+        //        buffer_a[0] = 0x00000000;
+//        buffer_a[1] = 0x00000000;
+//        buffer_a[19] = 0x00000000;
+//        gpu_set_pixel(buffer_a, 0, 0);
+//        gpu_set_pixel(buffer_a, 1, 0);
+//        gpu_set_pixel(buffer_a, 2, 0);
+//        gpu_set_pixel(buffer_a, 3, 0);
+//        gpu_set_pixel(buffer_a, 4, 0);
+//        gpu_set_pixel(buffer_a, 5, 0);
+//        gpu_set_pixel(buffer_a, 6, 0);
+//        gpu_set_pixel(buffer_a, 7, 0);
+//
+//        gpu_set_pixel(buffer_a, 8, 0);
+//        gpu_set_pixel(buffer_a, 9, 0);
+//        gpu_set_pixel(buffer_a, 10, 0);
+//        gpu_set_pixel(buffer_a, 11, 0);
+//        gpu_set_pixel(buffer_a, 12, 0);
+//        gpu_set_pixel(buffer_a, 13, 0);
+//        gpu_set_pixel(buffer_a, 14, 0);
+//        gpu_set_pixel(buffer_a, 15, 0);
 //        gpu_swap_buffers();
 }
 
@@ -124,8 +152,7 @@ void tim2_isr(void) {
         TIM_SR(TIM2) = 0x0000;
 }
 
-uint32_t pxs;
-const void *adr;
+uint32_t pxs = 0;
 
 void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
         if ((TIM_SR(TIM1) & TIM_SR_CC2IF) != 0) {
@@ -144,9 +171,6 @@ void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
                         case BUFFER_B_ADDRESS:
                                 line = (const void *) BUFFER_B_ADDRESS +
                                        (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
-                }
-                for (uint8_t i = 0; i < 20; ++i) {
-                        scan_line[i] = *(uint32_t *) (line + (i * BUFFER_BPP));
                 }
         } else {
                 TIM_SR(TIM1) = 0x0000;
