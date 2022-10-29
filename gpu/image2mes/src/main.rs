@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use bitvec::prelude::*;
-use png::ColorType;
-use std::{fs::File, path::PathBuf, str::FromStr};
+use png::{ColorType};
+use std::{fs::File, io::{Write, self}, path::PathBuf, str::FromStr};
 use structopt::StructOpt;
 
 fn main() {
@@ -22,46 +22,64 @@ fn run() -> anyhow::Result<()> {
     }
     let next_frame = reader.next_frame(&mut buf)?;
     let bytes = &buf[..next_frame.buffer_size()];
-    let mut palette = Vec::new();
-    let mut iter = reader.info().palette.as_ref().unwrap().iter();
-    while let (Some(&r), Some(&g), Some(&b)) = (iter.next(), iter.next(), iter.next()) {
+    let mut palette: Vec<Color> = Vec::new();
+    let mut chunks = reader.info().palette.as_ref().unwrap().chunks_exact(3);
+    while let Some(&[r, g, b]) = chunks.next() {
         palette.push(Color { r, g, b });
     }
     let mut bv = bitvec![u8, Msb0;];
     for i in 0..next_frame.buffer_size() {
-        print!("gpu_set_pixel(buffer_a, {}, {});", i *2, (bytes[i]  & 0b01110000) >> 4);
-        print!("gpu_set_pixel(buffer_a, {}, {});", i *2+1, bytes[i] & 0b00000111);
+        bv.extend(&bytes[i].view_bits::<Msb0>()[1..=3]);
+        bv.extend(&bytes[i].view_bits::<Msb0>()[5..=7]);
+    }
 
-        bv.extend(&bytes[i].view_bits::<Msb0>()[5..8]);
-        bv.extend(&bytes[i].view_bits::<Msb0>()[0..3]);
+
+    let mut out: Box<dyn Write> = if opt.output_file == "-" {
+        Box::new(io::stdout())
+    } else if let Ok(fd) = File::create(opt.output_file) {
+        Box::new(fd)
+    } else {
+        Err(anyhow!("Invalid output file."))?
+    };
+
+    if opt.include_color_palette || opt.output_type == OutputType::Code {
+        for (i, color) in palette.iter().enumerate() {
+            writeln!(
+                &mut out,
+                "color_palette[{}] = get_port_config_for_color(0x{:02x});",
+                i,
+                ((((color.r as f64) / 32.0) as u8) << 5)
+                    | ((((color.g as f64) / 32.0) as u8) << 2)
+                    | (((color.b as f64) / 64.0) as u8)
+            )?;
+        }
     }
-    // dbg!(palette);
-    let mut group: u8 = 0;
-    let mut i = 0;
-    for color in palette {
-        println!(
-            "color_palette[{}] = get_port_config_for_color({});",
-            i,
-            ((((color.r as f64) / 32.0) as u8) << 5)
-                | ((((color.g as f64) / 32.0) as u8) << 2)
-                | ((((color.b as f64) / 64.0) as u8))
-        );
-        i += 1;
+
+    for bytes in bv.as_raw_slice().chunks_exact(3) {
+        match opt.output_type {
+            OutputType::CArray => {
+                write!(
+                    &mut out,
+                    "0x{:02x}, 0x{:02x}, 0x{:02x}, ",
+                    bytes[2], bytes[1], bytes[0]
+                )?;
+            }
+            OutputType::HexNumber => {
+                write!(&mut out, "{:02x}{:02x}{:02x}", bytes[2], bytes[1], bytes[0])?;
+            }
+            OutputType::Binary => {
+                out.write(&[bytes[2], bytes[1], bytes[0]])?;
+            }
+            OutputType::Code => {
+                writeln!(
+                    &mut out,
+                    "buffer_a[i++] = 0x{:02x};\nbuffer_a[i++] = 0x{:02x};\nbuffer_a[i++] = 0x{:02x};",
+                    bytes[2], bytes[1], bytes[0]
+                )?;
+            },
+        }
     }
-    i = 0;
-    for hex in bv.as_raw_slice() {
-        // if group == 0 {
-        //     print!("buffer_a[{}] = 0x", i);
-        // }
-        // print!("{:02x}", hex);
-        // group += 1;
-        // if group == 4 {
-        //     print!(";");
-        //     group = 0;
-        //     i += 1;
-        // }
-        i += 1;
-    }
+    out.flush()?;
     Ok(())
 }
 
@@ -72,9 +90,10 @@ struct Color {
     b: u8,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum OutputType {
     CArray,
+    Code,
     HexNumber,
     Binary,
 }
@@ -87,6 +106,7 @@ impl FromStr for OutputType {
             "binary" | "bin" => OutputType::Binary,
             "array" | "c" => OutputType::CArray,
             "hex" | "number" | "hexadecimal" => OutputType::HexNumber,
+            "code" => OutputType::Code,
             _ => Err("Invalid Output type.")?,
         })
     }
@@ -104,7 +124,10 @@ struct Opt {
     /// Converion format
     #[structopt(short = "t", long = "output-type", default_value = "binary")]
     output_type: OutputType,
-    /// Output file
+    /// Output file, can also be - for stdout
     #[structopt(short = "o", long = "output")]
-    output_file: PathBuf,
+    output_file: String,
+    /// Include palette (c code)
+    #[structopt(short = "p", long = "include-color-palette")]
+    include_color_palette: bool,
 }

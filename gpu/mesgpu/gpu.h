@@ -63,10 +63,9 @@ uint16_t color_palette[1 << BUFFER_BPP]; // 2^BUFFER_BPP
 #define BUFFER_A_ADDRESS 0x20000000
 #define BUFFER_B_ADDRESS 0x20001c20
 
-uint32_t __attribute__((section (".buffer_a"))) buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))] __attribute__((aligned(32)));
-uint32_t __attribute__((section (".buffer_b"))) buffer_b[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint32_t))] __attribute__((aligned(32)));
-//#include "blocks.inc"
-uint32_t *front_buffer, *back_buffer;
+uint8_t __attribute__((section (".buffer_a"))) buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t))];
+uint8_t __attribute__((section (".buffer_b"))) buffer_b[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t))];
+uint8_t *front_buffer, *back_buffer;
 
 uint16_t get_port_config_for_color(uint8_t color) {
         uint16_t port = 0x0000;
@@ -95,7 +94,7 @@ void gpu_set_pixel(void *buffer, uint16_t position, uint8_t data) {
 }
 
 void gpu_swap_buffers(void) {
-        uint32_t *swap = front_buffer;
+        uint8_t *swap = front_buffer;
         front_buffer = back_buffer;
         back_buffer = swap;
 }

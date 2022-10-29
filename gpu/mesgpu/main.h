@@ -6,7 +6,6 @@
 #define MES_MAIN_H
 
 uint16_t buffer_line = 0;
-const uint32_t *(*frame_blocks);
 const void *line;
 
 void setup_clock(void);
