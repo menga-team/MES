@@ -3,21 +3,21 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/timer.h>
+#include <libopencm3/stm32/spi.h>
+#include <libopencm3/stm32/dma.h>
 #include <mesmath.h>
 #include "gpu.h"
 
 int main(void) {
-        setup_clock();
+        rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
         setup_output();
         gpu_init();
         setup_video();
+        start_communication();
         start_video();
-        while (1);
-        return 0;
-}
-
-void setup_clock(void) {
-        rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
+        while (1) {
+                // we have ~5µs every line and ~770µs every frame
+        }
 }
 
 void setup_output(void) {
@@ -26,6 +26,7 @@ void setup_output(void) {
         rcc_periph_clock_enable(RCC_GPIOB);
         rcc_periph_clock_enable(RCC_GPIOC);
         gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13); // built-in
+        gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPU_READY_PIN);
         gpio_set(GPIOC, GPIO13);
         // A8: hsync (yellow cable)
         // A6: vsync (orange cable)
@@ -35,7 +36,7 @@ void setup_output(void) {
                       RED_PIN_1 | RED_PIN_2 | RED_PIN_3 |
                       GREEN_PIN_1 | GREEN_PIN_2 | GREEN_PIN_3 |
                       BLUE_PIN_1 | BLUE_PIN_2);
-        reset_color();
+        GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
 }
 
 void setup_video(void) {
@@ -51,7 +52,40 @@ void setup_video(void) {
 //        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
 //                gpu_set_pixel(buffer_a, i, i % 8);
         // peppers
-        #include "images/peppers.m3if"
+//        #include "images/peppers.m3if"
+}
+
+void start_communication(void) {
+        rcc_periph_clock_enable(RCC_DMA1);
+        dma_channel_reset(DMA1, DMA_CHANNEL2);
+        rcc_periph_clock_enable(RCC_SPI1);
+        // SCK & MOSI
+        gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO3 | GPIO5);
+        gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO4); // MISO
+        gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO15); // NSS
+        spi_reset(SPI1);
+        SPI1_I2SCFGR = 0;
+        spi_set_slave_mode(SPI1);
+        spi_set_receive_only_mode(SPI1);
+        spi_set_dff_8bit(SPI1);
+        spi_set_clock_phase_1(SPI1);
+        spi_enable_software_slave_management(SPI1);
+        spi_set_nss_high(SPI1);
+        spi_set_baudrate_prescaler(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_64);
+        spi_send_msb_first(SPI1);
+        spi_disable_crc(SPI1);
+        spi_enable_rx_dma(SPI1);
+        spi_enable(SPI1);
+        nvic_set_priority(NVIC_DMA1_CHANNEL2_IRQ, 1);
+        nvic_enable_irq(NVIC_DMA1_CHANNEL2_IRQ);
+        dma_set_peripheral_address(DMA1, DMA_CHANNEL2, (uint32_t) &SPI1_DR);
+        dma_set_memory_address(DMA1, DMA_CHANNEL2, (uint32_t) operation);
+        dma_set_number_of_data(DMA1, DMA_CHANNEL2, OPERATION_LENGTH);
+        dma_set_read_from_peripheral(DMA1, DMA_CHANNEL2);
+        dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL2);
+        dma_set_peripheral_size(DMA1, DMA_CHANNEL2, DMA_CCR_PSIZE_8BIT);
+        dma_set_memory_size(DMA1, DMA_CHANNEL2, DMA_CCR_MSIZE_8BIT);
+        dma_set_priority(DMA1, DMA_CHANNEL2, DMA_CCR_PL_VERY_HIGH);
 }
 
 void start_video(void) {
@@ -76,14 +110,10 @@ void start_video(void) {
         if (H_SYNC_POLARITY) timer_set_oc_polarity_high(TIM1, TIM_OC1);
         else timer_set_oc_polarity_low(TIM1, TIM_OC1);
         nvic_enable_irq(NVIC_TIM1_CC_IRQ);
-        nvic_set_priority(NVIC_TIM1_CC_IRQ, 1);
-        // OC2 is responsible to reset the color, some monitors will base their black voltage level off the voltage
-        // in the back porch, this means we can't send any colors in this period.
-        timer_set_oc_value(TIM1, TIM_OC2, RESET_COLOR);
+        nvic_set_priority(NVIC_TIM1_CC_IRQ, 0);
+        // OC2 will let us know when we need to start preparing and outputting the image
+        timer_set_oc_value(TIM1, TIM_OC2, PREPARE_DISPLAY);
         timer_enable_irq(TIM1, TIM_DIER_CC2IE);
-        // OC3 will let us know when we can start drawing.
-        timer_set_oc_value(TIM1, TIM_OC3, START_DRAWING);
-        timer_enable_irq(TIM1, TIM_DIER_CC3IE);
 
         // TIM3 -> Vertical sync
         rcc_periph_clock_enable(RCC_TIM3);
@@ -102,59 +132,25 @@ void start_video(void) {
         if (V_SYNC_POLARITY) timer_set_oc_polarity_high(TIM3, TIM_OC1);
         else timer_set_oc_polarity_low(TIM3, TIM_OC1);
 
-        // TIM2 -> Pixel clock
-        rcc_periph_clock_enable(RCC_TIM2);
-        rcc_periph_reset_pulse(RST_TIM2);
-        timer_set_mode(TIM2, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-        timer_set_prescaler(TIM2, uround(rcc_apb2_frequency / (PIXEL_CLOCK / (double) BUFFER_TO_VIDEO_RATIO)) - 1);
-        timer_set_period(TIM2, 2);
-        timer_disable_preload(TIM2);
-        timer_continuous_mode(TIM2);
-        timer_set_counter(TIM2, 0);
-        timer_enable_irq(TIM2, TIM_DIER_UIE);
-
         // enable both counters
         timer_enable_counter(TIM3);
-//        timer_enable_counter(TIM2);
         timer_enable_counter(TIM1);
-}
-
-void set_color(uint8_t color) {
-        uint16_t port = get_port_config_for_color(color);
-        GPIO_ODR(GPIO_COLOR_PORT) = port;
-}
-
-void reset_color(void) {
-        GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
 }
 
 void tim2_isr(void) {
         TIM_SR(TIM2) = 0x0000;
 }
 
-uint32_t pxs = 0;
-
 void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
-        if ((TIM_SR(TIM1) & TIM_SR_CC2IF) != 0) {
-                TIM_SR(TIM1) = 0x0000;
-                reset_color();
-                // we have some spare time until the next interrupt ~970ns
-                buffer_line = (TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 1) / 5;
-                if (buffer_line >= BUFFER_HEIGHT) buffer_line = 0;
+        if (TIM3_CNT > V_BACK_PORCH_LINES + V_SYNC_PULSE_LINES - 2 &&
+            TIM3_CNT < V_BACK_PORCH_LINES + V_SYNC_PULSE_LINES + V_DISPLAY_LINES - 2) {
+                buffer_line = ((TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 2) / 5);
                 line = (const void *) front_buffer + (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
-                // this is faster than using the pointer (or is it???)
-//                switch ((uint32_t) front_buffer) {
-//                        case BUFFER_A_ADDRESS:
-//                                line = (const void *) BUFFER_A_ADDRESS +
-//                                       (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
-//                                break;
-//                        case BUFFER_B_ADDRESS:
-//                                line = (const void *) BUFFER_B_ADDRESS +
-//                                       (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
-//                }
-        } else {
-                TIM_SR(TIM1) = 0x0000;
 
-#include "scanline.g.c"
+#               include "scanline.g.c"
+
+                // some monitors sample their black voltage level in the back porch, so we need to stop outputting color
+                GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
         }
+        TIM_SR(TIM1) = 0x0000;
 }
