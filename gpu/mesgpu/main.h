@@ -14,6 +14,8 @@ uint32_t pxs = 0;
 uint8_t operation[OPERATION_LENGTH];
 uint8_t operation_data[OPERATION_DATA_LENGTH];
 
+void invalid_operation(uint8_t* invalid_op);
+
 void setup_output(void);
 
 void setup_video(void);

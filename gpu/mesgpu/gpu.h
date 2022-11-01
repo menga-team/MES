@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <limits.h>
 #include <assert.h>
+#include "font.h"
 
 #ifndef MES_GPU_H
 #define MES_GPU_H
@@ -64,8 +65,10 @@ uint16_t color_palette[1 << BUFFER_BPP]; // 2^BUFFER_BPP
 #define BUFFER_A_ADDRESS 0x20000000
 #define BUFFER_B_ADDRESS 0x20001c20
 
-uint8_t __attribute__((section (".buffer_a"))) buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t))];
-uint8_t __attribute__((section (".buffer_b"))) buffer_b[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t))];
+uint8_t __attribute__((section (".buffer_a"))) buffer_a[
+        (BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t))];
+uint8_t __attribute__((section (".buffer_b"))) buffer_b[
+        (BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t))];
 uint8_t *front_buffer, *back_buffer;
 
 uint16_t get_port_config_for_color(uint8_t color) {
@@ -114,6 +117,24 @@ void gpu_init(void) {
         color_palette[0b111] = get_port_config_for_color(0b00011111); // cyan
         front_buffer = buffer_a;
         back_buffer = buffer_b;
+}
+
+void write(uint8_t x, uint8_t y, uint8_t fg, uint8_t bg, const char *text) {
+        // TODO: Optimize lol
+        uint8_t i = 0;
+        while (text[i] != '\0') {
+                char to_print = text[i];
+                for (uint8_t j = 0; j < 6; ++j) {
+                        for (int k = 0; k < 8; ++k) {
+                                gpu_set_pixel(
+                                        front_buffer,
+                                        (y+k) * BUFFER_WIDTH + x + j,
+                                        ((console_font_6x8[8 * to_print + k] << j) & (1 << 7)) ? fg : bg);
+                        }
+                }
+                x += 6;
+                i++;
+        }
 }
 
 #endif

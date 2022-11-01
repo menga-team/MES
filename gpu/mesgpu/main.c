@@ -6,7 +6,13 @@
 #include <libopencm3/stm32/spi.h>
 #include <libopencm3/stm32/dma.h>
 #include <mesmath.h>
+#include <stdio.h>
 #include "gpu.h"
+
+// Include peppers image as `peppers`
+//#include "images/peppers.m3ifc"
+// Include error screen as 'error'
+#include "images/error.m3ifc"
 
 int main(void) {
         rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
@@ -15,8 +21,21 @@ int main(void) {
         setup_video();
         start_communication();
         start_video();
+        char* operation_string = malloc(sizeof (char) * 24 + 1); // 24chars + NUL
         while (1) {
                 // we have ~5µs every line and ~770µs every frame
+                sprintf(
+                        operation_string,
+                        "%02x %02x %02x %02x  %02x %02x %02x %02x",
+                        operation[0],
+                        operation[1],
+                        operation[2],
+                        operation[3],
+                        operation[4],
+                        operation[5],
+                        operation[6],
+                        operation[7]);
+                write(8, 96, 1, 0, operation_string);
         }
 }
 
@@ -29,9 +48,9 @@ void setup_output(void) {
         gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPU_READY_PIN);
         gpio_set(GPIOC, GPIO13);
         // A8: hsync (yellow cable)
-        // A6: vsync (orange cable)
+        // B0: vsync (orange cable)
         gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM1_CH1); // PA8
-        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM3_CH1); // PA6
+        gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM3_CH3); // PB0
         gpio_set_mode(GPIO_COLOR_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                       RED_PIN_1 | RED_PIN_2 | RED_PIN_3 |
                       GREEN_PIN_1 | GREEN_PIN_2 | GREEN_PIN_3 |
@@ -51,19 +70,17 @@ void setup_video(void) {
         // stripes
 //        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
 //                gpu_set_pixel(buffer_a, i, i % 8);
-        // peppers
-//        #include "images/peppers.m3if"
 }
 
 void start_communication(void) {
-        rcc_periph_clock_enable(RCC_DMA1);
         dma_channel_reset(DMA1, DMA_CHANNEL2);
+        spi_reset(SPI1);
+        rcc_periph_clock_enable(RCC_DMA1);
         rcc_periph_clock_enable(RCC_SPI1);
         // SCK & MOSI
-        gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO3 | GPIO5);
-        gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO4); // MISO
+        gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO3 | GPIO5);
+        gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO4); // MISO
         gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO15); // NSS
-        spi_reset(SPI1);
         SPI1_I2SCFGR = 0;
         spi_set_slave_mode(SPI1);
         spi_set_receive_only_mode(SPI1);
@@ -86,6 +103,8 @@ void start_communication(void) {
         dma_set_peripheral_size(DMA1, DMA_CHANNEL2, DMA_CCR_PSIZE_8BIT);
         dma_set_memory_size(DMA1, DMA_CHANNEL2, DMA_CCR_MSIZE_8BIT);
         dma_set_priority(DMA1, DMA_CHANNEL2, DMA_CCR_PL_VERY_HIGH);
+        dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL2);
+        dma_enable_channel(DMA1, DMA_CHANNEL2);
 }
 
 void start_video(void) {
@@ -124,13 +143,13 @@ void start_video(void) {
         timer_set_period(TIM3, V_WHOLE_FRAME_LINES - 1);
         timer_disable_preload(TIM3);
         timer_continuous_mode(TIM3);
-        timer_set_oc_value(TIM3, TIM_OC1, V_SYNC_PULSE_LINES);
+        timer_set_oc_value(TIM3, TIM_OC3, V_SYNC_PULSE_LINES);
         timer_set_counter(TIM3, 0);
-        timer_enable_oc_preload(TIM3, TIM_OC1);
-        timer_enable_oc_output(TIM3, TIM_OC1);
-        timer_set_oc_mode(TIM3, TIM_OC1, TIM_OCM_PWM1);
-        if (V_SYNC_POLARITY) timer_set_oc_polarity_high(TIM3, TIM_OC1);
-        else timer_set_oc_polarity_low(TIM3, TIM_OC1);
+        timer_enable_oc_preload(TIM3, TIM_OC3);
+        timer_enable_oc_output(TIM3, TIM_OC3);
+        timer_set_oc_mode(TIM3, TIM_OC3, TIM_OCM_PWM1);
+        if (V_SYNC_POLARITY) timer_set_oc_polarity_high(TIM3, TIM_OC3);
+        else timer_set_oc_polarity_low(TIM3, TIM_OC3);
 
         // enable both counters
         timer_enable_counter(TIM3);
@@ -153,4 +172,31 @@ void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
                 GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
         }
         TIM_SR(TIM1) = 0x0000;
+}
+
+void invalid_operation(uint8_t* invalid_op) {
+        color_palette[0] = get_port_config_for_color(0b00000011);
+        color_palette[1] = get_port_config_for_color(0b11111111);
+        for (uint16_t i = 0; i < 7200; ++i) {
+                front_buffer[i] = error[i];
+        }
+
+        write(2, 80, 1, 0, "-UNIMPLEMENTED  OPERATION-");
+        char* operation_string = malloc(sizeof (char) * 24 + 1); // 24chars + NUL
+        sprintf(
+                operation_string,
+                "%02x %02x %02x %02x  %02x %02x %02x %02x",
+                invalid_op[0],
+                invalid_op[1],
+                invalid_op[2],
+                invalid_op[3],
+                invalid_op[4],
+                invalid_op[5],
+                invalid_op[6],
+                invalid_op[7]);
+        write(8, 96, 1, 0, operation_string);
+}
+
+void dma1_channel2_isr(void) {
+        invalid_operation(operation);
 }
