@@ -1,6 +1,6 @@
 # Adapted from: https://github.com/libopencm3/libopencm3-template/blob/master/rules.mk
 PROJECT		= mescpu
-CFILES		= main.c
+CFILES		= main.c time.c controller.c
 OPENCM3_DIR	:= ../../libopencm3
 #DEVICE		= stm32f103c8t6
 LDSCRIPT	= ../../utils/stm32f103c8tx.ld
