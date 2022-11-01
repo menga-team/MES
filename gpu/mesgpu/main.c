@@ -14,6 +14,9 @@
 // Include error screen as 'error'
 #include "images/error.m3ifc"
 
+// the bits per pixel (bpp) define how large the palette can be.
+// colorid => port
+
 int main(void) {
         rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
         setup_output();
@@ -21,7 +24,7 @@ int main(void) {
         setup_video();
         start_communication();
         start_video();
-        char* operation_string = malloc(sizeof (char) * 24 + 1); // 24chars + NUL
+        char *operation_string = malloc(sizeof(char) * 24 + 1); // 24chars + NUL
         while (1) {
                 // we have ~5µs every line and ~770µs every frame
                 sprintf(
@@ -174,7 +177,7 @@ void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
         TIM_SR(TIM1) = 0x0000;
 }
 
-void invalid_operation(uint8_t* invalid_op) {
+void invalid_operation(uint8_t *invalid_op) {
         color_palette[0] = get_port_config_for_color(0b00000011);
         color_palette[1] = get_port_config_for_color(0b11111111);
         for (uint16_t i = 0; i < 7200; ++i) {
@@ -182,7 +185,7 @@ void invalid_operation(uint8_t* invalid_op) {
         }
 
         write(2, 80, 1, 0, "-UNIMPLEMENTED  OPERATION-");
-        char* operation_string = malloc(sizeof (char) * 24 + 1); // 24chars + NUL
+        char *operation_string = malloc(sizeof(char) * 24 + 1); // 24chars + NUL
         sprintf(
                 operation_string,
                 "%02x %02x %02x %02x  %02x %02x %02x %02x",
