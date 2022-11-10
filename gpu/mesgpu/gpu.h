@@ -42,17 +42,26 @@
 // colors
 #define GPIO_COLOR_PORT GPIOB
 
-#define RED_PIN_1 GPIO11 // most significant bit
-#define RED_PIN_2 GPIO10
-#define RED_PIN_3 GPIO1 // least significant bit
+/// Most Significant Pin
+#define RED_MSP GPIO11
+/// Middle Most Significant Pin
+#define RED_MMSP GPIO10
+/// Least Significant Pin
+#define RED_LSP GPIO1
 
-#define GREEN_PIN_1 GPIO12 // most significant bit
-#define GREEN_PIN_2 GPIO13
-#define GREEN_PIN_3 GPIO14 // least significant bit
+/// Most Significant Pin
+#define GREEN_MSP GPIO12
+/// Middle Most Significant Pin
+#define GREEN_MMSP GPIO13
+/// Least Significant Pin
+#define GREEN_LSP GPIO14
 
-#define BLUE_PIN_1 GPIO7 // most significant bit
-#define BLUE_PIN_2 GPIO8
-#define BLUE_PIN_3 GPIO9 // least significant bit
+/// Most Significant Pin
+#define BLUE_MSP GPIO7
+/// Middle Most Significant Pin
+#define BLUE_MMSP GPIO8
+/// Least Significant Pin
+#define BLUE_LSP GPIO9
 
 #define GPU_READY_PIN GPIO15
 
@@ -76,7 +85,7 @@ extern uint8_t operation[OPERATION_LENGTH];
 extern uint8_t operation_data[OPERATION_DATA_LENGTH];
 
 
-uint16_t get_port_config_for_color(uint8_t color);
+uint16_t get_port_config_for_color(uint8_t red, uint8_t green, uint8_t blue);
 
 uint8_t gpu_get_pixel(const void *buffer, uint16_t position);
 

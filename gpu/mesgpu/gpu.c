@@ -17,16 +17,18 @@ uint32_t pxs = 0;
 uint8_t operation[OPERATION_LENGTH];
 uint8_t operation_data[OPERATION_DATA_LENGTH];
 
-uint16_t get_port_config_for_color(uint8_t color) {
+uint16_t get_port_config_for_color(uint8_t red, uint8_t green, uint8_t blue) {
+        // TODO: maybe macro?
         uint16_t port = 0x0000;
-        if ((color & 0b10000000) != 0) port |= RED_PIN_1;
-        if ((color & 0b01000000) != 0) port |= RED_PIN_2;
-        if ((color & 0b00100000) != 0) port |= RED_PIN_3;
-        if ((color & 0b00010000) != 0) port |= GREEN_PIN_1;
-        if ((color & 0b00001000) != 0) port |= GREEN_PIN_2;
-        if ((color & 0b00000100) != 0) port |= GREEN_PIN_3;
-        if ((color & 0b00000010) != 0) port |= BLUE_PIN_1;
-        if ((color & 0b00000001) != 0) port |= BLUE_PIN_2;
+        if (red & 0b100) port |= RED_MSP;
+        if (red & 0b010) port |= RED_MMSP;
+        if (red & 0b001) port |= RED_LSP;
+        if (green & 0b100) port |= GREEN_MSP;
+        if (green & 0b010) port |= GREEN_MMSP;
+        if (green & 0b001) port |= GREEN_LSP;
+        if (blue & 0b100) port |= BLUE_MSP;
+        if (blue & 0b010) port |= BLUE_MMSP;
+        if (blue & 0b001) port |= BLUE_LSP;
         return port;
 }
 
@@ -53,14 +55,14 @@ void gpu_init(void) {
         // there are 8 standard colors, so the palette needs to be index-able with at least 3 bits.
         assert(BUFFER_BPP >= 3);
         // define standard color palette.
-        color_palette[0b000] = get_port_config_for_color(0b00000000); // black
-        color_palette[0b001] = get_port_config_for_color(0b11111111); // white
-        color_palette[0b010] = get_port_config_for_color(0b11100000); // red
-        color_palette[0b011] = get_port_config_for_color(0b00011100); // green
-        color_palette[0b100] = get_port_config_for_color(0b00000011); // blue
-        color_palette[0b101] = get_port_config_for_color(0b11111100); // yellow
-        color_palette[0b110] = get_port_config_for_color(0b11100011); // magenta
-        color_palette[0b111] = get_port_config_for_color(0b00011111); // cyan
+        color_palette[0] = get_port_config_for_color(0b000, 0b000, 0b000); // black
+        color_palette[1] = get_port_config_for_color(0b111, 0b111, 0b111); // white
+        color_palette[2] = get_port_config_for_color(0b111, 0b000, 0b000); // red
+        color_palette[3] = get_port_config_for_color(0b000, 0b111, 0b000); // green
+        color_palette[4] = get_port_config_for_color(0b000, 0b000, 0b111); // blue
+        color_palette[5] = get_port_config_for_color(0b111, 0b111, 0b000); // yellow
+        color_palette[6] = get_port_config_for_color(0b111, 0b000, 0b111); // magenta
+        color_palette[7] = get_port_config_for_color(0b000, 0b111, 0b111); // cyan
         front_buffer = buffer_a;
         back_buffer = buffer_b;
 }

@@ -55,10 +55,10 @@ void setup_output(void) {
         gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM1_CH1); // PA8
         gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO_TIM3_CH3); // PB0
         gpio_set_mode(GPIO_COLOR_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-                      RED_PIN_1 | RED_PIN_2 | RED_PIN_3 |
-                      GREEN_PIN_1 | GREEN_PIN_2 | GREEN_PIN_3 |
-                      BLUE_PIN_1 | BLUE_PIN_2);
-        GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
+                      RED_MSP | RED_MMSP | RED_LSP |
+                      GREEN_MSP | GREEN_MMSP | GREEN_LSP |
+                      BLUE_MSP | BLUE_MMSP | BLUE_LSP);
+        GPIO_BRR(GPIO_COLOR_PORT) = 0xffff; // reset colors
 }
 
 void setup_video(void) {
@@ -178,8 +178,8 @@ void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
 }
 
 void invalid_operation(uint8_t *invalid_op) {
-        color_palette[0] = get_port_config_for_color(0b00000011);
-        color_palette[1] = get_port_config_for_color(0b11111111);
+        color_palette[0] = get_port_config_for_color(0b000, 0b000, 0b111);
+        color_palette[1] = get_port_config_for_color(0b111, 0b111, 0b111);
         for (uint16_t i = 0; i < 7200; ++i) {
                 front_buffer[i] = error[i];
         }
