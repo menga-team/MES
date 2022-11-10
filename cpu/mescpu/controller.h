@@ -11,6 +11,10 @@
 
 #define CONTROLLER_FREQ 4000
 
+extern uint16_t active_controller[4];
+extern uint16_t buttons[32];
+extern int counter;
+
 /**
  * Initialize timers needed for controllers.
  */
