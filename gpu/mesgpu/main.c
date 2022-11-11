@@ -24,7 +24,9 @@ int main(void) {
         setup_video();
         start_communication();
         start_video();
-        char *operation_string = malloc(sizeof(char) * 24 + 1); // 24chars + NUL
+        char *operation_string = malloc(sizeof(char) * 25); // 24chars + NUL
+        char *counter_string = malloc(sizeof(char) * 9); // 8chars + NUL
+        uint32_t counter = 0;
         while (1) {
                 // we have ~5µs every line and ~770µs every frame
                 sprintf(
@@ -38,7 +40,9 @@ int main(void) {
                         operation[5],
                         operation[6],
                         operation[7]);
+                sprintf(counter_string, "%08lx \33 Wurzeln gezogen", counter++);
                 write(8, 96, 1, 0, operation_string);
+                write(2, 24, 1, 0, counter_string);
         }
 }
 
@@ -62,6 +66,8 @@ void setup_output(void) {
 }
 
 void setup_video(void) {
+        write(2, 0, 1, 0, "Was macht ein Mathelehrer ");
+        write(2, 8, 1, 0, "im Garten? Wurzeln ziehen.");
         // good for debugging pixel sizes
 //        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++) {
 //                gpu_set_pixel(buffer_a, i, i % 2);
@@ -86,27 +92,30 @@ void start_communication(void) {
         gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO15); // NSS
         SPI1_I2SCFGR = 0;
         spi_set_slave_mode(SPI1);
-        spi_set_receive_only_mode(SPI1);
+//        spi_set_receive_only_mode(SPI1);
         spi_set_dff_8bit(SPI1);
-        spi_set_clock_phase_1(SPI1);
         spi_enable_software_slave_management(SPI1);
         spi_set_nss_high(SPI1);
+        spi_set_clock_polarity_0(SPI1);
+        spi_set_clock_phase_1(SPI1);
         spi_set_baudrate_prescaler(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_64);
-        spi_send_msb_first(SPI1);
+//        spi_send_msb_first(SPI1);
         spi_disable_crc(SPI1);
         spi_enable_rx_dma(SPI1);
         spi_enable(SPI1);
-        nvic_set_priority(NVIC_DMA1_CHANNEL2_IRQ, 1);
-        nvic_enable_irq(NVIC_DMA1_CHANNEL2_IRQ);
         dma_set_peripheral_address(DMA1, DMA_CHANNEL2, (uint32_t) &SPI1_DR);
-        dma_set_memory_address(DMA1, DMA_CHANNEL2, (uint32_t) operation);
+        dma_set_memory_address(DMA1, DMA_CHANNEL2, (uint32_t) &operation);
+        dma_disable_peripheral_increment_mode(DMA1, DMA_CHANNEL2);
+        dma_enable_circular_mode(DMA1, DMA_CHANNEL2);
         dma_set_number_of_data(DMA1, DMA_CHANNEL2, OPERATION_LENGTH);
         dma_set_read_from_peripheral(DMA1, DMA_CHANNEL2);
         dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL2);
         dma_set_peripheral_size(DMA1, DMA_CHANNEL2, DMA_CCR_PSIZE_8BIT);
-        dma_set_memory_size(DMA1, DMA_CHANNEL2, DMA_CCR_MSIZE_8BIT);
+//        dma_set_memory_size(DMA1, DMA_CHANNEL2, DMA_CCR_MSIZE_8BIT);
         dma_set_priority(DMA1, DMA_CHANNEL2, DMA_CCR_PL_VERY_HIGH);
         dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL2);
+        nvic_set_priority(NVIC_DMA1_CHANNEL2_IRQ, 1);
+        nvic_enable_irq(NVIC_DMA1_CHANNEL2_IRQ);
         dma_enable_channel(DMA1, DMA_CHANNEL2);
 }
 
