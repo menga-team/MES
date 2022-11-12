@@ -27,13 +27,14 @@ int main(void) {
         char *operation_string = malloc(sizeof(char) * 25); // 24chars + NUL
         while (1) {
                 // we have ~5µs every line and ~770µs every frame
-                if (new_operation) {
+                if (processing_stage == UNHANDELED_OPERATION) {
                         GPIO_BRR(GPU_READY_PORT) = GPU_READY;
                         switch (operation[3]) {
                                 case 0xff:
                                         GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
                                         write(0, 0, 1, 0, "CPU synced!");
                                         dma_recieve_operation();
+                                        processing_stage = READY;
                                         break;
                                 default:
                                         sprintf(operation_string,
@@ -47,8 +48,9 @@ int main(void) {
                                                 operation[6],
                                                 operation[7]);
                                         write(8, 96, 1, 0, operation_string);
+                                        processing_stage = READY;
+                                        break;
                         }
-                        new_operation = false;
                 }
 //                sprintf(operation_string,
 //                        "%02x %02x %02x %02x  %02x %02x %02x %02x",
@@ -101,8 +103,8 @@ void setup_video(void) {
 void start_communication(void) {
         RCC_APB1ENR &= ~RCC_APB1ENR_I2C1EN; // disable i2c if it happend to be enabled, see erata.
         // SS=PA4 SCK=PA5 MISO=PA6 MOSI=PA7
-        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO4 | GPIO5 | GPIO7);
         gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO6);
+        gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO5 | GPIO4 | GPIO7);
         rcc_periph_clock_enable(RCC_SPI1);
         spi_reset(SPI1);
         spi_set_slave_mode(SPI1);
@@ -226,5 +228,5 @@ void dma1_channel2_isr(void) {
         dma_disable_transfer_complete_interrupt(DMA1, DMA_CHANNEL2);
         spi_disable_rx_dma(SPI1);
         dma_disable_channel(DMA1, DMA_CHANNEL2);
-        new_operation = true;
+        processing_stage = UNHANDELED_OPERATION;
 }
