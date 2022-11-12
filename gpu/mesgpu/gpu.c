@@ -16,6 +16,7 @@ const void *line;
 uint32_t pxs = 0;
 uint8_t operation[OPERATION_LENGTH];
 uint8_t operation_data[OPERATION_DATA_LENGTH];
+volatile bool new_operation = false;
 
 uint16_t get_port_config_for_color(uint8_t red, uint8_t green, uint8_t blue) {
         // TODO: maybe macro?

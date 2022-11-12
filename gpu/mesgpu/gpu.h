@@ -63,7 +63,8 @@
 /// Least Significant Pin
 #define BLUE_LSP GPIO9
 
-#define GPU_READY_PIN GPIO15
+#define GPU_READY_PORT GPIOC
+#define GPU_READY GPIO15
 
 // -11 because we need some time to get ready
 #define PREPARE_DISPLAY ((H_SYNC_PULSE_PIXELS / 5 + H_BACK_PORCH_PIXELS / 5) - 11) // 42-11 (43.2)
@@ -83,6 +84,7 @@ extern const void *line;
 extern uint32_t pxs;
 extern uint8_t operation[OPERATION_LENGTH];
 extern uint8_t operation_data[OPERATION_DATA_LENGTH];
+extern volatile bool new_operation;
 
 
 uint16_t get_port_config_for_color(uint8_t red, uint8_t green, uint8_t blue);

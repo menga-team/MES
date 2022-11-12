@@ -25,24 +25,42 @@ int main(void) {
         start_communication();
         start_video();
         char *operation_string = malloc(sizeof(char) * 25); // 24chars + NUL
-        char *counter_string = malloc(sizeof(char) * 9); // 8chars + NUL
-        uint32_t counter = 0;
         while (1) {
                 // we have ~5µs every line and ~770µs every frame
-                sprintf(
-                        operation_string,
-                        "%02x %02x %02x %02x  %02x %02x %02x %02x",
-                        operation[0],
-                        operation[1],
-                        operation[2],
-                        operation[3],
-                        operation[4],
-                        operation[5],
-                        operation[6],
-                        operation[7]);
-                sprintf(counter_string, "%08lx \33 Wurzeln gezogen", counter++);
-                write(8, 96, 1, 0, operation_string);
-                write(2, 24, 1, 0, counter_string);
+                if (new_operation) {
+                        GPIO_BRR(GPU_READY_PORT) = GPU_READY;
+                        switch (operation[3]) {
+                                case 0xff:
+                                        GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+                                        write(0, 0, 1, 0, "CPU synced!");
+                                        dma_recieve_operation();
+                                        break;
+                                default:
+                                        sprintf(operation_string,
+                                                "%02x %02x %02x %02x  %02x %02x %02x %02x",
+                                                operation[0],
+                                                operation[1],
+                                                operation[2],
+                                                operation[3],
+                                                operation[4],
+                                                operation[5],
+                                                operation[6],
+                                                operation[7]);
+                                        write(8, 96, 1, 0, operation_string);
+                        }
+                        new_operation = false;
+                }
+//                sprintf(operation_string,
+//                        "%02x %02x %02x %02x  %02x %02x %02x %02x",
+//                        operation[0],
+//                        operation[1],
+//                        operation[2],
+//                        operation[3],
+//                        operation[4],
+//                        operation[5],
+//                        operation[6],
+//                        operation[7]);
+//                write(8, 96, 1, 0, operation_string);
         }
 }
 
@@ -52,7 +70,7 @@ void setup_output(void) {
         rcc_periph_clock_enable(RCC_GPIOB);
         rcc_periph_clock_enable(RCC_GPIOC);
         gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13); // built-in
-        gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPU_READY_PIN);
+        gpio_set_mode(GPU_READY_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPU_READY);
         gpio_set(GPIOC, GPIO13);
         // A8: hsync (yellow cable)
         // B0: vsync (orange cable)
@@ -62,12 +80,11 @@ void setup_output(void) {
                       RED_MSP | RED_MMSP | RED_LSP |
                       GREEN_MSP | GREEN_MMSP | GREEN_LSP |
                       BLUE_MSP | BLUE_MMSP | BLUE_LSP);
-        GPIO_BRR(GPIO_COLOR_PORT) = 0xffff; // reset colors
+        gpio_clear(GPIO_COLOR_PORT, 0xffff); // reset colors
+        gpio_clear(GPU_READY_PORT, GPU_READY); // set gpu ready to low
 }
 
 void setup_video(void) {
-        write(2, 0, 1, 0, "Was macht ein Mathelehrer ");
-        write(2, 8, 1, 0, "im Garten? Wurzeln ziehen.");
         // good for debugging pixel sizes
 //        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++) {
 //                gpu_set_pixel(buffer_a, i, i % 2);
@@ -77,45 +94,41 @@ void setup_video(void) {
 //                        gpu_set_pixel(buffer_a, i, 0b111);
 //        }
         // stripes
-//        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
-//                gpu_set_pixel(buffer_a, i, i % 8);
+        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
+                gpu_set_pixel(buffer_a, i, i % 8);
 }
 
 void start_communication(void) {
-        dma_channel_reset(DMA1, DMA_CHANNEL2);
-        spi_reset(SPI1);
-        rcc_periph_clock_enable(RCC_DMA1);
+        RCC_APB1ENR &= ~RCC_APB1ENR_I2C1EN; // disable i2c if it happend to be enabled, see erata.
+        // SS=PA4 SCK=PA5 MISO=PA6 MOSI=PA7
+        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO4 | GPIO5 | GPIO7);
+        gpio_set_mode(GPIOA, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO6);
         rcc_periph_clock_enable(RCC_SPI1);
-        // SCK & MOSI
-        gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO3 | GPIO5);
-        gpio_set_mode(GPIOB, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, GPIO4); // MISO
-        gpio_set_mode(GPIOA, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO15); // NSS
-        SPI1_I2SCFGR = 0;
+        spi_reset(SPI1);
         spi_set_slave_mode(SPI1);
-//        spi_set_receive_only_mode(SPI1);
-        spi_set_dff_8bit(SPI1);
-        spi_enable_software_slave_management(SPI1);
-        spi_set_nss_high(SPI1);
-        spi_set_clock_polarity_0(SPI1);
+        spi_set_clock_polarity_1(SPI1);
         spi_set_clock_phase_1(SPI1);
-        spi_set_baudrate_prescaler(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_64);
-//        spi_send_msb_first(SPI1);
-        spi_disable_crc(SPI1);
-        spi_enable_rx_dma(SPI1);
+        spi_set_dff_8bit(SPI1);
+        spi_send_msb_first(SPI1);
         spi_enable(SPI1);
+        rcc_periph_clock_enable(RCC_DMA1);
+        dma_recieve_operation();
+        nvic_set_priority(NVIC_DMA1_CHANNEL2_IRQ, 1);
+        nvic_enable_irq(NVIC_DMA1_CHANNEL2_IRQ);
+}
+
+void dma_recieve_operation(void) {
+        dma_channel_reset(DMA1, DMA_CHANNEL2);
         dma_set_peripheral_address(DMA1, DMA_CHANNEL2, (uint32_t) &SPI1_DR);
         dma_set_memory_address(DMA1, DMA_CHANNEL2, (uint32_t) &operation);
-        dma_disable_peripheral_increment_mode(DMA1, DMA_CHANNEL2);
-        dma_enable_circular_mode(DMA1, DMA_CHANNEL2);
         dma_set_number_of_data(DMA1, DMA_CHANNEL2, OPERATION_LENGTH);
         dma_set_read_from_peripheral(DMA1, DMA_CHANNEL2);
         dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL2);
         dma_set_peripheral_size(DMA1, DMA_CHANNEL2, DMA_CCR_PSIZE_8BIT);
-//        dma_set_memory_size(DMA1, DMA_CHANNEL2, DMA_CCR_MSIZE_8BIT);
+        dma_set_memory_size(DMA1, DMA_CHANNEL2, DMA_CCR_MSIZE_8BIT);
         dma_set_priority(DMA1, DMA_CHANNEL2, DMA_CCR_PL_VERY_HIGH);
         dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL2);
-        nvic_set_priority(NVIC_DMA1_CHANNEL2_IRQ, 1);
-        nvic_enable_irq(NVIC_DMA1_CHANNEL2_IRQ);
+        spi_enable_rx_dma(SPI1);
         dma_enable_channel(DMA1, DMA_CHANNEL2);
 }
 
@@ -210,5 +223,8 @@ void invalid_operation(uint8_t *invalid_op) {
 }
 
 void dma1_channel2_isr(void) {
-        invalid_operation(operation);
+        dma_disable_transfer_complete_interrupt(DMA1, DMA_CHANNEL2);
+        spi_disable_rx_dma(SPI1);
+        dma_disable_channel(DMA1, DMA_CHANNEL2);
+        new_operation = true;
 }

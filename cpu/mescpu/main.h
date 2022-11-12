@@ -3,7 +3,7 @@
 
 void configure_io(void);
 
-void wait_for_gpu(void);
+void clock_peripherals(void);
 
 
 #endif //MES_MAIN_H
