@@ -1,7 +1,12 @@
 use anyhow::anyhow;
 use bitvec::prelude::*;
-use png::{ColorType};
-use std::{fs::File, io::{Write, self}, path::PathBuf, str::FromStr};
+use png::ColorType;
+use std::{
+    fs::File,
+    io::{self, Write},
+    path::PathBuf,
+    str::FromStr,
+};
 use structopt::StructOpt;
 
 fn main() {
@@ -29,10 +34,23 @@ fn run() -> anyhow::Result<()> {
     }
     let mut bv = bitvec![u8, Msb0;];
     for i in 0..next_frame.buffer_size() {
-        bv.extend(&bytes[i].view_bits::<Msb0>()[1..=3]);
-        bv.extend(&bytes[i].view_bits::<Msb0>()[5..=7]);
+        match next_frame.bit_depth {
+            png::BitDepth::One => {
+                for bit in bytes[i].view_bits::<Msb0>().iter() {
+                    bv.push(false);
+                    bv.push(false);
+                    bv.push(*bit);
+                }
+            },
+            png::BitDepth::Two => todo!(),
+            png::BitDepth::Four => {
+                bv.extend(&bytes[i].view_bits::<Msb0>()[1..=3]);
+                bv.extend(&bytes[i].view_bits::<Msb0>()[5..=7]);        
+            },
+            png::BitDepth::Eight => todo!(),
+            png::BitDepth::Sixteen => todo!(),
+        }
     }
-
 
     let mut out: Box<dyn Write> = if opt.output_file == "-" {
         Box::new(io::stdout())
@@ -54,10 +72,16 @@ fn run() -> anyhow::Result<()> {
             )?;
         }
     }
-
+    if opt.output_type == OutputType::Code {
+        write!(
+            &mut out,
+            "uint8_t __attribute__((section (\".rodata\"))) image[{}] = {{\n\t",
+            bv.as_raw_slice().len()
+        )?;
+    }
     for bytes in bv.as_raw_slice().chunks_exact(3) {
         match opt.output_type {
-            OutputType::CArray => {
+            OutputType::CArray | OutputType::Code => {
                 write!(
                     &mut out,
                     "0x{:02x}, 0x{:02x}, 0x{:02x}, ",
@@ -70,14 +94,14 @@ fn run() -> anyhow::Result<()> {
             OutputType::Binary => {
                 out.write(&[bytes[2], bytes[1], bytes[0]])?;
             }
-            OutputType::Code => {
-                writeln!(
-                    &mut out,
-                    "buffer_a[i++] = 0x{:02x};\nbuffer_a[i++] = 0x{:02x};\nbuffer_a[i++] = 0x{:02x};",
-                    bytes[2], bytes[1], bytes[0]
-                )?;
-            },
         }
+    }
+    if opt.output_type == OutputType::Code {
+        writeln!(
+            &mut out,
+            "\n}};\nfor(uint16_t i; i < {}; ++i)\n\tfront_buffer[i] = image[i];",
+            bv.as_raw_slice().len()
+        )?;
     }
     out.flush()?;
     Ok(())

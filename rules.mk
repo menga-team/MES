@@ -1,32 +1,8 @@
 # Adapted from: https://github.com/libopencm3/libopencm3-template/blob/master/rules.mk
-PROJECT		= mesgpu
-CFILES		= main.c gpu.c
-OPENCM3_DIR	:= ../../libopencm3
-#DEVICE		= stm32f103c8t6
-LDSCRIPT	= stm32f103c8tx.ld
-OPENCM3_LIB	= opencm3_stm32f1
-OPENCM3_DEFS	= -DSTM32F1
-ARCH_FLAGS	= -mcpu=cortex-m3 -mlittle-endian -mthumb
-
-INCLUDES	= -I../../include
-BUILD_DIR	?= bin
-OPT		?= -O2
-CSTD		?= -std=c99
-OOCD_FILE	= ../../utils/openocd.stlink-stm32fx.cfg
-
-LDFLAGS		+= --specs=rdimon.specs -lc -lrdimon
-
-SEMIHOSTING	?= 0
 
 ifeq ($(SEMIHOSTING),1)
 DEFS		+= -DSEMIHOSTING=1
 endif
-
-# CXXSTD - no default.
-# OOCD_INTERFACE - eg stlink-v2
-# OOCD_TARGET - eg stm32f4x
-# OOCD_FILE - eg my.openocd.cfg
-
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
 # If you're insane, V=99 will print out all sorts of things.
@@ -54,11 +30,10 @@ OBJS = $(CFILES:%.c=$(BUILD_DIR)/%.o)
 OBJS += $(CXXFILES:%.cxx=$(BUILD_DIR)/%.o)
 OBJS += $(AFILES:%.S=$(BUILD_DIR)/%.o)
 GENERATED_BINS = $(PROJECT).elf $(PROJECT).bin $(PROJECT).map $(PROJECT).list $(PROJECT).lss
-GENERATED_CODE = scanline.g.c
 
 TGT_CPPFLAGS += -MD
 TGT_CPPFLAGS += -Wall -Wundef $(INCLUDES)
-TGT_CPPFLAGS += $(INCLUDES) $(OPENCM3_DEFS) $(DEFS)
+TGT_CPPFLAGS += $(INCLUDES) $(OPENCM3_DEFS)
 
 TGT_CFLAGS += $(OPT) $(CSTD) -ggdb3
 TGT_CFLAGS += $(ARCH_FLAGS)
@@ -106,7 +81,6 @@ LDLIBS += -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
 
 all: $(PROJECT).elf $(PROJECT).bin
 flash: $(PROJECT).flash
-oocd: $(PROJECT).oocd
 
 # error if not using linker script generator
 ifeq (,$(DEVICE))
@@ -120,7 +94,7 @@ GENERATED_BINS += $(LDSCRIPT)
 endif
 
 # Need a special rule to have a bin dir
-$(BUILD_DIR)/%.o: %.c scanline.g.c
+$(BUILD_DIR)/%.o: %.c
 	@printf "  CC\t$<\n"
 	@mkdir -p $(dir $@)
 	$(Q)$(CC) $(TGT_CFLAGS) $(CFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $@ -c $<
@@ -153,27 +127,8 @@ $(PROJECT).elf: $(OBJS) $(LDSCRIPT) $(LIBDEPS)
 	@printf "  FLASH\t$<\n"
 	st-flash write $(*).bin 0x08000000
 
-%.oocd: %.elf
-	@printf "  OOCD\t$<\n"
-
-ifeq (,$(OOCD_FILE))
-	$(Q)(echo "halt; program $(realpath $(*).elf) verify reset halt" | nc -4 localhost 4444 2>/dev/null) || \
-		$(OOCD) -f interface/$(OOCD_INTERFACE).cfg \
-		-f target/$(OOCD_TARGET).cfg \
-		-c "program $(realpath $(*).elf) verify reset exit" \
-		#$(NULL)
-else
-	$(Q)(echo "halt; program $(realpath $(*).elf) verify reset halt" | nc -4 localhost 4444 2>/dev/null) || \
-		$(OOCD) -f $(OOCD_FILE) \
-		-c "program $(realpath $(*).elf) verify reset exit" \
-		#$(NULL)
-endif
-
-scanline.g.c:
-	python generators/scanline_generator.py > scanline.g.c
-
 clean:
-	rm -rf $(BUILD_DIR) $(GENERATED_BINS) $(GENERATED_CODE)
+	rm -rf $(BUILD_DIR) $(GENERATED_BINS)
 
 .PHONY: all clean flash
 -include $(OBJS:.o=.d)
