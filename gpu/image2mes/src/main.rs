@@ -42,7 +42,13 @@ fn run() -> anyhow::Result<()> {
                     bv.push(*bit);
                 }
             },
-            png::BitDepth::Two => todo!(),
+            png::BitDepth::Two => {
+                for bits in bytes[i].view_bits::<Msb0>().chunks_exact(2) {
+                    bv.push(false);
+                    bv.push(bits[0]);
+                    bv.push(bits[1]);
+                }
+            },
             png::BitDepth::Four => {
                 bv.extend(&bytes[i].view_bits::<Msb0>()[1..=3]);
                 bv.extend(&bytes[i].view_bits::<Msb0>()[5..=7]);        
@@ -64,11 +70,11 @@ fn run() -> anyhow::Result<()> {
         for (i, color) in palette.iter().enumerate() {
             writeln!(
                 &mut out,
-                "color_palette[{}] = get_port_config_for_color(0x{:02x});",
+                "color_palette[{}] = get_port_config_for_color(0b{:03b}, 0b{:03b}, 0b{:03b});",
                 i,
-                ((((color.r as f64) / 32.0) as u8) << 5)
-                    | ((((color.g as f64) / 32.0) as u8) << 2)
-                    | (((color.b as f64) / 64.0) as u8)
+                ((color.r as f64) / 32.0) as u8,
+                ((color.g as f64) / 32.0) as u8,
+                ((color.b as f64) / 32.0) as u8
             )?;
         }
     }
