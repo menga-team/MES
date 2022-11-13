@@ -3,7 +3,7 @@
 
 // the bits per pixel (bpp) define how large the palette can be.
 // colorid => port
-uint16_t color_palette[1 << BUFFER_BPP]; // 2^BUFFER_BPP
+uint16_t color_palette[1 << DRM_BUFFER_BPP]; // 2^BUFFER_BPP
 
 uint8_t __attribute__((section (".buffer_a"))) buffer_a[
         (BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t))];
@@ -17,6 +17,13 @@ uint32_t pxs = 0;
 uint8_t operation[OPERATION_LENGTH];
 uint8_t operation_data[OPERATION_DATA_LENGTH];
 volatile enum Stage processing_stage = READY;
+const char *stage_pretty_names[4] = {
+        "Waiting for operation",
+        "New operation",
+        "Waiting for data",
+        "New data"
+};
+volatile bool run = true;
 
 uint16_t get_port_config_for_color(uint8_t red, uint8_t green, uint8_t blue) {
         // TODO: maybe macro?
@@ -68,7 +75,7 @@ void gpu_init(void) {
         back_buffer = buffer_b;
 }
 
-void write(uint8_t x, uint8_t y, uint8_t fg, uint8_t bg, const char *text) {
+void gpu_write(uint8_t x, uint8_t y, uint8_t fg, uint8_t bg, const char *text) {
         // TODO: Optimize lol
         uint8_t i = 0;
         while (text[i] != '\0') {

@@ -9,10 +9,10 @@
 #include <stdio.h>
 #include "gpu.h"
 
-// Include peppers image as `peppers`
-//#include "images/peppers.m3ifc"
 // Include error screen as 'error'
 #include "images/error.m3ifc"
+// Include cpu timeout screen as 'cpu_timeout'
+#include "images/cpu_timeout.m3ifc"
 
 // the bits per pixel (bpp) define how large the palette can be.
 // colorid => port
@@ -24,46 +24,46 @@ int main(void) {
         setup_video();
         start_communication();
         start_video();
-        char *operation_string = malloc(sizeof(char) * 25); // 24chars + NUL
-        while (1) {
+//        cpu_communication_timeout();
+        while (run) {
                 // we have ~5µs every line and ~770µs every frame
-                if (processing_stage == UNHANDELED_OPERATION) {
-                        GPIO_BRR(GPU_READY_PORT) = GPU_READY;
-                        switch (operation[3]) {
-                                case 0xff:
-                                        GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
-                                        write(0, 0, 1, 0, "CPU synced!");
-                                        dma_recieve_operation();
-                                        processing_stage = READY;
-                                        break;
-                                default:
-                                        sprintf(operation_string,
-                                                "%02x %02x %02x %02x  %02x %02x %02x %02x",
-                                                operation[0],
-                                                operation[1],
-                                                operation[2],
-                                                operation[3],
-                                                operation[4],
-                                                operation[5],
-                                                operation[6],
-                                                operation[7]);
-                                        write(8, 96, 1, 0, operation_string);
-                                        processing_stage = READY;
-                                        break;
+                switch (processing_stage) {
+                        case UNHANDELED_OPERATION: {
+                                GPIO_BRR(GPU_READY_PORT) = GPU_READY;
+                                switch (operation[3]) {
+                                        case 0xff: { // init
+                                                gpu_write(0, 0, 1, 0, "CPU synced!");
+                                                dma_recieve_operation();
+                                                processing_stage = READY;
+                                                GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+                                                break;
+                                        }
+                                        case 0x02: { // swap buffers
+                                                gpu_swap_buffers();
+                                                processing_stage = READY;
+                                                GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+                                                break;
+                                        }
+                                        default: { // unimplemented operation
+                                                invalid_operation(operation);
+                                                processing_stage = READY;
+                                                break;
+                                        }
+                                }
+                                break;
+                        }
+                        case READY: {
+                                break;
+                        }
+                        case WAITING_FOR_DATA: {
+                                break;
+                        }
+                        default: {
+                                break;
                         }
                 }
-//                sprintf(operation_string,
-//                        "%02x %02x %02x %02x  %02x %02x %02x %02x",
-//                        operation[0],
-//                        operation[1],
-//                        operation[2],
-//                        operation[3],
-//                        operation[4],
-//                        operation[5],
-//                        operation[6],
-//                        operation[7]);
-//                write(8, 96, 1, 0, operation_string);
         }
+        while (true);
 }
 
 void setup_output(void) {
@@ -96,8 +96,8 @@ void setup_video(void) {
 //                        gpu_set_pixel(buffer_a, i, 0b111);
 //        }
         // stripes
-        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
-                gpu_set_pixel(buffer_a, i, i % 8);
+//        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
+//                gpu_set_pixel(buffer_a, i, i % 8);
 }
 
 void start_communication(void) {
@@ -120,10 +120,14 @@ void start_communication(void) {
 }
 
 void dma_recieve_operation(void) {
+        dma_recieve((uint32_t) &operation, OPERATION_LENGTH);
+}
+
+void dma_recieve(uint32_t adr, uint32_t len) {
         dma_channel_reset(DMA1, DMA_CHANNEL2);
         dma_set_peripheral_address(DMA1, DMA_CHANNEL2, (uint32_t) &SPI1_DR);
-        dma_set_memory_address(DMA1, DMA_CHANNEL2, (uint32_t) &operation);
-        dma_set_number_of_data(DMA1, DMA_CHANNEL2, OPERATION_LENGTH);
+        dma_set_memory_address(DMA1, DMA_CHANNEL2, adr);
+        dma_set_number_of_data(DMA1, DMA_CHANNEL2, len);
         dma_set_read_from_peripheral(DMA1, DMA_CHANNEL2);
         dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL2);
         dma_set_peripheral_size(DMA1, DMA_CHANNEL2, DMA_CCR_PSIZE_8BIT);
@@ -201,15 +205,19 @@ void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
         TIM_SR(TIM1) = 0x0000;
 }
 
-void invalid_operation(uint8_t *invalid_op) {
+void generic_error(void) {
+        run = false;
         color_palette[0] = get_port_config_for_color(0b000, 0b000, 0b111);
         color_palette[1] = get_port_config_for_color(0b111, 0b111, 0b111);
         for (uint16_t i = 0; i < 7200; ++i) {
                 front_buffer[i] = error[i];
         }
+}
 
-        write(2, 80, 1, 0, "-UNIMPLEMENTED  OPERATION-");
-        char *operation_string = malloc(sizeof(char) * 24 + 1); // 24chars + NUL
+void invalid_operation(uint8_t *invalid_op) {
+        generic_error();
+        gpu_write(2, 80, 1, 0, "-UNIMPLEMENTED  OPERATION-");
+        char *operation_string = malloc(sizeof(char) * 25); // 24chars + NUL
         sprintf(
                 operation_string,
                 "%02x %02x %02x %02x  %02x %02x %02x %02x",
@@ -221,12 +229,47 @@ void invalid_operation(uint8_t *invalid_op) {
                 invalid_op[5],
                 invalid_op[6],
                 invalid_op[7]);
-        write(8, 96, 1, 0, operation_string);
+        gpu_write(8, 96, 1, 0, operation_string);
+}
+
+void unexpected_data(enum Stage c_stage) {
+        generic_error();
+        gpu_write(2, 80, 1, 0, "  -  UNEXPECTED  DATA  -  ");
+        gpu_write(0, 88, 1, 0, "Current processing stage:");
+        char *buf = malloc(sizeof(char) * 27); // 26chars (whole line) + NUL
+        sprintf(buf, "%s (%02x)", stage_pretty_names[c_stage], c_stage);
+        gpu_write(0, 96, 1, 0, buf);
+        sprintf(buf, "Recieved data: (%04lx)", DMA_CMAR(DMA1, DMA_CHANNEL2));
+        gpu_write(0, 104, 1, 0, buf);
+        uint8_t *data = (uint8_t *) DMA_CMAR(DMA1, DMA_CHANNEL2);
+        sprintf(buf, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x ...",
+                data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10]);
+        gpu_write(0, 112, 1, 0, buf);
+}
+
+void cpu_communication_timeout(void) {
+        color_palette[0] = get_port_config_for_color(0b000, 0b000, 0b000);
+        color_palette[1] = get_port_config_for_color(0b110, 0b110, 0b110);
+        color_palette[2] = get_port_config_for_color(0b100, 0b100, 0b100);
+        color_palette[3] = get_port_config_for_color(0b111, 0b111, 0b111);
+        for (uint16_t i = 0; i < 7200; ++i) {
+                front_buffer[i] = cpu_timeout[i];
+        }
 }
 
 void dma1_channel2_isr(void) {
         dma_disable_transfer_complete_interrupt(DMA1, DMA_CHANNEL2);
         spi_disable_rx_dma(SPI1);
         dma_disable_channel(DMA1, DMA_CHANNEL2);
-        processing_stage = UNHANDELED_OPERATION;
+        switch (processing_stage) {
+                case READY:
+                        processing_stage = UNHANDELED_OPERATION;
+                        break;
+                case WAITING_FOR_DATA:
+                        processing_stage = UNHANDELED_DATA;
+                        break;
+                default:
+                        unexpected_data(processing_stage);
+                        break;
+        }
 }
