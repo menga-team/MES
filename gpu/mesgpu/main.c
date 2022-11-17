@@ -14,9 +14,6 @@
 // Include cpu timeout screen as 'cpu_timeout'
 #include "images/cpu_timeout.m3ifc"
 
-// the bits per pixel (bpp) define how large the palette can be.
-// colorid => port
-
 int main(void) {
         rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
         setup_output();
@@ -24,6 +21,7 @@ int main(void) {
         setup_video();
         start_communication();
         start_video();
+        // TODO: activate systick while cpu is not yet connected to display cpu timeout in case it happends
 //        cpu_communication_timeout();
         while (run) {
                 // we have ~5µs every line and ~770µs every frame
@@ -40,6 +38,14 @@ int main(void) {
                                         }
                                         case 0x02: { // swap buffers
                                                 gpu_swap_buffers();
+                                                dma_recieve_operation();
+                                                processing_stage = READY;
+                                                GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+                                                break;
+                                        }
+                                        case 0x00: {
+                                                if(operation[])
+                                                dma_recieve();
                                                 processing_stage = READY;
                                                 GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
                                                 break;
@@ -114,9 +120,9 @@ void start_communication(void) {
         spi_send_msb_first(SPI1);
         spi_enable(SPI1);
         rcc_periph_clock_enable(RCC_DMA1);
-        dma_recieve_operation();
         nvic_set_priority(NVIC_DMA1_CHANNEL2_IRQ, 1);
         nvic_enable_irq(NVIC_DMA1_CHANNEL2_IRQ);
+        dma_recieve_operation();
 }
 
 void dma_recieve_operation(void) {
