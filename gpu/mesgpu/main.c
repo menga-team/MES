@@ -44,10 +44,18 @@ int main(void) {
                                                 break;
                                         }
                                         case 0x00: {
-                                                if(operation[])
-                                                dma_recieve();
-                                                processing_stage = READY;
-                                                GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+                                                if (operation[4] == 0x00 && operation[5] == 0x00 &&
+                                                    operation[6] == 0x00 && operation[7] == 0x00) {
+                                                        // recieve full frame via dma
+                                                        dma_recieve((uint32_t) front_buffer, BUFFER_SIZE);
+                                                        processing_stage = WAITING_FOR_DMA;
+                                                } else {
+                                                        dma_recieve(
+                                                                (uint32_t) operation_data,
+                                                                uround((operation[6] * operation[7] * BUFFER_BPP) / 8)
+                                                        );
+                                                        processing_stage = WAITING_FOR_DATA;
+                                                }
                                                 break;
                                         }
                                         default: { // unimplemented operation
@@ -58,10 +66,26 @@ int main(void) {
                                 }
                                 break;
                         }
-                        case READY: {
-                                break;
-                        }
-                        case WAITING_FOR_DATA: {
+                        case UNHANDELED_DATA: {
+                                switch (operation[3]) {
+                                        case 0x00: {
+                                                const uint8_t o_x = operation[4];
+                                                const uint8_t o_y = operation[5];
+                                                const uint8_t s_x = operation[6];
+                                                const uint8_t s_y = operation[7];
+                                                uint16_t buf_size = DMA_CNDTR(DMA1, DMA_CHANNEL2);
+                                                for (uint8_t c_x = 0; c_x < s_x; ++c_x) {
+                                                        for (uint8_t c_y = 0; c_y < s_y; ++c_y) {
+                                                                gpu_set_pixel(
+                                                                        front_buffer,
+                                                                        0, // todo
+                                                                        gpu_get_pixel(operation_data, c_y * s_y + c_x)
+                                                                )
+                                                        }
+                                                }
+                                                break;
+                                        }
+                                }
                                 break;
                         }
                         default: {
@@ -274,6 +298,9 @@ void dma1_channel2_isr(void) {
                 case WAITING_FOR_DATA:
                         processing_stage = UNHANDELED_DATA;
                         break;
+                case WAITING_FOR_DMA:
+                        processing_stage = READY;
+                        GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
                 default:
                         unexpected_data(processing_stage);
                         break;

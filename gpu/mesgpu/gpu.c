@@ -14,14 +14,16 @@ uint8_t *front_buffer, *back_buffer;
 uint8_t buffer_line = 0;
 const void *line;
 uint32_t pxs = 0;
+uint16_t data_cursor = 0;
 uint8_t operation[OPERATION_LENGTH];
 uint8_t operation_data[OPERATION_DATA_LENGTH];
 volatile enum Stage processing_stage = READY;
-const char *stage_pretty_names[4] = {
+const char *stage_pretty_names[5] = {
         "Waiting for operation",
         "New operation",
         "Waiting for data",
-        "New data"
+        "New data",
+        "Waiting for DMA"
 };
 volatile bool run = true;
 

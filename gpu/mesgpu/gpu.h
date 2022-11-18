@@ -36,6 +36,7 @@
 #define BUFFER_TO_VIDEO_RATIO 5
 #define BUFFER_WIDTH (H_DISPLAY_PIXELS / BUFFER_TO_VIDEO_RATIO)
 #define BUFFER_HEIGHT (V_DISPLAY_LINES / BUFFER_TO_VIDEO_RATIO)
+#define BUFFER_SIZE ((BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t)))
 #define BUFFER_BPP 3
 #define DRM_BUFFER_BPP 6
 #define PIXEL_MASK ((1 << BUFFER_BPP) - 1)
@@ -77,7 +78,7 @@
 #define OPERATION_DATA_LENGTH 512
 
 enum Stage {
-    READY = 0, UNHANDELED_OPERATION = 1, WAITING_FOR_DATA = 2, UNHANDELED_DATA = 3
+    READY = 0, UNHANDELED_OPERATION = 1, WAITING_FOR_DATA = 2, UNHANDELED_DATA = 3, WAITING_FOR_DMA = 4
 } __attribute__ ((__packed__));
 
 extern uint16_t color_palette[1 << DRM_BUFFER_BPP];
@@ -87,10 +88,11 @@ extern uint8_t *front_buffer, *back_buffer;
 extern uint8_t buffer_line;
 extern const void *line;
 extern uint32_t pxs;
+extern uint16_t data_cursor;
 extern uint8_t operation[OPERATION_LENGTH];
 extern uint8_t operation_data[OPERATION_DATA_LENGTH];
 extern volatile enum Stage processing_stage;
-extern const char *stage_pretty_names[4];
+extern const char *stage_pretty_names[5];
 extern volatile bool run;
 
 uint16_t get_port_config_for_color(uint8_t red, uint8_t green, uint8_t blue);
