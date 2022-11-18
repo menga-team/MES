@@ -65,11 +65,11 @@ void tim1_cc_isr(void) {
 }
 
 uint16_t controller_get_button_by_controller_and_index(int controller, int button) {
-        return buttons[(controller * 4) + button];
+        return buttons[(controller * 8) + button];
 }
 
 uint16_t controller_get_button_copy_by_controller_and_index(int controller, int button) {
-        uint16_t temp = buttons[(controller * 4) + button];
+        uint16_t temp = buttons[(controller * 8) + button];
         return temp;
 }
 

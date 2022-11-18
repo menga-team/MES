@@ -15,6 +15,11 @@ int main(void) {
         controller_setup_timers();
         gpu_initiate_communication();
         gpu_block_until_ready();
+        controller_get_button_by_index(2);
+        controller_get_button_by_controller_and_index(0, 2);
+        controller_get_buttons(0);
+        controller_get_status(0);
+        controller_get_statuses();
         while (true);
 }
 
