@@ -5,6 +5,7 @@
 #include "time.h"
 #include "gpu.h"
 #include "controller.h"
+#include "sdcard.h"
 
 int main(void) {
         rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
@@ -15,6 +16,7 @@ int main(void) {
         controller_setup_timers();
         gpu_initiate_communication();
         gpu_block_until_ready();
+        sdcard_init_peripheral();
         while (true);
 }
 
@@ -29,4 +31,12 @@ void clock_peripherals(void) {
 void configure_io(void) {
         gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13); // in-built
         gpio_set(GPIOC, GPIO13); // clear in-built led.
+}
+
+void __attribute__((weak)) sdcard_on_insert(void) {
+        // NOP
+}
+
+void __attribute__((weak)) sdcard_on_eject(void) {
+        // NOP
 }
