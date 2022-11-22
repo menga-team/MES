@@ -32,11 +32,3 @@ void configure_io(void) {
         gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13); // in-built
         gpio_set(GPIOC, GPIO13); // clear in-built led.
 }
-
-void __attribute__((weak)) sdcard_on_insert(void) {
-        // NOP
-}
-
-void __attribute__((weak)) sdcard_on_eject(void) {
-        // NOP
-}

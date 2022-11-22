@@ -264,3 +264,11 @@ bool sdcard_init_peripheral(void) {
         gpu_print_text(0, 32, 1, 0, text);
         return true;
 }
+
+void __attribute__((weak)) sdcard_on_insert(void) {
+        // NOP
+}
+
+void __attribute__((weak)) sdcard_on_eject(void) {
+        // NOP
+}
