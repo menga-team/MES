@@ -1,5 +1,4 @@
-
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 import sys
 import png # pip install pypng
 import curses.ascii
