@@ -4,13 +4,13 @@
 #include "stdint.h"
 #include <libopencm3/stm32/gpio.h>
 
-#define SDCARD_DRIVER_SPI_PORT GPIOB
-#define SDCARD_DRIVER_SPI_NSS GPIO12
-#define SDCARD_DRIVER_SPI_SCK GPIO13
-#define SDCARD_DRIVER_SPI_MISO GPIO14
-#define SDCARD_DRIVER_SPI_MOSI GPIO15
-#define SDCARD_DRIVER_SECTOR_SIZE 512
-#define SDCARD_DRIVER_CRC_POLY 0b10001001
+#define SD_SPI_PORT GPIOB
+#define SD_SPI_NSS GPIO12
+#define SD_SPI_SCK GPIO13
+#define SD_SPI_MISO GPIO14
+#define SD_SPI_MOSI GPIO15
+#define SD_SECTOR_SIZE 512
+#define SD_CRC_POLY 0b10001001
 
 #define SD_CMD0_GO_IDLE_STATE 0
 #define SD_CMD2_ALL_SEND_CID 2
@@ -64,8 +64,9 @@
 // next 6 bits reserved... 6: 0b00001111 7: 0b11000000
 #define SD_CSDV2_C_SIZE(X)                (uint32_t)((((uint32_t)X[7] & 0b00111111) << 10) | ((uint32_t)X[8] << 8) | ((uint32_t)X[9]))
 
-
 #define SD_START_BITS (0b01000000)
+
+#define SD_BLOCK_START_BYTE 0xfe
 
 // can be anything, but this pattern was recommended in spec page 40 of version 2.00.
 #define SD_CHECK_PATTERN (0b10101010)
@@ -109,7 +110,7 @@ union SDResponse1 {
 
 /**
  * Calculate the 7 bit CRC value of the given data.
- * The data will be shifted by one bit to the left and the firt bit will be set to 1.
+ * The data will be shifted by one bit to the left and the first bit will be set to 1.
  * @param data The data to be processed.
  * @param len The size of the data that should be processed.
  * @return 7 bit CRC
@@ -120,7 +121,7 @@ uint8_t sdcard_calculate_crc(const uint8_t *data, uint32_t len);
  * Will calculate the size of the SD-Card with the CSD Register according to Specification 1.00.
  * @related For Specification 2.00 see sdcard_calculate_size_csdv2.
  * @param csd The CSD Register @related sdcard_request_csd.
- * @return Size in bytes.
+ * @return Size in kb (kilobytes).
  */
 uint32_t sdcard_calculate_size_csdv1(const uint8_t *csd);
 
@@ -135,16 +136,16 @@ uint32_t sdcard_calculate_size_csdv2(const uint8_t *csd);
 
 /**
  * Establish the SPI peripheral for communicating with the Card.
- * @note The initial baudrate should be around 100kHz-400kHz.
+ * @note The initial baud-rate should be around 100kHz-400kHz.
  *          This can be speed up after the initialization via @related sdcard_set_spi_baudrate, if required.
  * @param br
  */
 void sdcard_establish_spi(uint32_t br);
 
 /**
- * Change the baudrate after already initializing SPI.
- * Used to speed up SPI after Card initializion is done.
- * @param br The new prefered baudrate.
+ * Change the baud-rate after already initializing SPI.
+ * Used to speed up SPI after Card initialization is done.
+ * @param br The new preferred baud-rate.
  */
 void sdcard_set_spi_baudrate(uint32_t br);
 
@@ -171,9 +172,9 @@ void sdcard_select(void);
 void sdcard_release(void);
 
 /**
- * This function is very similar to @related sdcard_transieve().
- * Unlike sdcard_transieve(), this function does not take a argument and will read first before transmitting any bytes.
- * If there are no bytes to be read, is will transmitt 0xff. This function is best used sequentially.
+ * This function is very similar to @related sdcard_transceive().
+ * Unlike sdcard_transceive(), this function does not take a argument and will read first before transmitting any bytes.
+ * If there are no bytes to be read, is will transmit 0xff. This function is best used sequentially.
  * @return Byte that was read.
  */
 uint8_t sdcard_read(void);
@@ -187,12 +188,12 @@ void sdcard_read_buf(uint8_t *buf, uint32_t len);
 
 /**
  * Read data of size @param len into @param buf, allowing for @param bytes_timeout timeout bytes before cancelling.
- * @param buf The buffer for incomming data.
- * @param len The length of incomming data.
+ * @param buf The buffer for incoming data.
+ * @param len The length of incoming data.
  * @param bytes_timeout How many timeout bytes (0xff) should be read before cancelling. Use 0 for no timeout.
  * @return
  */
-uint16_t sdcard_read_fe(uint8_t *buf, uint32_t len, uint32_t bytes_timeout);
+uint16_t sdcard_read_block(uint8_t *buf, uint32_t len, uint32_t bytes_timeout);
 
 /**
  * This function will block while SPI is busy.
@@ -200,12 +201,12 @@ uint16_t sdcard_read_fe(uint8_t *buf, uint32_t len, uint32_t bytes_timeout);
 void block_while_spi_busy(void);
 
 /**
- * Write a byte and recive a byte with one operation.
+ * Write a byte and receive a byte with one operation.
  * This function will block while SPI is busy.
  * @param data byte to be transmitted
  * @return byte recieved.
  */
-uint8_t sdcard_transieve(uint8_t data);
+uint8_t sdcard_transceive(uint8_t data);
 
 /**
  * Will transmit @param len bytes from @param data.
@@ -243,34 +244,51 @@ void sdcard_boot_sequence(void);
 
 /**
  * Will make the SD-Card operational, enabling functions like: `sdcard_request_csd`.
- * @return Possible errors that occured while initializing, or 0 (SD_CARD_NO_ERROR) when no error occured.
+ * @return Possible errors that occurred while initializing, or 0 (SD_CARD_NO_ERROR) when no error occurred.
  * @related SDInitResult
  */
 enum SDInitResult sdcard_init(void);
 
 /**
- * @param csd pointer thats pointing to atleast 16 bytes of free space.
- * This will read the 128bit CSD Register of the connected SD-Card into @param csd
+ * @param csd pointer that's pointing to at least 16 bytes of free space.
+ * This will read the 128bit CSD Register /of the connected SD-Card into @param csd
  * @return CRC
  */
 uint16_t sdcard_request_csd(uint8_t *csd);
 
 /**
  * This function will properly setup the SD-Card and display information about it on the connected Display.
- * Therefore the GPU must have been initilized beforehand.
- * @return Was the peripheral initialized sucessfully?
+ * Therefore the GPU must have been initialized beforehand.
+ * @return Was the peripheral initialized successfully?
  */
 bool sdcard_init_peripheral(void);
 
 /**
+ * Will read 512 bytes of data from sector @param sector.
+ * @related sdcard_read_sector_partially
+ * @param sector The sector to read from, first sector is 0
+ * @param data Where the data should be stored to.
+ */
+void sdcard_read_sector(uint32_t sector, uint8_t *data);
+
+/**
+ * Will read @param len bytes of data from sector @param sector.
+ * @param sector The sector to read from, first sector is 0
+ * @param data Where the data should be stored to.
+ * @param len The amount of data that should be read form the sector.
+ *              The method will discard the rest of the data, limiting data will not improve runtime.
+ */
+void sdcard_read_sector_partially(uint32_t sector, uint8_t *data, uint32_t len);
+
+/**
  * This function gets called when a new SD-Card was inserted.
- * It needs to be defined by the using programm.
+ * It needs to be defined by the using program.
  */
 void sdcard_on_insert(void);
 
 /**
  * This function gets called when a SD-Card was ejected.
- * It needs to be defined by the using programm.
+ * It needs to be defined by the using program.
  */
 void sdcard_on_eject(void);
 

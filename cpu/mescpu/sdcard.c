@@ -11,7 +11,7 @@ uint8_t sdcard_calculate_crc(const uint8_t *data, uint32_t len) {
         for (uint32_t i = 0; i < len; i++) {
                 crc ^= data[i];
                 for (int j = 0; j < 8; j++) {
-                        crc = (crc & 0x80u) ? ((crc << 1) ^ (SDCARD_DRIVER_CRC_POLY << 1)) : (crc << 1);
+                        crc = (crc & 0x80u) ? ((crc << 1) ^ (SD_CRC_POLY << 1)) : (crc << 1);
                 }
         }
         return crc + 1; // setting the end bit
@@ -21,7 +21,7 @@ uint32_t sdcard_args_send_if_cond(bool pcie_1v2, bool pcie_avail, enum SDVoltage
         return 0x00000000 | (pcie_1v2 << 13) | (pcie_avail << 12) | (vhs << 8) | pattern;
 }
 
-uint8_t sdcard_transieve(uint8_t data) {
+uint8_t sdcard_transceive(uint8_t data) {
         while (SPI2_SR & SPI_SR_BSY);
         SPI2_DR = data;
         while (!(SPI2_SR & SPI_SR_RXNE));
@@ -29,15 +29,15 @@ uint8_t sdcard_transieve(uint8_t data) {
 }
 
 void sdcard_select(void) {
-        sdcard_transieve(0xff);
-        gpio_clear(SDCARD_DRIVER_SPI_PORT, SDCARD_DRIVER_SPI_NSS);
-        sdcard_transieve(0xff);
+        sdcard_transceive(0xff);
+        gpio_clear(SD_SPI_PORT, SD_SPI_NSS);
+        sdcard_transceive(0xff);
 }
 
 void sdcard_release(void) {
-        sdcard_transieve(0xff);
-        gpio_set(SDCARD_DRIVER_SPI_PORT, SDCARD_DRIVER_SPI_NSS);
-        sdcard_transieve(0xff);
+        sdcard_transceive(0xff);
+        gpio_set(SD_SPI_PORT, SD_SPI_NSS);
+        sdcard_transceive(0xff);
 }
 
 void sdcard_boot_sequence(void) {
@@ -45,14 +45,14 @@ void sdcard_boot_sequence(void) {
         // MOSI needs to be high for at least 74 cycles to enter SPI mode.
         // We send 10 bytes = 80 cycles.
         for (uint8_t i = 0; i < 10; ++i) {
-                sdcard_transieve(0xff);
+                sdcard_transceive(0xff);
         }
         while (SPI2_SR & SPI_SR_BSY); // wait for the last 8 bits to be sent.
 }
 
 void sdcard_send_blocking(const uint8_t *data, uint32_t len) {
         for (uint32_t i = 0; i < len; ++i) {
-                sdcard_transieve(data[i]);
+                sdcard_transceive(data[i]);
         }
 }
 
@@ -75,20 +75,20 @@ void block_while_spi_busy(void) {
         while (SPI2_SR & SPI_SR_BSY);
 }
 
-uint16_t sdcard_read_fe(uint8_t *buf, uint32_t len, uint32_t bytes_timeout) {
+uint16_t sdcard_read_block(uint8_t *buf, uint32_t len, uint32_t bytes_timeout) {
         uint8_t cursor;
         uint16_t crc = 0;
-        while ((cursor = sdcard_transieve(0xff)) == 0xff) {
+        while ((cursor = sdcard_transceive(0xff)) == 0xff) {
                 bytes_timeout--;
                 if (bytes_timeout == 0) break;
         }
-        if (cursor == 0xfe) {
+        if (cursor == SD_BLOCK_START_BYTE) {
                 for (uint32_t i = 0; i < len; ++i) {
-                        *buf++ = sdcard_transieve(0xff);
+                        *buf++ = sdcard_transceive(0xff);
                 }
                 // 16bit crc
-                crc = sdcard_transieve(0xff) << 8;
-                crc |= sdcard_transieve(0xff);
+                crc = sdcard_transceive(0xff) << 8;
+                crc |= sdcard_transceive(0xff);
         }
         sdcard_release();
         return crc;
@@ -105,7 +105,7 @@ uint8_t sdcard_send_command_blocking(uint8_t cmd, uint32_t args, uint32_t bytes_
         sdcard_select();
         sdcard_send_blocking(send, sizeof(send));
         uint8_t response;
-        while ((response = sdcard_transieve(0xff)) == 0xff) {
+        while ((response = sdcard_transceive(0xff)) == 0xff) {
                 bytes_timeout--;
                 if (bytes_timeout == 0) break;
         }
@@ -120,11 +120,11 @@ uint8_t sdcard_send_app_command_blocking(uint8_t cmd, uint32_t args, uint32_t by
 
 void sdcard_establish_spi(uint32_t br) {
         rcc_periph_clock_enable(RCC_SPI2);
-        gpio_set_mode(SDCARD_DRIVER_SPI_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
-                      SDCARD_DRIVER_SPI_SCK | SDCARD_DRIVER_SPI_MOSI);
-        gpio_set_mode(SDCARD_DRIVER_SPI_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SDCARD_DRIVER_SPI_MISO);
-        gpio_set_mode(SDCARD_DRIVER_SPI_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
-                      SDCARD_DRIVER_SPI_NSS);
+        gpio_set_mode(SD_SPI_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_ALTFN_PUSHPULL,
+                      SD_SPI_SCK | SD_SPI_MOSI);
+        gpio_set_mode(SD_SPI_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, SD_SPI_MISO);
+        gpio_set_mode(SD_SPI_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
+                      SD_SPI_NSS);
         spi_init_master(SPI2, br, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
                         SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
         spi_enable_software_slave_management(SPI2);
@@ -146,14 +146,14 @@ uint16_t sdcard_request_csd(uint8_t *csd) {
         union SDResponse1 r1;
         r1.repr = sdcard_send_command_blocking(SD_CMD9_SEND_CSD, 0x00000000, 8);
         if (r1.invalid) return 0;
-        return sdcard_read_fe(csd, 16, 8);
+        return sdcard_read_block(csd, 16, 8);
 }
 
 uint32_t sdcard_calculate_size_csdv1(const uint8_t *csd) {
         uint32_t mult = 2 << (SD_CSDV1_C_SIZE_MULT(csd) + 1);
         uint32_t block_nr = (SD_CSDV1_C_SIZE(csd) + 1) * mult;
         uint32_t block_len = 2 << (SD_CSDV1_READ_BL_LEN(csd) - 1);
-        return block_nr * block_len;
+        return (block_nr * block_len) / 1000;
 }
 
 uint32_t sdcard_calculate_size_csdv2(const uint8_t *csd) {
@@ -224,7 +224,7 @@ enum SDInitResult sdcard_init(void) {
 bool sdcard_init_peripheral(void) {
         sdcard_establish_spi(SPI_CR1_BAUDRATE_FPCLK_DIV_256);
         enum SDInitResult res = sdcard_init();
-        sdcard_set_spi_baudrate(SPI_CR1_BAUDRATE_FPCLK_DIV_4);
+        sdcard_set_spi_baudrate(SPI_CR1_BAUDRATE_FPCLK_DIV_8);
         char *text = malloc(27);
         sprintf(text, "sdcard_init returned: %u", res);
         gpu_print_text(0, 100, 1, 0, text);
@@ -262,7 +262,37 @@ bool sdcard_init_peripheral(void) {
         gpu_block_until_ack();
         sprintf(text, "CAPACITY %lukb", sdcard_calculate_size_csdv2(csd));
         gpu_print_text(0, 32, 1, 0, text);
+        gpu_print_text(0, 40, 1, 0, "Reading sector 0 (0..51)...");
+        uint8_t sector[512];
+        sdcard_read_sector(0, sector);
+        gpu_block_until_ack();
+        sprintf(text, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", sector[0], sector[1], sector[2],
+                sector[3], sector[4], sector[5], sector[6], sector[7], sector[8], sector[9], sector[10], sector[11],
+                sector[12], sector[13], sector[14], sector[15], sector[16], sector[17], sector[18], sector[19],
+                sector[20], sector[21], sector[22], sector[23], sector[24], sector[25]);
+        gpu_print_text(0, 48, 1, 0, text);
+        gpu_block_until_ack();
+        sprintf(text, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", sector[26], sector[27], sector[28],
+                sector[29], sector[30], sector[31], sector[32], sector[33], sector[34], sector[35], sector[36],
+                sector[37], sector[38], sector[39], sector[40], sector[41], sector[42], sector[43], sector[44],
+                sector[45], sector[46], sector[47], sector[48], sector[49], sector[50], sector[51]);
+        gpu_print_text(0, 56, 1, 0, text);
+        if (sector[0] == 'M' && sector[1] == 'E' && sector[2] == 'S') {
+                gpu_print_text(0, 64, 3, 0, "SD-Card passed.");
+        } else {
+                gpu_print_text(0, 64, 5, 0, "SD-Card not MES formatted.");
+        }
         return true;
+}
+
+void sdcard_read_sector(uint32_t sector, uint8_t *data) {
+        sdcard_send_command_blocking(SD_CMD17_READ_SINGLE_BLOCK, sector, 8);
+        sdcard_read_block(data, SD_SECTOR_SIZE, 0); // TODO: limit bytes
+}
+
+void sdcard_read_sector_partially(uint32_t sector, uint8_t *data, uint32_t len) {
+        const uint32_t remaining_bytes = SD_SECTOR_SIZE - len;
+        // TODO: read sector partially
 }
 
 void __attribute__((weak)) sdcard_on_insert(void) {
