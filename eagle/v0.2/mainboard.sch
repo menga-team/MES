@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="100" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="50" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -8398,90 +8398,40 @@ Based on the following sources:
 </net>
 <net name="N$1" class="0">
 <segment>
-<pinref part="J2" gate="G$1" pin="VBUS2"/>
-<wire x1="16.51" y1="160.02" x2="16.51" y2="157.48" width="0.1524" layer="91"/>
-<wire x1="21.59" y1="157.48" x2="16.51" y2="157.48" width="0.1524" layer="91"/>
-<pinref part="J2" gate="G$1" pin="VBUS1"/>
-<wire x1="21.59" y1="160.02" x2="16.51" y2="160.02" width="0.1524" layer="91"/>
-<wire x1="57.15" y1="165.1" x2="16.51" y2="165.1" width="0.1524" layer="91"/>
-<wire x1="16.51" y1="165.1" x2="16.51" y2="160.02" width="0.1524" layer="91"/>
-<junction x="16.51" y="160.02"/>
 <pinref part="J2" gate="G$1" pin="VBUS4"/>
 <pinref part="R1" gate="G$1" pin="1"/>
-<wire x1="52.07" y1="157.48" x2="57.15" y2="157.48" width="0.1524" layer="91"/>
-<wire x1="57.15" y1="157.48" x2="59.69" y2="157.48" width="0.1524" layer="91"/>
-<wire x1="57.15" y1="165.1" x2="57.15" y2="160.02" width="0.1524" layer="91"/>
-<junction x="57.15" y="157.48"/>
-<pinref part="J2" gate="G$1" pin="VBUS3"/>
-<wire x1="57.15" y1="160.02" x2="57.15" y2="157.48" width="0.1524" layer="91"/>
-<wire x1="52.07" y1="160.02" x2="57.15" y2="160.02" width="0.1524" layer="91"/>
-<junction x="57.15" y="160.02"/>
+<wire x1="52.07" y1="157.48" x2="59.69" y2="157.48" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$2" class="0">
+<net name="C4_CHECK" class="0">
 <segment>
-<pinref part="J3" gate="G$1" pin="VBUS2"/>
-<wire x1="16.51" y1="93.98" x2="16.51" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="21.59" y1="91.44" x2="16.51" y2="91.44" width="0.1524" layer="91"/>
 <pinref part="J3" gate="G$1" pin="VBUS1"/>
-<wire x1="21.59" y1="93.98" x2="16.51" y2="93.98" width="0.1524" layer="91"/>
-<wire x1="57.15" y1="99.06" x2="16.51" y2="99.06" width="0.1524" layer="91"/>
-<wire x1="16.51" y1="99.06" x2="16.51" y2="93.98" width="0.1524" layer="91"/>
-<junction x="16.51" y="93.98"/>
-<pinref part="J3" gate="G$1" pin="VBUS4"/>
-<pinref part="R2" gate="G$1" pin="1"/>
-<wire x1="52.07" y1="91.44" x2="57.15" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="57.15" y1="91.44" x2="59.69" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="57.15" y1="99.06" x2="57.15" y2="93.98" width="0.1524" layer="91"/>
-<junction x="57.15" y="91.44"/>
+<wire x1="21.59" y1="93.98" x2="19.05" y2="93.98" width="0.1524" layer="91"/>
+<label x="19.05" y="93.98" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
 <pinref part="J3" gate="G$1" pin="VBUS3"/>
-<wire x1="57.15" y1="93.98" x2="57.15" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="52.07" y1="93.98" x2="57.15" y2="93.98" width="0.1524" layer="91"/>
-<junction x="57.15" y="93.98"/>
+<wire x1="52.07" y1="93.98" x2="54.61" y2="93.98" width="0.1524" layer="91"/>
+<label x="54.61" y="93.98" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
-<net name="N$4" class="0">
+<net name="C1_CHECK" class="0">
 <segment>
-<pinref part="J4" gate="G$1" pin="VBUS2"/>
-<wire x1="97.79" y1="93.98" x2="97.79" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="102.87" y1="91.44" x2="97.79" y2="91.44" width="0.1524" layer="91"/>
 <pinref part="J4" gate="G$1" pin="VBUS1"/>
-<wire x1="102.87" y1="93.98" x2="97.79" y2="93.98" width="0.1524" layer="91"/>
-<wire x1="138.43" y1="99.06" x2="97.79" y2="99.06" width="0.1524" layer="91"/>
-<wire x1="97.79" y1="99.06" x2="97.79" y2="93.98" width="0.1524" layer="91"/>
-<junction x="97.79" y="93.98"/>
-<pinref part="J4" gate="G$1" pin="VBUS4"/>
-<pinref part="R3" gate="G$1" pin="1"/>
-<wire x1="133.35" y1="91.44" x2="138.43" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="138.43" y1="91.44" x2="140.97" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="138.43" y1="99.06" x2="138.43" y2="93.98" width="0.1524" layer="91"/>
-<junction x="138.43" y="91.44"/>
+<wire x1="102.87" y1="93.98" x2="100.33" y2="93.98" width="0.1524" layer="91"/>
+<label x="100.33" y="93.98" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
 <pinref part="J4" gate="G$1" pin="VBUS3"/>
-<wire x1="138.43" y1="93.98" x2="138.43" y2="91.44" width="0.1524" layer="91"/>
-<wire x1="133.35" y1="93.98" x2="138.43" y2="93.98" width="0.1524" layer="91"/>
-<junction x="138.43" y="93.98"/>
+<wire x1="133.35" y1="93.98" x2="135.89" y2="93.98" width="0.1524" layer="91"/>
+<label x="135.89" y="93.98" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="N$5" class="0">
 <segment>
-<pinref part="J5" gate="G$1" pin="VBUS2"/>
-<wire x1="97.79" y1="160.02" x2="97.79" y2="157.48" width="0.1524" layer="91"/>
-<wire x1="102.87" y1="157.48" x2="97.79" y2="157.48" width="0.1524" layer="91"/>
-<pinref part="J5" gate="G$1" pin="VBUS1"/>
-<wire x1="102.87" y1="160.02" x2="97.79" y2="160.02" width="0.1524" layer="91"/>
-<wire x1="138.43" y1="165.1" x2="97.79" y2="165.1" width="0.1524" layer="91"/>
-<wire x1="97.79" y1="165.1" x2="97.79" y2="160.02" width="0.1524" layer="91"/>
-<junction x="97.79" y="160.02"/>
 <pinref part="J5" gate="G$1" pin="VBUS4"/>
 <pinref part="R4" gate="G$1" pin="1"/>
-<wire x1="133.35" y1="157.48" x2="138.43" y2="157.48" width="0.1524" layer="91"/>
-<wire x1="138.43" y1="157.48" x2="140.97" y2="157.48" width="0.1524" layer="91"/>
-<wire x1="138.43" y1="165.1" x2="138.43" y2="160.02" width="0.1524" layer="91"/>
-<junction x="138.43" y="157.48"/>
-<pinref part="J5" gate="G$1" pin="VBUS3"/>
-<wire x1="138.43" y1="160.02" x2="138.43" y2="157.48" width="0.1524" layer="91"/>
-<wire x1="133.35" y1="160.02" x2="138.43" y2="160.02" width="0.1524" layer="91"/>
-<junction x="138.43" y="160.02"/>
+<wire x1="133.35" y1="157.48" x2="140.97" y2="157.48" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="C2_A" class="0">
@@ -8792,6 +8742,69 @@ Based on the following sources:
 <wire x1="227.33" y1="93.98" x2="227.33" y2="91.44" width="0.1524" layer="91"/>
 <wire x1="222.25" y1="93.98" x2="227.33" y2="93.98" width="0.1524" layer="91"/>
 <junction x="227.33" y="93.98"/>
+</segment>
+</net>
+<net name="N$23" class="0">
+<segment>
+<pinref part="J4" gate="G$1" pin="VBUS2"/>
+<wire x1="102.87" y1="91.44" x2="101.6" y2="91.44" width="0.1524" layer="91"/>
+<wire x1="101.6" y1="91.44" x2="101.6" y2="97.79" width="0.1524" layer="91"/>
+<pinref part="R3" gate="G$1" pin="1"/>
+<pinref part="J4" gate="G$1" pin="VBUS4"/>
+<wire x1="133.35" y1="91.44" x2="134.62" y2="91.44" width="0.1524" layer="91"/>
+<wire x1="134.62" y1="91.44" x2="140.97" y2="91.44" width="0.1524" layer="91"/>
+<wire x1="101.6" y1="97.79" x2="134.62" y2="97.79" width="0.1524" layer="91"/>
+<wire x1="134.62" y1="97.79" x2="134.62" y2="91.44" width="0.1524" layer="91"/>
+<junction x="134.62" y="91.44"/>
+</segment>
+</net>
+<net name="N$4" class="0">
+<segment>
+<pinref part="R2" gate="G$1" pin="1"/>
+<pinref part="J3" gate="G$1" pin="VBUS4"/>
+<wire x1="52.07" y1="91.44" x2="59.69" y2="91.44" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$21" class="0">
+<segment>
+<pinref part="J3" gate="G$1" pin="VBUS2"/>
+<wire x1="21.59" y1="91.44" x2="20.32" y2="91.44" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="C3_CHECK" class="0">
+<segment>
+<pinref part="J2" gate="G$1" pin="VBUS1"/>
+<wire x1="21.59" y1="160.02" x2="19.05" y2="160.02" width="0.1524" layer="91"/>
+<label x="19.05" y="160.02" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="J2" gate="G$1" pin="VBUS3"/>
+<wire x1="52.07" y1="160.02" x2="54.61" y2="160.02" width="0.1524" layer="91"/>
+<label x="54.61" y="160.02" size="1.27" layer="95" xref="yes"/>
+</segment>
+</net>
+<net name="N$26" class="0">
+<segment>
+<pinref part="J2" gate="G$1" pin="VBUS2"/>
+<wire x1="21.59" y1="157.48" x2="20.32" y2="157.48" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="C2_CHECK" class="0">
+<segment>
+<pinref part="J5" gate="G$1" pin="VBUS1"/>
+<wire x1="102.87" y1="160.02" x2="100.33" y2="160.02" width="0.1524" layer="91"/>
+<label x="100.33" y="160.02" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="J5" gate="G$1" pin="VBUS3"/>
+<wire x1="133.35" y1="160.02" x2="135.89" y2="160.02" width="0.1524" layer="91"/>
+<label x="135.89" y="160.02" size="1.27" layer="95" xref="yes"/>
+</segment>
+</net>
+<net name="N$28" class="0">
+<segment>
+<pinref part="J5" gate="G$1" pin="VBUS2"/>
+<wire x1="102.87" y1="157.48" x2="101.6" y2="157.48" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
@@ -9374,13 +9387,6 @@ Based on the following sources:
 </net>
 <net name="SYNC" class="0">
 <segment>
-<pinref part="IC6" gate="A" pin="Y"/>
-<wire x1="142.24" y1="12.7" x2="149.86" y2="12.7" width="0.1524" layer="91"/>
-<label x="149.86" y="12.7" size="1.778" layer="95" xref="yes"/>
-</segment>
-</net>
-<net name="C1-C4" class="0">
-<segment>
 <pinref part="IC5" gate="A" pin="Y"/>
 <wire x1="144.78" y1="-60.96" x2="149.86" y2="-60.96" width="0.1524" layer="91"/>
 <label x="149.86" y="-60.96" size="1.778" layer="95" xref="yes"/>
@@ -9396,21 +9402,21 @@ Based on the following sources:
 <wire x1="15.24" y1="-78.74" x2="20.32" y2="-78.74" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$65" class="0">
+<net name="C3_CHECK" class="0">
 <segment>
 <pinref part="IC5" gate="A" pin="D3"/>
 <wire x1="119.38" y1="-63.5" x2="106.68" y2="-63.5" width="0.1524" layer="91"/>
 <label x="106.68" y="-63.5" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
-<net name="N$66" class="0">
+<net name="C2_CHECK" class="0">
 <segment>
 <pinref part="IC5" gate="A" pin="D2"/>
 <wire x1="119.38" y1="-60.96" x2="106.68" y2="-60.96" width="0.1524" layer="91"/>
 <label x="106.68" y="-60.96" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
-<net name="N$67" class="0">
+<net name="C1_CHECK" class="0">
 <segment>
 <pinref part="IC5" gate="A" pin="D1"/>
 <wire x1="119.38" y1="-58.42" x2="106.68" y2="-58.42" width="0.1524" layer="91"/>
@@ -9431,7 +9437,7 @@ Based on the following sources:
 <pinref part="P+7" gate="1" pin="+5V"/>
 </segment>
 </net>
-<net name="N$16" class="0">
+<net name="C4_CHECK" class="0">
 <segment>
 <pinref part="IC5" gate="A" pin="D4"/>
 <wire x1="119.38" y1="-66.04" x2="106.68" y2="-66.04" width="0.1524" layer="91"/>
@@ -9462,6 +9468,13 @@ Based on the following sources:
 <wire x1="68.58" y1="88.9" x2="58.42" y2="88.9" width="0.1524" layer="91"/>
 <pinref part="IC1" gate="A" pin="D2"/>
 <label x="58.42" y="88.9" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="DATA" class="0">
+<segment>
+<pinref part="IC6" gate="A" pin="Y"/>
+<wire x1="142.24" y1="12.7" x2="149.86" y2="12.7" width="0.1524" layer="91"/>
+<label x="149.86" y="12.7" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 </nets>
