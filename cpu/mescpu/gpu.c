@@ -51,13 +51,14 @@ void gpu_initiate_communication(void) {
         gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO4);
 
         spi_reset(SPI1);
-        spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_64, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
+        // TODO: Make spi clock faster when no longer testing
+        spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
                         SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
         spi_enable_software_slave_management(SPI1);
         spi_set_nss_high(SPI1);
         spi_enable(SPI1);
 
-        rcc_periph_clock_enable(RCC_SPI1);
+        rcc_periph_clock_enable(RCC_DMA1);
         nvic_set_priority(NVIC_DMA1_CHANNEL3_IRQ, 1);
         nvic_enable_irq(NVIC_DMA1_CHANNEL3_IRQ);
 
@@ -124,8 +125,8 @@ void exti15_10_isr(void) {
 //                for(int j = 0; j < 1000000; ++j) __asm__("nop");
 //        }
         if (!current_operation.data_sent) {
-                gpu_send_blocking(
-                        (uint8_t *) current_operation.operation_data,
+                gpu_send_dma(
+                        (uint32_t) current_operation.operation_data,
                         current_operation.operation_data_len
                 );
                 current_operation.data_sent = true;
