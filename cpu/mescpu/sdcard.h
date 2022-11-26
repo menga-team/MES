@@ -115,7 +115,9 @@ union SDResponse1 {
  * @param len The size of the data that should be processed.
  * @return 7 bit CRC
  */
-uint8_t sdcard_calculate_crc(const uint8_t *data, uint32_t len);
+uint8_t sdcard_calculate_crc7(const uint8_t *data, uint32_t len);
+
+uint16_t sdcard_calculate_crc16(const uint8_t *data, uint32_t len);
 
 /**
  * Will calculate the size of the SD-Card with the CSD Register according to Specification 1.00.
@@ -195,6 +197,8 @@ void sdcard_read_buf(uint8_t *buf, uint32_t len);
  */
 uint16_t sdcard_read_block(uint8_t *buf, uint32_t len, uint32_t bytes_timeout);
 
+void sdcard_send_block(uint8_t *buf, uint32_t len);
+
 /**
  * This function will block while SPI is busy.
  */
@@ -264,15 +268,23 @@ uint16_t sdcard_request_csd(uint8_t *csd);
 bool sdcard_init_peripheral(void);
 
 /**
- * Will read 512 bytes of data from sector @param sector.
+ * Will read 512 bytes of @param data from sector @param sector.
  * @related sdcard_read_sector_partially
- * @param sector The sector to read from, first sector is 0
+ * @param sector The sector to read from, first sector is 0.
  * @param data Where the data should be stored to.
  */
 void sdcard_read_sector(uint32_t sector, uint8_t *data);
 
 /**
- * Will read @param len bytes of data from sector @param sector.
+ * Will write 512 bytes of @param data into sector @param sector.
+ * @related sdcard_read_sector
+ * @param sector The sector to read from, first sector is 0.
+ * @param data The to be written data.
+ */
+void sdcard_write_sector(uint32_t sector, uint8_t *data);
+
+/**
+ * Will read @param len bytes of @param data from sector @param sector.
  * @param sector The sector to read from, first sector is 0
  * @param data Where the data should be stored to.
  * @param len The amount of data that should be read form the sector.

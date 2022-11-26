@@ -6,15 +6,27 @@
 #include "gpu.h"
 #include "time.h"
 
-uint8_t sdcard_calculate_crc(const uint8_t *data, uint32_t len) {
+uint8_t sdcard_calculate_crc7(const uint8_t *data, uint32_t len) {
         uint8_t crc = 0;
-        for (uint32_t i = 0; i < len; i++) {
+        for (uint32_t i = 0; i < len; ++i) {
                 crc ^= data[i];
-                for (int j = 0; j < 8; j++) {
+                for (int j = 0; j < 8; ++j) {
                         crc = (crc & 0x80u) ? ((crc << 1) ^ (SD_CRC_POLY << 1)) : (crc << 1);
                 }
         }
         return crc + 1; // setting the end bit
+}
+
+uint16_t sdcard_calculate_crc16(const uint8_t *data, uint32_t len) {
+        uint16_t crc = 0x00;
+        for (uint32_t i = 0; i < len; ++len) {
+                crc = (uint8_t) (crc >> 8) | (crc << 8);
+                crc ^= data[len];
+                crc ^= (uint8_t) (crc & 0xff) >> 4;
+                crc ^= (crc << 8) << 4;
+                crc ^= ((crc & 0xff) << 4) << 1;
+        }
+        return crc;
 }
 
 uint32_t sdcard_args_send_if_cond(bool pcie_1v2, bool pcie_avail, enum SDVoltageSupplied vhs, uint8_t pattern) {
@@ -94,6 +106,18 @@ uint16_t sdcard_read_block(uint8_t *buf, uint32_t len, uint32_t bytes_timeout) {
         return crc;
 }
 
+void sdcard_send_block(uint8_t *buf, uint32_t len) {
+        uint16_t crc = 0;//sdcard_calculate_crc16(buf, len);
+        sdcard_transceive(0xff);
+        sdcard_transceive(SD_BLOCK_START_BYTE);
+        for (uint32_t i = 0; i < len; ++i) {
+                sdcard_transceive(buf[i]);
+        }
+        sdcard_transceive((crc >> 8) & 0xff);
+        sdcard_transceive(crc & 0xff);
+}
+
+
 uint8_t sdcard_send_command_blocking(uint8_t cmd, uint32_t args, uint32_t bytes_timeout) {
         uint8_t send[6];
         send[0] = cmd | SD_START_BITS;
@@ -101,7 +125,7 @@ uint8_t sdcard_send_command_blocking(uint8_t cmd, uint32_t args, uint32_t bytes_
         send[2] = (args >> 16) & 0xff;
         send[3] = (args >> 8) & 0xff;
         send[4] = args & 0xff;
-        send[5] = sdcard_calculate_crc(send, sizeof(send) - 1);
+        send[5] = sdcard_calculate_crc7(send, sizeof(send) - 1);
         sdcard_select();
         sdcard_send_blocking(send, sizeof(send));
         uint8_t response;
@@ -227,7 +251,7 @@ bool sdcard_init_peripheral(void) {
         sdcard_set_spi_baudrate(SPI_CR1_BAUDRATE_FPCLK_DIV_8);
         char *text = malloc(27);
         sprintf(text, "sdcard_init returned: %u", res);
-        gpu_print_text(0, 100, 1, 0, text);
+        gpu_print_text(0, 112, 1, 0, text);
         switch (res) {
                 case SD_CARD_TIMEOUT:
                         gpu_print_text(0, 108, 2, 0, "SD-CARD TIMEOUT");
@@ -262,7 +286,7 @@ bool sdcard_init_peripheral(void) {
         gpu_block_until_ack();
         sprintf(text, "CAPACITY %lukb", sdcard_calculate_size_csdv2(csd));
         gpu_print_text(0, 32, 1, 0, text);
-        gpu_print_text(0, 40, 1, 0, "Reading sector 0 (0..51)...");
+        gpu_print_text(0, 40, 1, 0, "Reading sector 0 (0-51)...");
         uint8_t sector[512];
         sdcard_read_sector(0, sector);
         gpu_block_until_ack();
@@ -287,7 +311,14 @@ bool sdcard_init_peripheral(void) {
 
 void sdcard_read_sector(uint32_t sector, uint8_t *data) {
         sdcard_send_command_blocking(SD_CMD17_READ_SINGLE_BLOCK, sector, 8);
-        sdcard_read_block(data, SD_SECTOR_SIZE, 0); // TODO: limit bytes
+        sdcard_read_block(data, SD_SECTOR_SIZE, 0);
+}
+
+void sdcard_write_sector(uint32_t sector, uint8_t *data) {
+        sdcard_send_command_blocking(SD_CMD24_WRITE_BLOCK, sector, 8);
+        sdcard_send_block(data, SD_SECTOR_SIZE);
+        while (sdcard_transceive(0xff) == 0xff);
+        while (sdcard_transceive(0xff) != 0xff);
 }
 
 void sdcard_read_sector_partially(uint32_t sector, uint8_t *data, uint32_t len) {
