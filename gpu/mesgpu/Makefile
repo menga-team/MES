@@ -54,7 +54,7 @@ OBJS = $(CFILES:%.c=$(BUILD_DIR)/%.o)
 OBJS += $(CXXFILES:%.cxx=$(BUILD_DIR)/%.o)
 OBJS += $(AFILES:%.S=$(BUILD_DIR)/%.o)
 GENERATED_BINS = $(PROJECT).elf $(PROJECT).bin $(PROJECT).map $(PROJECT).list $(PROJECT).lss
-GENERATED_CODE = scanline.g.c
+GENERATED_CODE = scanline.g.c font.h
 
 TGT_CPPFLAGS += -MD
 TGT_CPPFLAGS += -Wall -Wundef $(INCLUDES)
@@ -120,7 +120,7 @@ GENERATED_BINS += $(LDSCRIPT)
 endif
 
 # Need a special rule to have a bin dir
-$(BUILD_DIR)/%.o: %.c scanline.g.c
+$(BUILD_DIR)/%.o: %.c scanline.g.c font.h
 	@printf "  CC\t$<\n"
 	@mkdir -p $(dir $@)
 	$(Q)$(CC) $(TGT_CFLAGS) $(CFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $@ -c $<
@@ -171,6 +171,9 @@ endif
 
 scanline.g.c:
 	python generators/scanline_generator.py > scanline.g.c
+
+font.h:
+	python ../../utils/pngtoarray.py images/menga68.png > font.h
 
 clean:
 	rm -rf $(BUILD_DIR) $(GENERATED_BINS) $(GENERATED_CODE)
