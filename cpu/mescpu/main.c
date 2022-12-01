@@ -5,6 +5,7 @@
 #include "time.h"
 #include "gpu.h"
 #include "controller.h"
+#include "sdcard.h"
 
 int main(void) {
         rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
@@ -15,6 +16,7 @@ int main(void) {
         controller_setup_timers();
         gpu_initiate_communication();
         gpu_block_until_ready();
+        sdcard_init_peripheral();
         controller_get_button_by_index(2);
         controller_get_button_by_controller_and_index(0, 2);
         controller_get_buttons(0);

@@ -10,14 +10,34 @@
 #define GPU_READY_PORT GPIOC
 #define GPU_READY GPIO15
 
-bool spi_dma_transmit_ongoing = false;
+volatile bool spi_dma_transmit_ongoing = false;
+volatile Queue current_operation;
 
-struct Operation gpu_operation_init(void) {
+Operation gpu_operation_init(void) {
         return (Operation) {0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00};
 }
 
-struct Operation gpu_operation_send_buf(uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy) {
+Operation gpu_operation_send_buf(uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy) {
         return (Operation) {0x00, 0x00, 0x00, 0x00, xx, yy, sx, sy};
+}
+
+Operation gpu_operation_print_text(uint8_t fore, uint8_t back, uint16_t size, uint8_t ox, uint8_t oy) {
+        return (Operation) {fore, back, 0x00, 0x01, (size >> 8) & 0xff, size & 0xff, ox, oy};
+}
+
+void gpu_print_text(uint8_t ox, uint8_t oy, uint8_t foreground, uint8_t background, const char *text) {
+        while (!gpio_get(GPU_READY_PORT, GPU_READY));
+        while (!current_operation.ack);
+        uint16_t len = 0;
+        while (text[len++] != 0);
+        current_operation = (Queue) {
+                gpu_operation_print_text(foreground, background, len, ox, oy),
+                (uint8_t *) text,
+                len,
+                false,
+                false
+        };
+        gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
 }
 
 void gpu_initiate_communication(void) {
@@ -31,29 +51,32 @@ void gpu_initiate_communication(void) {
         gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO4);
 
         spi_reset(SPI1);
-        spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_64, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
+        // TODO: Make spi clock faster when no longer testing
+        spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
                         SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
         spi_enable_software_slave_management(SPI1);
         spi_set_nss_high(SPI1);
         spi_enable(SPI1);
 
-        rcc_periph_clock_enable(RCC_SPI1);
+        rcc_periph_clock_enable(RCC_DMA1);
         nvic_set_priority(NVIC_DMA1_CHANNEL3_IRQ, 1);
         nvic_enable_irq(NVIC_DMA1_CHANNEL3_IRQ);
 
         // GPU READY
-        nvic_enable_irq(NVIC_EXTI0_IRQ);
         gpio_set_mode(GPIOC, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO15);
-        exti_select_source(EXTI0, GPIOC);
-        exti_set_trigger(EXTI0, EXTI_TRIGGER_RISING);
-        exti_enable_request(EXTI0);
+        nvic_enable_irq(NVIC_EXTI15_10_IRQ);
+        nvic_set_priority(NVIC_EXTI15_10_IRQ, 2);
+        exti_select_source(EXTI15, GPIOC);
+        exti_set_trigger(EXTI15, EXTI_TRIGGER_RISING);
+        exti_enable_request(EXTI15);
 }
 
 void gpu_block_until_ready(void) {
         Operation init = gpu_operation_init();
+        current_operation = (Queue) {init, 0, 0, true, true};
         while (!gpio_get(GPU_READY_PORT, GPU_READY)) {
                 gpio_toggle(GPIOC, GPIO13);
-                gpu_send_blocking((uint8_t *) &init, 8);
+                gpu_send_blocking((uint8_t *) &init, sizeof(Operation));
                 block(500);
         }
         gpio_set(GPIOC, GPIO13);
@@ -91,6 +114,23 @@ void dma1_channel3_isr(void) {
         spi_dma_transmit_ongoing = false;
 }
 
-void exti0_isr(void) {
-        exti_reset_request(EXTI0);
+void gpu_block_until_ack(void) {
+        while (!current_operation.ack);
+}
+
+void exti15_10_isr(void) {
+        exti_reset_request(EXTI15);
+//        for (int i = 0; i < 6; ++i) {
+//                gpio_toggle(GPIOC, GPIO13);
+//                for(int j = 0; j < 1000000; ++j) __asm__("nop");
+//        }
+        if (!current_operation.data_sent) {
+                gpu_send_dma(
+                        (uint32_t) current_operation.operation_data,
+                        current_operation.operation_data_len
+                );
+                current_operation.data_sent = true;
+        } else {
+                current_operation.ack = true;
+        }
 }

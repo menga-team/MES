@@ -8269,17 +8269,25 @@ Updated by Ella Wu 2022-11-15&lt;br&gt;
 <net name="GND" class="0">
 <segment>
 <pinref part="GND2" gate="1" pin="GND"/>
-<wire x1="13.97" y1="118.11" x2="13.97" y2="121.92" width="0.1524" layer="91"/>
-<wire x1="13.97" y1="121.92" x2="13.97" y2="124.46" width="0.1524" layer="91"/>
-<wire x1="13.97" y1="124.46" x2="13.97" y2="127" width="0.1524" layer="91"/>
-<wire x1="13.97" y1="127" x2="13.97" y2="129.54" width="0.1524" layer="91"/>
-<wire x1="19.05" y1="121.92" x2="13.97" y2="121.92" width="0.1524" layer="91"/>
-<junction x="13.97" y="121.92"/>
-<wire x1="19.05" y1="124.46" x2="13.97" y2="124.46" width="0.1524" layer="91"/>
-<junction x="13.97" y="124.46"/>
-<wire x1="19.05" y1="127" x2="13.97" y2="127" width="0.1524" layer="91"/>
-<junction x="13.97" y="127"/>
-<wire x1="19.05" y1="129.54" x2="13.97" y2="129.54" width="0.1524" layer="91"/>
+<wire x1="13.97" y1="118.11" x2="13.97" y2="132.08" width="0.1524" layer="91"/>
+<wire x1="13.97" y1="132.08" x2="13.97" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="13.97" y1="134.62" x2="13.97" y2="137.16" width="0.1524" layer="91"/>
+<wire x1="13.97" y1="137.16" x2="13.97" y2="139.7" width="0.1524" layer="91"/>
+<wire x1="13.97" y1="139.7" x2="13.97" y2="142.24" width="0.1524" layer="91"/>
+<junction x="13.97" y="134.62"/>
+<wire x1="20.32" y1="134.62" x2="13.97" y2="134.62" width="0.1524" layer="91"/>
+<junction x="13.97" y="137.16"/>
+<wire x1="20.32" y1="137.16" x2="13.97" y2="137.16" width="0.1524" layer="91"/>
+<junction x="13.97" y="139.7"/>
+<wire x1="20.32" y1="139.7" x2="13.97" y2="139.7" width="0.1524" layer="91"/>
+<pinref part="J1" gate="G$1" pin="GND"/>
+<wire x1="20.32" y1="142.24" x2="13.97" y2="142.24" width="0.1524" layer="91"/>
+<pinref part="J1" gate="G$1" pin="GND1"/>
+<pinref part="J1" gate="G$1" pin="GND2"/>
+<pinref part="J1" gate="G$1" pin="GND3"/>
+<pinref part="J1" gate="G$1" pin="SHIELD"/>
+<wire x1="20.32" y1="132.08" x2="13.97" y2="132.08" width="0.1524" layer="91"/>
+<junction x="13.97" y="132.08"/>
 </segment>
 <segment>
 <pinref part="C1" gate="G$1" pin="1"/>
