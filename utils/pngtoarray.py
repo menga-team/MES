@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+
+# adapted from https://github.com/idispatch/raster-fonts/blob/master/png2c.py
 import sys
 import png # pip install pypng
 import curses.ascii

@@ -7,8 +7,8 @@
 #include <malloc.h>
 #include "controller.h"
 
-uint16_t active_controller[4] = {0, 0, 0, 0};
-uint16_t buttons[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+uint8_t active_controller[4] = {0, 0, 0, 0};
+uint8_t buttons[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int counter = 0;
 
 void controller_setup_timers(void) {
@@ -42,77 +42,42 @@ void controller_setup_timers(void) {
 void tim1_cc_isr(void) {
         // gets executed at the rising edge.
         TIM_SR(TIM1) = 0x0000;
-        uint16_t data_bit = gpio_get(DATA_PORT, DATA_PIN);
-        uint16_t sync_bit = gpio_get(SYNC_PORT, SYNC_PIN);
-        if (counter == 0) {
+        uint8_t data_bit = gpio_get(DATA_PORT, DATA_PIN);
+        uint8_t sync_bit = gpio_get(SYNC_PORT, SYNC_PIN);
+        if (counter == 0) { // we wait for the syncbit to start counting
                 if (sync_bit) {
                         counter++;
                 }
-        } else if (counter < 5) {
+        } else if (counter < 5) { // if we are registering the controller status, save sync_bit in he controller array
                 active_controller[counter - 1] = sync_bit;
-        } else {
+        } else { // if an unexpected sync_bit arrives reset the counter and start again
                 if (sync_bit) {
                         counter = 1;
                 }
         }
-        if (counter) {
+        if (counter > 0) { // if we are counting, save the data_bit in the buttons array
                 buttons[counter - 1] = data_bit;
                 counter++;
-                if (counter > 31) {
-
+                if (counter >= 31) {
+                    counter = 0 //when we reach the last bit reset the counter
                 }
         }
 }
 
-uint16_t controller_get_button_by_controller_and_index(int controller, int button) {
+uint8_t controller_get_button_by_controller_and_index(int controller, int button) {
         return buttons[(controller * 8) + button];
 }
 
-uint16_t controller_get_button_copy_by_controller_and_index(int controller, int button) {
-        uint16_t temp = buttons[(controller * 8) + button];
-        return temp;
+uint8_t *controller_get_buttons(int controller) {
+        return buttons + controller * 8;
 }
 
-uint16_t controller_get_button_by_index(int button) {
-        return buttons[button];
-}
-
-uint16_t controller_get_button_copy_by_index(int button) {
-        uint16_t temp = buttons[button];
-        return temp;
-}
-
-uint16_t **controller_get_buttons(int controller) {
-        uint16_t **subset = malloc(sizeof(uint16_t *) * 8);
-        for (int i = 0; i < 8; i++)
-                subset[i] = &buttons[(controller * 4) + i];
-        return subset;
-}
-
-uint16_t *controller_get_buttons_by_copy(int controller) {
-        uint16_t *subset = malloc(sizeof(uint16_t) * 8);
-        for (int i = 0; i < 8; i++)
-                subset[i] = buttons[(controller * 4) + i];
-        return subset;
-}
-
-uint16_t controller_get_status(int controller) {
+uint8_t controller_get_status(int controller) {
         return active_controller[controller];
 }
 
-uint16_t controller_get_status_copy(int controller) {
-        uint16_t temp = active_controller[controller];
-        return temp;
-}
-
-uint16_t *controller_get_statuses(void) {
+uint8_t *controller_get_statuses(void) {
         return active_controller;
-}
-
-uint16_t *controller_get_statuses_copy(void) {
-        uint16_t *subset = malloc(sizeof(uint16_t) * 4);
-        memcpy(subset, active_controller, sizeof(uint16_t) * 4);
-        return subset;
 }
 
 void controller_configure_io(void) {
