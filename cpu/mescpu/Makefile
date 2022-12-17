@@ -1,5 +1,5 @@
 PROJECT		= mescpu
-CFILES		= main.c time.c gpu.c controller.c sdcard.c
+CFILES		= main.c time.c gpu.c sdcard.c
 OPENCM3_DIR	:= ../../libopencm3
 #DEVICE		= stm32f103c8t6
 LDSCRIPT	= ../../utils/stm32f103c8tx.ld
