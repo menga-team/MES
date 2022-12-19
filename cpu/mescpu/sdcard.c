@@ -275,19 +275,19 @@ bool sdcard_init_peripheral(void) {
         gpu_print_text(0, 112, 1, 0, text);
         switch (res) {
                 case SD_CARD_TIMEOUT:
-                        gpu_print_text(0, 108, 2, 0, "SD-CARD TIMEOUT");
+                        gpu_print_text(0, 104, 2, 0, "SD-CARD TIMEOUT");
                         return false;
                 case SD_CARD_RESET_ERROR:
-                        gpu_print_text(0, 108, 2, 0, "SD-CARD RESET ERROR");
+                        gpu_print_text(0, 104, 2, 0, "SD-CARD RESET ERROR");
                         return false;
                 case SD_CARD_GENERIC_COMMUNICATION_ERROR:
-                        gpu_print_text(0, 108, 2, 0, "SD-CARD GENERIC ERROR");
+                        gpu_print_text(0, 104, 2, 0, "SD-CARD GENERIC ERROR");
                         return false;
                 case SD_CARD_TARGET_VOLTAGE_UNSUPPORTED:
-                        gpu_print_text(0, 108, 2, 0, "SD-CARD VOLTAGE ERROR");
+                        gpu_print_text(0, 104, 2, 0, "SD-CARD VOLTAGE ERROR");
                         return false;
                 case SD_CARD_WAKEUP_TIMEOUT:
-                        gpu_print_text(0, 108, 2, 0, "SD-CARD WAKEUP TIMEOUT");
+                        gpu_print_text(0, 104, 2, 0, "SD-CARD WAKEUP TIMEOUT");
                         return false;
                 default:
                         break;
@@ -323,9 +323,9 @@ bool sdcard_init_peripheral(void) {
                 sector[45], sector[46], sector[47], sector[48], sector[49], sector[50], sector[51]);
         gpu_print_text(0, 56, 1, 0, text);
         if (sector[0] == 'M' && sector[1] == 'E' && sector[2] == 'S') {
-                gpu_print_text(0, 64, 3, 0, "SD-Card passed.");
+                gpu_print_text(0, 104, 3, 0, "SD-Card passed.");
         } else {
-                gpu_print_text(0, 64, 5, 0, "SD-Card not MES formatted.");
+                gpu_print_text(0, 104, 5, 0, "SD-Card not MES formatted.");
         }
         return true;
 }
