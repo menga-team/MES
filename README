@@ -7,4 +7,5 @@
         $ git submodule update --init
 
 2. Make libopencm3:
-    $ make -C libopencm3
+    $ cd libopencm3
+    $ make
