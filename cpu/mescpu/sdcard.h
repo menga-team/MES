@@ -137,6 +137,16 @@ uint32_t sdcard_calculate_size_csdv1(const uint8_t *csd);
 uint32_t sdcard_calculate_size_csdv2(const uint8_t *csd);
 
 /**
+ * Will execute either sdcard_calculate_size_csdv1 or sdcard_calculate_size_csdv2,
+ * depending on the SD-Card.
+ * @related sdcard_calculate_size_csdv1
+ * @related sdcard_calculate_size_csdv2
+ * @param csd
+ * @return
+ */
+uint32_t sdcard_calculate_size(const uint8_t *csd);
+
+/**
  * Establish the SPI peripheral for communicating with the Card.
  * @note The initial baud-rate should be around 100kHz-400kHz.
  *          This can be speed up after the initialization via @related sdcard_set_spi_baudrate, if required.
@@ -254,11 +264,19 @@ void sdcard_boot_sequence(void);
 enum SDInitResult sdcard_init(void);
 
 /**
+ * Will read the csd register from the SD-Card.
  * @param csd pointer that's pointing to at least 16 bytes of free space.
  * This will read the 128bit CSD Register /of the connected SD-Card into @param csd
  * @return CRC
  */
 uint16_t sdcard_request_csd(uint8_t *csd);
+
+/**
+ * Will read the ocr register from the SD-Card.
+ * @param ocr pointer that's pointing to at least 4 bytes of free space.
+ * @return true if ocr was read.
+ */
+bool sdcard_request_ocr(uint8_t *ocr);
 
 /**
  * This function will properly setup the SD-Card and display information about it on the connected Display.

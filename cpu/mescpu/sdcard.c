@@ -173,6 +173,14 @@ uint16_t sdcard_request_csd(uint8_t *csd) {
         return sdcard_read_block(csd, 16, 8);
 }
 
+bool sdcard_request_ocr(uint8_t *ocr) {
+        union SDResponse1 r1;
+        r1.repr = sdcard_send_command_blocking(SD_CMD58_READ_OCR, 0x00000000, 8);
+        if (r1.invalid) return false;
+        sdcard_read_buf(ocr, 4);
+        return true;
+}
+
 uint32_t sdcard_calculate_size_csdv1(const uint8_t *csd) {
         uint32_t mult = 2 << (SD_CSDV1_C_SIZE_MULT(csd) + 1);
         uint32_t block_nr = (SD_CSDV1_C_SIZE(csd) + 1) * mult;
@@ -184,13 +192,26 @@ uint32_t sdcard_calculate_size_csdv2(const uint8_t *csd) {
         return 512 * (SD_CSDV2_C_SIZE(csd) + 1);
 }
 
+uint32_t sdcard_calculate_size(const uint8_t *csd) {
+        uint8_t ocr[4];
+        if (sdcard_request_ocr(ocr)) {
+                if (SD_OCR_IS_SDHC_OR_SDXC(ocr)) {
+                        return sdcard_calculate_size_csdv2(csd);
+                } else {
+                        return sdcard_calculate_size_csdv1(csd);
+                }
+        }
+        return 0;
+}
+
 
 enum SDInitResult sdcard_init(void) {
         // sd needs to be powered for around 1ms before starting.
         sdcard_boot_sequence();
         union SDResponse1 r1;
-        r1.repr = sdcard_send_command_blocking(SD_CMD0_GO_IDLE_STATE, 0x00000000, 2);
-        if (r1.invalid) return SD_CARD_TIMEOUT; // gets returned when to sd failed to answer for 16 cycles
+        r1.repr = sdcard_send_command_blocking(SD_CMD0_GO_IDLE_STATE, 0x00000000,
+                                               rcc_ahb_frequency / SPI_CR1_BAUDRATE_FPCLK_DIV_256);
+        if (r1.invalid) return SD_CARD_TIMEOUT; // gets returned when to sd failed to answer for ~1s
         if (!r1.in_idle_state) return SD_CARD_RESET_ERROR;
         sdcard_release();
         gpu_print_text(0, 0, 1, 0, "SD-Card detected!");
@@ -284,7 +305,7 @@ bool sdcard_init_peripheral(void) {
         sprintf(text, "S%02x", SD_CSDV2_TRAN_SPEED(csd));
         gpu_print_text(0, 24, SD_CSDV2_TRAN_SPEED(csd) == 0x32 ? 5 : 3, 0, text);
         gpu_block_until_ack();
-        sprintf(text, "CAPACITY %lukb", sdcard_calculate_size_csdv2(csd));
+        sprintf(text, "CAPACITY %lukb", sdcard_calculate_size(csd));
         gpu_print_text(0, 32, 1, 0, text);
         gpu_print_text(0, 40, 1, 0, "Reading sector 0 (0-51)...");
         uint8_t sector[512];
