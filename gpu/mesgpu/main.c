@@ -25,88 +25,7 @@ int main(void) {
 //        cpu_communication_timeout();
         while (run) {
                 // we have ~5µs every line and ~770µs every frame
-                switch (processing_stage) {
-                        case UNHANDELED_OPERATION: {
-                                GPIO_BRR(GPU_READY_PORT) = GPU_READY;
-                                switch (operation[3]) {
-                                        case 0xff: { // init
-                                                gpu_write(0, 0, 1, 0, "CPU synced!");
-                                                dma_recieve_operation();
-                                                processing_stage = READY;
-                                                break;
-                                        }
-                                        case 0x02: { // swap buffers
-                                                gpu_swap_buffers();
-                                                dma_recieve_operation();
-                                                processing_stage = READY;
-                                                break;
-                                        }
-                                        case 0x00: {
-                                                if (operation[4] == 0x00 && operation[5] == 0x00 &&
-                                                    operation[6] == 0x00 && operation[7] == 0x00) {
-                                                        // recieve full frame via dma
-                                                        dma_recieve((uint32_t) front_buffer, BUFFER_SIZE);
-                                                        processing_stage = WAITING_FOR_DMA;
-                                                } else {
-                                                        dma_recieve(
-                                                                (uint32_t) operation_data,
-                                                                uround((operation[6] * operation[7] * BUFFER_BPP) / 8)
-                                                        );
-                                                        processing_stage = WAITING_FOR_DATA;
-                                                }
-                                                break;
-                                        }
-                                        case 0x01: {
-                                                dma_recieve(
-                                                        (uint32_t) operation_data,
-                                                        ((uint16_t) operation[4] << 8) | operation[5]
-                                                );
-                                                processing_stage = WAITING_FOR_DATA;
-                                                break;
-                                        }
-                                        default: { // unimplemented operation
-                                                invalid_operation(operation);
-                                                processing_stage = READY;
-                                                break;
-                                        }
-                                }
-                                GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
-                                break;
-                        }
-                        case UNHANDELED_DATA: {
-                                GPIO_BRR(GPU_READY_PORT) = GPU_READY;
-                                switch (operation[3]) {
-                                        case 0x00: {
-                                                const uint8_t o_x = operation[4];
-                                                const uint8_t o_y = operation[5];
-                                                const uint8_t s_x = operation[6];
-                                                const uint8_t s_y = operation[7];
-                                                for (uint8_t c_x = 0; c_x < s_x; ++c_x) {
-                                                        for (uint8_t c_y = 0; c_y < s_y; ++c_y) {
-                                                                gpu_set_pixel(
-                                                                        front_buffer,
-                                                                        (o_y + c_y) * BUFFER_WIDTH + o_x + c_x,
-                                                                        gpu_get_pixel(operation_data, c_y * s_y + c_x)
-                                                                );
-                                                        }
-                                                }
-                                                break;
-                                        }
-                                        case 0x01: {
-                                                gpu_write(operation[6], operation[7], operation[0], operation[1],
-                                                          (char *) operation_data);
-                                                break;
-                                        }
-                                }
-                                dma_recieve_operation();
-                                processing_stage = READY;
-                                GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
-                                break;
-                        }
-                        default: {
-                                break;
-                        }
-                }
+                handle_operation();
         }
         while (true);
 }
@@ -322,4 +241,97 @@ void dma1_channel2_isr(void) {
                         unexpected_data(processing_stage);
                         break;
         }
+}
+
+void handle_operation(void) {
+        switch (processing_stage) {
+                case UNHANDELED_OPERATION: {
+                        new_operation();
+                        break;
+                }
+                case UNHANDELED_DATA: {
+                        new_data();
+                        break;
+                }
+                default: {
+                        break;
+                }
+        }
+}
+
+void new_operation(void) {
+        GPIO_BRR(GPU_READY_PORT) = GPU_READY;
+        switch (operation[3]) {
+                case 0xff: { // init
+                        gpu_write(0, 0, 1, 0, "CPU synced!");
+                        dma_recieve_operation();
+                        processing_stage = READY;
+                        break;
+                }
+                case 0x02: { // swap buffers
+                        gpu_swap_buffers();
+                        dma_recieve_operation();
+                        processing_stage = READY;
+                        break;
+                }
+                case 0x00: {
+                        if (operation[4] == 0x00 && operation[5] == 0x00 &&
+                            operation[6] == 0x00 && operation[7] == 0x00) {
+                                // recieve full frame via dma
+                                dma_recieve((uint32_t) front_buffer, BUFFER_SIZE);
+                                processing_stage = WAITING_FOR_DMA;
+                        } else {
+                                dma_recieve(
+                                        (uint32_t) operation_data,
+                                        uround((operation[6] * operation[7] * BUFFER_BPP) / 8)
+                                );
+                                processing_stage = WAITING_FOR_DATA;
+                        }
+                        break;
+                }
+                case 0x01: {
+                        dma_recieve(
+                                (uint32_t) operation_data,
+                                ((uint16_t) operation[4] << 8) | operation[5]
+                        );
+                        processing_stage = WAITING_FOR_DATA;
+                        break;
+                }
+                default: { // unimplemented operation
+                        invalid_operation(operation);
+                        processing_stage = READY;
+                        break;
+                }
+        }
+        GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+}
+
+void new_data(void) {
+        GPIO_BRR(GPU_READY_PORT) = GPU_READY;
+        switch (operation[3]) {
+                case 0x00: {
+                        const uint8_t o_x = operation[4];
+                        const uint8_t o_y = operation[5];
+                        const uint8_t s_x = operation[6];
+                        const uint8_t s_y = operation[7];
+                        for (uint8_t c_x = 0; c_x < s_x; ++c_x) {
+                                for (uint8_t c_y = 0; c_y < s_y; ++c_y) {
+                                        gpu_set_pixel(
+                                                front_buffer,
+                                                (o_y + c_y) * BUFFER_WIDTH + o_x + c_x,
+                                                gpu_get_pixel(operation_data, c_y * s_y + c_x)
+                                        );
+                                }
+                        }
+                        break;
+                }
+                case 0x01: {
+                        gpu_write(operation[6], operation[7], operation[0], operation[1],
+                                  (char *) operation_data);
+                        break;
+                }
+        }
+        dma_recieve_operation();
+        processing_stage = READY;
+        GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
 }

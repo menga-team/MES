@@ -26,6 +26,12 @@ void start_communication(void);
 
 void start_video(void);
 
+void handle_operation(void);
+
+void new_operation(void);
+
+void new_data(void);
+
 int main(void);
 
 #endif
