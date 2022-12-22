@@ -13,11 +13,14 @@ uint8_t *front_buffer, *back_buffer;
 
 uint8_t buffer_line = 0;
 const void *line;
+
 uint32_t pxs = 0;
-uint16_t data_cursor = 0;
+
 uint8_t operation[OPERATION_LENGTH];
 uint8_t operation_data[OPERATION_DATA_LENGTH];
+
 volatile enum Stage processing_stage = READY;
+
 const char *stage_pretty_names[5] = {
         "Waiting for operation",
         "New operation",
@@ -25,22 +28,8 @@ const char *stage_pretty_names[5] = {
         "New data",
         "Waiting for DMA"
 };
-volatile bool run = true;
 
-uint16_t get_port_config_for_color(uint8_t red, uint8_t green, uint8_t blue) {
-        // TODO: maybe macro?
-        uint16_t port = 0x0000;
-        if (red & 0b100) port |= RED_MSP;
-        if (red & 0b010) port |= RED_MMSP;
-        if (red & 0b001) port |= RED_LSP;
-        if (green & 0b100) port |= GREEN_MSP;
-        if (green & 0b010) port |= GREEN_MMSP;
-        if (green & 0b001) port |= GREEN_LSP;
-        if (blue & 0b100) port |= BLUE_MSP;
-        if (blue & 0b010) port |= BLUE_MMSP;
-        if (blue & 0b001) port |= BLUE_LSP;
-        return port;
-}
+volatile bool run = true;
 
 uint8_t gpu_get_pixel(const void *buffer, uint16_t position) {
         // 3 bytes = 8 pairs of 3bit pixels
@@ -65,29 +54,42 @@ void gpu_init(void) {
         // there are 8 standard colors, so the palette needs to be index-able with at least 3 bits.
         assert(BUFFER_BPP >= 3);
         // define standard color palette.
-        color_palette[0] = get_port_config_for_color(0b000, 0b000, 0b000); // black
-        color_palette[1] = get_port_config_for_color(0b111, 0b111, 0b111); // white
-        color_palette[2] = get_port_config_for_color(0b111, 0b000, 0b000); // red
-        color_palette[3] = get_port_config_for_color(0b000, 0b111, 0b000); // green
-        color_palette[4] = get_port_config_for_color(0b000, 0b000, 0b111); // blue
-        color_palette[5] = get_port_config_for_color(0b111, 0b111, 0b000); // yellow
-        color_palette[6] = get_port_config_for_color(0b111, 0b000, 0b111); // magenta
-        color_palette[7] = get_port_config_for_color(0b000, 0b111, 0b111); // cyan
+        color_palette[0] = COLOR(0b000, 0b000, 0b000); // black
+        color_palette[1] = COLOR(0b111, 0b111, 0b111); // white
+        color_palette[2] = COLOR(0b111, 0b000, 0b000); // red
+        color_palette[3] = COLOR(0b000, 0b111, 0b000); // green
+        color_palette[4] = COLOR(0b000, 0b000, 0b111); // blue
+        color_palette[5] = COLOR(0b111, 0b111, 0b000); // yellow
+        color_palette[6] = COLOR(0b111, 0b000, 0b111); // magenta
+        color_palette[7] = COLOR(0b000, 0b111, 0b111); // cyan
         front_buffer = buffer_a;
         back_buffer = buffer_b;
 }
 
-void gpu_write(uint8_t x, uint8_t y, uint8_t fg, uint8_t bg, const char *text) {
-        // TODO: Optimize lol
+void gpu_write(void *buffer, uint8_t x, uint8_t y, uint8_t fg, uint8_t bg, const char *text) {
+        // TODO: Benchmark vs commit 199a54e34fa452cd73fd015bf033ed4b4a6d605a
         uint8_t i = 0;
         while (text[i] != '\0') {
                 char to_print = text[i];
-                for (uint8_t j = 0; j < 6; ++j) {
-                        for (int k = 0; k < 8; ++k) {
-                                gpu_set_pixel(
-                                        front_buffer,
-                                        (y + k) * BUFFER_WIDTH + x + j,
-                                        ((console_font_6x8[8 * to_print + k] << j) & (1 << 7)) ? fg : bg);
+                for (int k = 0; k < 8; ++k) {
+                        // Reading the code for `gpu_set_pixel` might help with understanding this one.
+                        uint16_t position = ((y + k) * BUFFER_WIDTH + x);
+                        uint32_t *bytes = (uint32_t *) (buffer + (position / 8) * BUFFER_BPP);
+                        // This last shift might not be accurate, but it does not matter because it will get corrected.
+                        // We just need a value that is garanteed not to be 0.
+                        // If it is 0, we would be wasting cpu time because of the if in the loop below.
+                        uint8_t last_shift = -1;
+                        for (uint8_t j = 0; j < 6; ++j) {
+                                uint8_t shift = (7 - ((position + j) % 8)) * BUFFER_BPP;
+                                if (last_shift == 0) {
+                                        // 0 is the last possible shift, meaning we reached the end.
+                                        // We need to update our bytes because the next pixel won't fit.
+                                        // Shift of 21 is the first pixel & shift of 0 is the last pixel.
+                                        bytes = (uint32_t *) (buffer + ((position + j) / 8) * BUFFER_BPP);
+                                }
+                                *bytes = (*bytes & ~(PIXEL_MASK << shift)) |
+                                         ((((console_font_6x8[8 * to_print + k] << j) & (1 << 7)) ? fg : bg) << shift);
+                                last_shift = shift;
                         }
                 }
                 x += 6;

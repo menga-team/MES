@@ -173,8 +173,8 @@ void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
 
 void generic_error(void) {
         run = false;
-        color_palette[0] = get_port_config_for_color(0b000, 0b000, 0b111);
-        color_palette[1] = get_port_config_for_color(0b111, 0b111, 0b111);
+        color_palette[0] = COLOR(0b000, 0b000, 0b111);
+        color_palette[1] = COLOR(0b111, 0b111, 0b111);
         for (uint16_t i = 0; i < 7200; ++i) {
                 front_buffer[i] = error[i];
         }
@@ -182,7 +182,7 @@ void generic_error(void) {
 
 void invalid_operation(uint8_t *invalid_op) {
         generic_error();
-        gpu_write(2, 80, 1, 0, "-UNIMPLEMENTED  OPERATION-");
+        gpu_write(front_buffer, 2, 80, 1, 0, "-UNIMPLEMENTED  OPERATION-");
         char *operation_string = malloc(sizeof(char) * 25); // 24chars + NUL
         sprintf(
                 operation_string,
@@ -195,29 +195,29 @@ void invalid_operation(uint8_t *invalid_op) {
                 invalid_op[5],
                 invalid_op[6],
                 invalid_op[7]);
-        gpu_write(8, 96, 1, 0, operation_string);
+        gpu_write(front_buffer, 8, 96, 1, 0, operation_string);
 }
 
 void unexpected_data(enum Stage c_stage) {
         generic_error();
-        gpu_write(2, 80, 1, 0, "  -  UNEXPECTED  DATA  -  ");
-        gpu_write(0, 88, 1, 0, "Current processing stage:");
+        gpu_write(front_buffer, 2, 80, 1, 0, "  -  UNEXPECTED  DATA  -  ");
+        gpu_write(front_buffer, 0, 88, 1, 0, "Current processing stage:");
         char *buf = malloc(sizeof(char) * 27); // 26chars (whole line) + NUL
         sprintf(buf, "%s (%02x)", stage_pretty_names[c_stage], c_stage);
-        gpu_write(0, 96, 1, 0, buf);
+        gpu_write(front_buffer, 0, 96, 1, 0, buf);
         sprintf(buf, "Recieved data: (%04lx)", DMA_CMAR(DMA1, DMA_CHANNEL2));
-        gpu_write(0, 104, 1, 0, buf);
+        gpu_write(front_buffer, 0, 104, 1, 0, buf);
         uint8_t *data = (uint8_t *) DMA_CMAR(DMA1, DMA_CHANNEL2);
         sprintf(buf, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x ...",
                 data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10]);
-        gpu_write(0, 112, 1, 0, buf);
+        gpu_write(front_buffer, 0, 112, 1, 0, buf);
 }
 
 void cpu_communication_timeout(void) {
-        color_palette[0] = get_port_config_for_color(0b000, 0b000, 0b000);
-        color_palette[1] = get_port_config_for_color(0b110, 0b110, 0b110);
-        color_palette[2] = get_port_config_for_color(0b100, 0b100, 0b100);
-        color_palette[3] = get_port_config_for_color(0b111, 0b111, 0b111);
+        color_palette[0] = COLOR(0b000, 0b000, 0b000);
+        color_palette[1] = COLOR(0b110, 0b110, 0b110);
+        color_palette[2] = COLOR(0b100, 0b100, 0b100);
+        color_palette[3] = COLOR(0b111, 0b111, 0b111);
         for (uint16_t i = 0; i < 7200; ++i) {
                 front_buffer[i] = cpu_timeout[i];
         }
@@ -263,7 +263,7 @@ void new_operation(void) {
         GPIO_BRR(GPU_READY_PORT) = GPU_READY;
         switch (operation[3]) {
                 case 0xff: { // init
-                        gpu_write(0, 0, 1, 0, "CPU synced!");
+                        gpu_write(front_buffer, 0, 0, 1, 0, "CPU synced!");
                         dma_recieve_operation();
                         processing_stage = READY;
                         break;
@@ -314,6 +314,7 @@ void new_data(void) {
                         const uint8_t o_y = operation[5];
                         const uint8_t s_x = operation[6];
                         const uint8_t s_y = operation[7];
+                        // TODO: Optimize
                         for (uint8_t c_x = 0; c_x < s_x; ++c_x) {
                                 for (uint8_t c_y = 0; c_y < s_y; ++c_y) {
                                         gpu_set_pixel(
@@ -326,7 +327,7 @@ void new_data(void) {
                         break;
                 }
                 case 0x01: {
-                        gpu_write(operation[6], operation[7], operation[0], operation[1],
+                        gpu_write(front_buffer, operation[6], operation[7], operation[0], operation[1],
                                   (char *) operation_data);
                         break;
                 }

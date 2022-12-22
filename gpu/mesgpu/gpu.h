@@ -77,6 +77,18 @@
 #define OPERATION_LENGTH 8
 #define OPERATION_DATA_LENGTH 512
 
+/**
+ * @param red: 0b000 - 0b111
+ * @param green: 0b000 - 0b111
+ * @param blue: 0b000 - 0b111
+ * Generates a port config given the 3 colors.
+ */
+#define COLOR(red, green, blue) ( \
+((red & 0b100) << 9) | ((red & 0b010) << 9) | ((red & 0b001) << 1) | \
+((green & 0b100) << 10) | ((green & 0b010) << 12) | ((green & 0b001) << 14) | \
+((blue & 0b100) << 5) | ((blue & 0b010) << 7) | ((blue & 0b001) << 9) \
+)
+
 enum Stage {
     READY = 0, UNHANDELED_OPERATION = 1, WAITING_FOR_DATA = 2, UNHANDELED_DATA = 3, WAITING_FOR_DMA = 4
 } __attribute__ ((__packed__));
@@ -95,8 +107,6 @@ extern volatile enum Stage processing_stage;
 extern const char *stage_pretty_names[5];
 extern volatile bool run;
 
-uint16_t get_port_config_for_color(uint8_t red, uint8_t green, uint8_t blue);
-
 uint8_t gpu_get_pixel(const void *buffer, uint16_t position);
 
 void gpu_set_pixel(void *buffer, uint16_t position, uint8_t data);
@@ -105,6 +115,6 @@ void gpu_swap_buffers(void);
 
 void gpu_init(void);
 
-void gpu_write(uint8_t x, uint8_t y, uint8_t fg, uint8_t bg, const char *text);
+void gpu_write(void *buffer, uint8_t x, uint8_t y, uint8_t fg, uint8_t bg, const char *text);
 
 #endif
