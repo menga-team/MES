@@ -1,3 +1,4 @@
+#include <memory.h>
 #include "gpu.h"
 #include "font.h"
 
@@ -19,9 +20,10 @@ uint32_t pxs = 0;
 uint8_t operation[OPERATION_LENGTH];
 uint8_t operation_data[OPERATION_DATA_LENGTH];
 
-volatile enum Stage processing_stage = READY;
+volatile enum Stage processing_stage = UNINITIALIZED;
 
-const char *stage_pretty_names[5] = {
+const char *stage_pretty_names[6] = {
+        "Uninitialized",
         "Waiting for operation",
         "New operation",
         "Waiting for data",
@@ -64,6 +66,15 @@ void gpu_init(void) {
         color_palette[7] = COLOR(0b000, 0b111, 0b111); // cyan
         front_buffer = buffer_a;
         back_buffer = buffer_b;
+}
+
+void gpu_patch_font(void *patch, uint8_t start, uint8_t end) {
+        memcpy(patch, &console_font_6x8[start * 8], (end - start) * 8);
+}
+
+void gpu_reset(void) {
+        uint32_t *aircr = (uint32_t *) (SCB_BASE + (3 * sizeof(uint32_t)));
+        *aircr = ((0x5FA << 16) | (*aircr & (0x700)) | (1 << 2));
 }
 
 void gpu_write(void *buffer, uint8_t x, uint8_t y, uint8_t fg, uint8_t bg, const char *text) {

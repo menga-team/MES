@@ -45,11 +45,11 @@
 #define GPIO_COLOR_PORT GPIOB
 
 /// Most Significant Pin
-#define RED_MSP GPIO11
+#define RED_MSP GPIO1
 /// Middle Most Significant Pin
 #define RED_MMSP GPIO10
 /// Least Significant Pin
-#define RED_LSP GPIO1
+#define RED_LSP GPIO11
 
 /// Most Significant Pin
 #define GREEN_MSP GPIO12
@@ -83,14 +83,30 @@
  * @param blue: 0b000 - 0b111
  * Generates a port config given the 3 colors.
  */
-#define COLOR(red, green, blue) ( \
-((red & 0b100) << 9) | ((red & 0b010) << 9) | ((red & 0b001) << 1) | \
+#define COLOR(red, green, blue) (uint16_t)( \
+((red & 0b100) >> 1) | ((red & 0b010) << 9) | ((red & 0b001) << 11) | \
 ((green & 0b100) << 10) | ((green & 0b010) << 12) | ((green & 0b001) << 14) | \
 ((blue & 0b100) << 5) | ((blue & 0b010) << 7) | ((blue & 0b001) << 9) \
 )
 
+#define OPERATION_ID_INIT 0xff
+#define OPERATION_ID_SEND_BUF 0x00
+#define OPERATION_ID_PRINT_TEXT 0x01
+#define OPERATION_ID_SWAP_BUF 0x02
+#define OPERATION_ID_CHANGE_PALETTE 0x03
+#define OPERATION_ID_DELAY_VSYNC 0x04
+#define OPERATION_ID_DELAY_HSYNC 0x05
+#define OPERATION_ID_WAIT_FRAME 0x06
+#define OPERATION_ID_PRINT_TRANSPARENT 0x07
+#define OPERATION_ID_DISPLAY_BUF 0x08
+#define OPERATION_ID_PATCH_FONT 0x09
+#define OPERATION_ID_RESET 0x0a
+#define OPERATION_ID_BLANK 0x0b
+
+#define OPERATION_ID(x) x[3]
+
 enum Stage {
-    READY = 0, UNHANDELED_OPERATION = 1, WAITING_FOR_DATA = 2, UNHANDELED_DATA = 3, WAITING_FOR_DMA = 4
+    UNINITIALIZED = 0, READY = 1, UNHANDELED_OPERATION = 2, WAITING_FOR_DATA = 3, UNHANDELED_DATA = 4, WAITING_FOR_DMA = 5
 } __attribute__ ((__packed__));
 
 extern uint16_t color_palette[1 << DRM_BUFFER_BPP];
@@ -100,11 +116,10 @@ extern uint8_t *front_buffer, *back_buffer;
 extern uint8_t buffer_line;
 extern const void *line;
 extern uint32_t pxs;
-extern uint16_t data_cursor;
 extern uint8_t operation[OPERATION_LENGTH];
 extern uint8_t operation_data[OPERATION_DATA_LENGTH];
 extern volatile enum Stage processing_stage;
-extern const char *stage_pretty_names[5];
+extern const char *stage_pretty_names[6];
 extern volatile bool run;
 
 uint8_t gpu_get_pixel(const void *buffer, uint16_t position);
@@ -116,5 +131,9 @@ void gpu_swap_buffers(void);
 void gpu_init(void);
 
 void gpu_write(void *buffer, uint8_t x, uint8_t y, uint8_t fg, uint8_t bg, const char *text);
+
+void gpu_patch_font(void *patch, uint8_t start, uint8_t end);
+
+void gpu_reset(void);
 
 #endif

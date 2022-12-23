@@ -5,6 +5,7 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/spi.h>
 #include <libopencm3/stm32/dma.h>
+#include "libopencm3/cm3/systick.h"
 #include <mesmath.h>
 #include <stdio.h>
 #include "gpu.h"
@@ -21,13 +22,35 @@ int main(void) {
         setup_video();
         start_communication();
         start_video();
-        // TODO: activate systick while cpu is not yet connected to display cpu timeout in case it happends
-//        cpu_communication_timeout();
+        // Setup timeout
+        systick_clear();
+        systick_set_clocksource(STK_CSR_CLKSOURCE_AHB_DIV8);
+        systick_set_reload(16777215); // 24-bit limit. (~1.8s)
+        systick_interrupt_enable();
+        systick_counter_enable();
         while (run) {
                 // we have ~5µs every line and ~770µs every frame
                 handle_operation();
         }
         while (true);
+}
+
+void sys_tick_handler(void) {
+        systick_interrupt_disable();
+        systick_counter_disable();
+        systick_clear();
+        // Did we sync after ~1.8s?
+        // If we didn't then show the timeout error.
+        if(processing_stage == UNINITIALIZED) {
+                // Show timeout screen if cpu failed to sync.
+                cpu_communication_timeout();
+                // Run gets disabled when the 1. operation sent is not the init operation.
+                // Inorder to help debugging we will display the "COM_BRK" error, meaning the gpu is able to recieve
+                // from the cpu, but the communication might be unreliable.
+                if(!run) {
+                        gpu_write(front_buffer, 118, 112, 2, 3, "COM_BRK");
+                }
+        }
 }
 
 void setup_output(void) {
@@ -46,7 +69,7 @@ void setup_output(void) {
                       RED_MSP | RED_MMSP | RED_LSP |
                       GREEN_MSP | GREEN_MMSP | GREEN_LSP |
                       BLUE_MSP | BLUE_MMSP | BLUE_LSP);
-        gpio_clear(GPIO_COLOR_PORT, 0xffff); // reset colors
+        gpio_clear(GPIO_COLOR_PORT, GPIO_ALL); // reset colors
         gpio_clear(GPU_READY_PORT, GPU_READY); // set gpu ready to low
 }
 
@@ -166,7 +189,7 @@ void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
 #               include "scanline.g.c"
 
                 // some monitors sample their black voltage level in the back porch, so we need to stop outputting color
-                GPIO_BRR(GPIO_COLOR_PORT) = 0xffff;
+                GPIO_BRR(GPIO_COLOR_PORT) = GPIO_ALL;
         }
         TIM_SR(TIM1) = 0x0000;
 }
@@ -228,6 +251,14 @@ void dma1_channel2_isr(void) {
         spi_disable_rx_dma(SPI1);
         dma_disable_channel(DMA1, DMA_CHANNEL2);
         switch (processing_stage) {
+                case UNINITIALIZED:
+                        if(OPERATION_ID(operation) != OPERATION_ID_INIT) {
+                                // 1. Operation was not the sync operation...
+                                // The communication is not reliable and should not be trusted with further operations.
+                                // An error will be displayed automatically via the systick interupt.
+                                run = false;
+                                break;
+                        }
                 case READY:
                         processing_stage = UNHANDELED_OPERATION;
                         break;
@@ -261,20 +292,20 @@ void handle_operation(void) {
 
 void new_operation(void) {
         GPIO_BRR(GPU_READY_PORT) = GPU_READY;
-        switch (operation[3]) {
-                case 0xff: { // init
+        switch (OPERATION_ID(operation)) {
+                case OPERATION_ID_INIT: {
                         gpu_write(front_buffer, 0, 0, 1, 0, "CPU synced!");
                         dma_recieve_operation();
                         processing_stage = READY;
                         break;
                 }
-                case 0x02: { // swap buffers
+                case OPERATION_ID_SWAP_BUF: {
                         gpu_swap_buffers();
                         dma_recieve_operation();
                         processing_stage = READY;
                         break;
                 }
-                case 0x00: {
+                case OPERATION_ID_SEND_BUF: {
                         if (operation[4] == 0x00 && operation[5] == 0x00 &&
                             operation[6] == 0x00 && operation[7] == 0x00) {
                                 // recieve full frame via dma
@@ -289,10 +320,10 @@ void new_operation(void) {
                         }
                         break;
                 }
-                case 0x01: {
+                case OPERATION_ID_PRINT_TEXT: {
                         dma_recieve(
                                 (uint32_t) operation_data,
-                                ((uint16_t) operation[4] << 8) | operation[5]
+                                operation[5]
                         );
                         processing_stage = WAITING_FOR_DATA;
                         break;
@@ -308,8 +339,8 @@ void new_operation(void) {
 
 void new_data(void) {
         GPIO_BRR(GPU_READY_PORT) = GPU_READY;
-        switch (operation[3]) {
-                case 0x00: {
+        switch (OPERATION_ID(operation)) {
+                case OPERATION_ID_SEND_BUF: {
                         const uint8_t o_x = operation[4];
                         const uint8_t o_y = operation[5];
                         const uint8_t s_x = operation[6];
@@ -326,7 +357,7 @@ void new_data(void) {
                         }
                         break;
                 }
-                case 0x01: {
+                case OPERATION_ID_PRINT_TEXT: {
                         gpu_write(front_buffer, operation[6], operation[7], operation[0], operation[1],
                                   (char *) operation_data);
                         break;
