@@ -205,14 +205,21 @@ uint32_t sdcard_calculate_size(const uint8_t *csd) {
 }
 
 
+uint8_t sdcard_go_idle(void) {
+        return sdcard_send_command_blocking(SD_CMD0_GO_IDLE_STATE, 0x00000000,
+                                            rcc_ahb_frequency / SPI_CR1_BAUDRATE_FPCLK_DIV_256);
+}
+
 enum SDInitResult sdcard_init(void) {
         // sd needs to be powered for around 1ms before starting.
         sdcard_boot_sequence();
         union SDResponse1 r1;
-        r1.repr = sdcard_send_command_blocking(SD_CMD0_GO_IDLE_STATE, 0x00000000,
-                                               rcc_ahb_frequency / SPI_CR1_BAUDRATE_FPCLK_DIV_256);
+        r1.repr = sdcard_go_idle();
         if (r1.invalid) return SD_CARD_TIMEOUT; // gets returned when to sd failed to answer for ~1s
-        if (!r1.in_idle_state) return SD_CARD_RESET_ERROR;
+        if (!r1.in_idle_state) { // SD-Card should be in idle after commanding it to go in idle...
+                r1.repr = sdcard_go_idle(); // From my experience, sending the command a 2nd time sometimes does the trick.
+                if (!r1.in_idle_state) return SD_CARD_RESET_ERROR; // give up...
+        }
         sdcard_release();
         gpu_print_text(0, 0, 1, 0, "SD-Card detected!");
         r1.repr = sdcard_send_command_blocking(
@@ -256,7 +263,7 @@ enum SDInitResult sdcard_init(void) {
         r1.repr = sdcard_send_command_blocking(SD_CMD58_READ_OCR, 0x00000000, 2);
         if (r1.invalid) return SD_CARD_GENERIC_COMMUNICATION_ERROR;
         sdcard_read_buf(ocr_register, sizeof(ocr_register));
-        sprintf(text, "OCR: %02x %02x %02x %02x", ocr_register[0], ocr_register[1], ocr_register[2], ocr_register[3]);
+        sprintf(text, "OCR %02x %02x %02x %02x", ocr_register[0], ocr_register[1], ocr_register[2], ocr_register[3]);
         gpu_print_text(0, 8, 1, 0, text);
         if (SD_OCR_IS_SDHC_OR_SDXC(ocr_register)) {
                 gpu_print_text(106, 8, 3, 0, "SDHC/SDXC");
@@ -269,7 +276,7 @@ enum SDInitResult sdcard_init(void) {
 bool sdcard_init_peripheral(void) {
         sdcard_establish_spi(SPI_CR1_BAUDRATE_FPCLK_DIV_256);
         enum SDInitResult res = sdcard_init();
-        sdcard_set_spi_baudrate(SPI_CR1_BAUDRATE_FPCLK_DIV_8);
+        sdcard_set_spi_baudrate(SPI_CR1_BAUDRATE_FPCLK_DIV_8); // TODO: Change
         char *text = malloc(27);
         sprintf(text, "sdcard_init returned: %u", res);
         gpu_print_text(0, 112, 1, 0, text);
@@ -302,7 +309,7 @@ bool sdcard_init_peripheral(void) {
                 csd[8], csd[9], csd[10], csd[11], csd[12], csd[13], csd[14], csd[15]);
         gpu_print_text(0, 24, 1, 0, text);
         gpu_block_until_ack();
-        sprintf(text, "S%02x", SD_CSDV2_TRAN_SPEED(csd));
+        sprintf(text, "S%02x", SD_CSDV2_TRAN_SPEED(csd)); // CSDV1 & CSDV2 are identical in this case.
         gpu_print_text(0, 24, SD_CSDV2_TRAN_SPEED(csd) == 0x32 ? 5 : 3, 0, text);
         gpu_block_until_ack();
         sprintf(text, "CAPACITY %lukb", sdcard_calculate_size(csd));

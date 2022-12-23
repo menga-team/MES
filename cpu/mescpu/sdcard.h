@@ -257,6 +257,12 @@ uint8_t sdcard_send_app_command_blocking(uint8_t cmd, uint32_t args, uint32_t by
 void sdcard_boot_sequence(void);
 
 /**
+ * Sends a GO_IDLE command.
+ * @return R1 Response
+ */
+uint8_t sdcard_go_idle(void);
+
+/**
  * Will make the SD-Card operational, enabling functions like: `sdcard_request_csd`.
  * @return Possible errors that occurred while initializing, or 0 (SD_CARD_NO_ERROR) when no error occurred.
  * @related SDInitResult
