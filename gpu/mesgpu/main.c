@@ -8,6 +8,7 @@
 #include "libopencm3/cm3/systick.h"
 #include <mesmath.h>
 #include <stdio.h>
+#include <memory.h>
 #include "gpu.h"
 
 // Include error screen as 'error'
@@ -41,13 +42,13 @@ void sys_tick_handler(void) {
         systick_clear();
         // Did we sync after ~1.8s?
         // If we didn't then show the timeout error.
-        if(processing_stage == UNINITIALIZED) {
+        if (processing_stage == UNINITIALIZED) {
                 // Show timeout screen if cpu failed to sync.
                 cpu_communication_timeout();
                 // Run gets disabled when the 1. operation sent is not the init operation.
                 // Inorder to help debugging we will display the "COM_BRK" error, meaning the gpu is able to recieve
                 // from the cpu, but the communication might be unreliable.
-                if(!run) {
+                if (!run) {
                         gpu_write(front_buffer, 118, 112, 2, 3, "COM_BRK");
                 }
         }
@@ -59,7 +60,8 @@ void setup_output(void) {
         rcc_periph_clock_enable(RCC_GPIOB);
         rcc_periph_clock_enable(RCC_GPIOC);
         gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPIO13); // built-in
-        gpio_set_mode(GPU_READY_PORT, GPIO_MODE_OUTPUT_50_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPU_READY);
+        gpio_set_mode(GPU_READY_PORT, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL, GPU_READY);
+        gpio_clear(GPU_READY_PORT, GPU_READY); // set gpu ready to low
         gpio_set(GPIOC, GPIO13);
         // A8: hsync (yellow cable)
         // B0: vsync (orange cable)
@@ -70,7 +72,6 @@ void setup_output(void) {
                       GREEN_MSP | GREEN_MMSP | GREEN_LSP |
                       BLUE_MSP | BLUE_MMSP | BLUE_LSP);
         gpio_clear(GPIO_COLOR_PORT, GPIO_ALL); // reset colors
-        gpio_clear(GPU_READY_PORT, GPU_READY); // set gpu ready to low
 }
 
 void setup_video(void) {
@@ -85,8 +86,7 @@ void setup_video(void) {
         // stripes
 //        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
 //                gpu_set_pixel(buffer_a, i, i % 8);
-        for (uint16_t i = 0; i < 7200; i++)
-                front_buffer[i] = 0x00;
+        gpu_blank(front_buffer, 0x00);
 }
 
 void start_communication(void) {
@@ -198,9 +198,7 @@ void generic_error(void) {
         run = false;
         color_palette[0] = COLOR(0b000, 0b000, 0b111);
         color_palette[1] = COLOR(0b111, 0b111, 0b111);
-        for (uint16_t i = 0; i < 7200; ++i) {
-                front_buffer[i] = error[i];
-        }
+        memcpy(front_buffer, error, BUFFER_SIZE);
 }
 
 void invalid_operation(uint8_t *invalid_op) {
@@ -241,9 +239,7 @@ void cpu_communication_timeout(void) {
         color_palette[1] = COLOR(0b110, 0b110, 0b110);
         color_palette[2] = COLOR(0b100, 0b100, 0b100);
         color_palette[3] = COLOR(0b111, 0b111, 0b111);
-        for (uint16_t i = 0; i < 7200; ++i) {
-                front_buffer[i] = cpu_timeout[i];
-        }
+        memcpy(front_buffer, cpu_timeout, BUFFER_SIZE);
 }
 
 void dma1_channel2_isr(void) {
@@ -252,7 +248,7 @@ void dma1_channel2_isr(void) {
         dma_disable_channel(DMA1, DMA_CHANNEL2);
         switch (processing_stage) {
                 case UNINITIALIZED:
-                        if(OPERATION_ID(operation) != OPERATION_ID_INIT) {
+                        if (OPERATION_ID(operation) != OPERATION_ID_INIT) {
                                 // 1. Operation was not the sync operation...
                                 // The communication is not reliable and should not be trusted with further operations.
                                 // An error will be displayed automatically via the systick interupt.
@@ -268,6 +264,7 @@ void dma1_channel2_isr(void) {
                 case WAITING_FOR_DMA:
                         processing_stage = READY;
                         GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+                        break;
                 default:
                         unexpected_data(processing_stage);
                         break;
@@ -328,6 +325,16 @@ void new_operation(void) {
                         processing_stage = WAITING_FOR_DATA;
                         break;
                 }
+                case OPERATION_ID_RESET: {
+                        gpu_reset();
+                        processing_stage = READY; // won't be executed.
+                        break;
+                }
+                case OPERATION_ID_BLANK: {
+                        gpu_blank(OPERATION_BUFFER(operation), operation[7]);
+                        processing_stage = READY;
+                        break;
+                }
                 default: { // unimplemented operation
                         invalid_operation(operation);
                         processing_stage = READY;
@@ -349,7 +356,7 @@ void new_data(void) {
                         for (uint8_t c_x = 0; c_x < s_x; ++c_x) {
                                 for (uint8_t c_y = 0; c_y < s_y; ++c_y) {
                                         gpu_set_pixel(
-                                                front_buffer,
+                                                OPERATION_BUFFER(operation),
                                                 (o_y + c_y) * BUFFER_WIDTH + o_x + c_x,
                                                 gpu_get_pixel(operation_data, c_y * s_y + c_x)
                                         );
@@ -358,7 +365,7 @@ void new_data(void) {
                         break;
                 }
                 case OPERATION_ID_PRINT_TEXT: {
-                        gpu_write(front_buffer, operation[6], operation[7], operation[0], operation[1],
+                        gpu_write(OPERATION_BUFFER(operation), operation[6], operation[7], operation[0], operation[1],
                                   (char *) operation_data);
                         break;
                 }

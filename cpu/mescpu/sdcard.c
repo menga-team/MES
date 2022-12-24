@@ -221,7 +221,7 @@ enum SDInitResult sdcard_init(void) {
                 if (!r1.in_idle_state) return SD_CARD_RESET_ERROR; // give up...
         }
         sdcard_release();
-        gpu_print_text(0, 0, 1, 0, "SD-Card detected!");
+        gpu_print_text(FRONT_BUFFER, 0, 0, 1, 0, "SD-Card detected!");
         r1.repr = sdcard_send_command_blocking(
                 SD_CMD8_SEND_IF_COND,
                 sdcard_args_send_if_cond(false, false, VOLTAGE_2V7_TO_3V6, SD_CHECK_PATTERN),
@@ -239,7 +239,7 @@ enum SDInitResult sdcard_init(void) {
         if (vhs != VOLTAGE_2V7_TO_3V6) return SD_CARD_TARGET_VOLTAGE_UNSUPPORTED;
         if (pcie) return SD_CARD_GENERIC_COMMUNICATION_ERROR;
         if (pcie_1v2) return SD_CARD_GENERIC_COMMUNICATION_ERROR;
-        gpu_print_text(106, 0, 1, 0, "3V3+-10%");
+        gpu_print_text(FRONT_BUFFER, 106, 0, 1, 0, "3V3+-10%");
         sdcard_release();
         r1.repr = sdcard_send_command_blocking(SD_CMD58_READ_OCR, 0x00000000, 2);
         if (r1.invalid) return SD_CARD_GENERIC_COMMUNICATION_ERROR;
@@ -247,7 +247,7 @@ enum SDInitResult sdcard_init(void) {
         sdcard_read_buf(ocr_register, sizeof(ocr_register));
         char *text = malloc(27);
         sprintf(text, "OCR %02x %02x %02x %02x", ocr_register[0], ocr_register[1], ocr_register[2], ocr_register[3]);
-        gpu_print_text(0, 8, 1, 0, text);
+        gpu_print_text(FRONT_BUFFER, 0, 8, 1, 0, text);
         sdcard_release();
         uint32_t start_time = millis_since_boot();
         while (r1.in_idle_state) {
@@ -264,11 +264,11 @@ enum SDInitResult sdcard_init(void) {
         if (r1.invalid) return SD_CARD_GENERIC_COMMUNICATION_ERROR;
         sdcard_read_buf(ocr_register, sizeof(ocr_register));
         sprintf(text, "OCR %02x %02x %02x %02x", ocr_register[0], ocr_register[1], ocr_register[2], ocr_register[3]);
-        gpu_print_text(0, 8, 1, 0, text);
+        gpu_print_text(FRONT_BUFFER, 0, 8, 1, 0, text);
         if (SD_OCR_IS_SDHC_OR_SDXC(ocr_register)) {
-                gpu_print_text(106, 8, 3, 0, "SDHC/SDXC");
+                gpu_print_text(FRONT_BUFFER, 106, 8, 3, 0, "SDHC/SDXC");
         } else {
-                gpu_print_text(106, 8, 1, 0, "SDSC");
+                gpu_print_text(FRONT_BUFFER, 106, 8, 1, 0, "SDSC");
         }
         return SD_CARD_NO_ERROR;
 }
@@ -279,22 +279,22 @@ bool sdcard_init_peripheral(void) {
         sdcard_set_spi_baudrate(SPI_CR1_BAUDRATE_FPCLK_DIV_8); // TODO: Change
         char *text = malloc(27);
         sprintf(text, "sdcard_init returned: %u", res);
-        gpu_print_text(0, 112, 1, 0, text);
+        gpu_print_text(FRONT_BUFFER, 0, 112, 1, 0, text);
         switch (res) {
                 case SD_CARD_TIMEOUT:
-                        gpu_print_text(0, 104, 2, 0, "SD-CARD TIMEOUT");
+                        gpu_print_text(FRONT_BUFFER, 0, 104, 2, 0, "SD-CARD TIMEOUT");
                         return false;
                 case SD_CARD_RESET_ERROR:
-                        gpu_print_text(0, 104, 2, 0, "SD-CARD RESET ERROR");
+                        gpu_print_text(FRONT_BUFFER, 0, 104, 2, 0, "SD-CARD RESET ERROR");
                         return false;
                 case SD_CARD_GENERIC_COMMUNICATION_ERROR:
-                        gpu_print_text(0, 104, 2, 0, "SD-CARD GENERIC ERROR");
+                        gpu_print_text(FRONT_BUFFER, 0, 104, 2, 0, "SD-CARD GENERIC ERROR");
                         return false;
                 case SD_CARD_TARGET_VOLTAGE_UNSUPPORTED:
-                        gpu_print_text(0, 104, 2, 0, "SD-CARD VOLTAGE ERROR");
+                        gpu_print_text(FRONT_BUFFER, 0, 104, 2, 0, "SD-CARD VOLTAGE ERROR");
                         return false;
                 case SD_CARD_WAKEUP_TIMEOUT:
-                        gpu_print_text(0, 104, 2, 0, "SD-CARD WAKEUP TIMEOUT");
+                        gpu_print_text(FRONT_BUFFER, 0, 104, 2, 0, "SD-CARD WAKEUP TIMEOUT");
                         return false;
                 default:
                         break;
@@ -303,18 +303,18 @@ bool sdcard_init_peripheral(void) {
         sdcard_request_csd(csd);
         sprintf(text, "CSD 0-7  %02x%02x%02x%02x %02x%02x%02x%02x",
                 csd[0], csd[1], csd[2], csd[3], csd[4], csd[5], csd[6], csd[7]);
-        gpu_print_text(0, 16, 1, 0, text);
+        gpu_print_text(FRONT_BUFFER, 0, 16, 1, 0, text);
         gpu_block_until_ack();
         sprintf(text, "    8-15 %02x%02x%02x%02x %02x%02x%02x%02x",
                 csd[8], csd[9], csd[10], csd[11], csd[12], csd[13], csd[14], csd[15]);
-        gpu_print_text(0, 24, 1, 0, text);
+        gpu_print_text(FRONT_BUFFER, 0, 24, 1, 0, text);
         gpu_block_until_ack();
         sprintf(text, "S%02x", SD_CSDV2_TRAN_SPEED(csd)); // CSDV1 & CSDV2 are identical in this case.
-        gpu_print_text(0, 24, SD_CSDV2_TRAN_SPEED(csd) == 0x32 ? 5 : 3, 0, text);
+        gpu_print_text(FRONT_BUFFER, 0, 24, SD_CSDV2_TRAN_SPEED(csd) == 0x32 ? 5 : 3, 0, text);
         gpu_block_until_ack();
         sprintf(text, "CAPACITY %lukb", sdcard_calculate_size(csd));
-        gpu_print_text(0, 32, 1, 0, text);
-        gpu_print_text(0, 40, 1, 0, "Reading sector 0 (0-51)...");
+        gpu_print_text(FRONT_BUFFER, 0, 32, 1, 0, text);
+        gpu_print_text(FRONT_BUFFER, 0, 40, 1, 0, "Reading sector 0 (0-51)...");
         uint8_t sector[512];
         sdcard_read_sector(0, sector);
         gpu_block_until_ack();
@@ -322,17 +322,17 @@ bool sdcard_init_peripheral(void) {
                 sector[3], sector[4], sector[5], sector[6], sector[7], sector[8], sector[9], sector[10], sector[11],
                 sector[12], sector[13], sector[14], sector[15], sector[16], sector[17], sector[18], sector[19],
                 sector[20], sector[21], sector[22], sector[23], sector[24], sector[25]);
-        gpu_print_text(0, 48, 1, 0, text);
+        gpu_print_text(FRONT_BUFFER, 0, 48, 1, 0, text);
         gpu_block_until_ack();
         sprintf(text, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", sector[26], sector[27], sector[28],
                 sector[29], sector[30], sector[31], sector[32], sector[33], sector[34], sector[35], sector[36],
                 sector[37], sector[38], sector[39], sector[40], sector[41], sector[42], sector[43], sector[44],
                 sector[45], sector[46], sector[47], sector[48], sector[49], sector[50], sector[51]);
-        gpu_print_text(0, 56, 1, 0, text);
+        gpu_print_text(FRONT_BUFFER, 0, 56, 1, 0, text);
         if (sector[0] == 'M' && sector[1] == 'E' && sector[2] == 'S') {
-                gpu_print_text(0, 104, 3, 0, "SD-Card passed.");
+                gpu_print_text(FRONT_BUFFER, 0, 104, 3, 0, "SD-Card passed.");
         } else {
-                gpu_print_text(0, 104, 5, 0, "SD-Card not MES formatted.");
+                gpu_print_text(FRONT_BUFFER, 0, 104, 5, 0, "SD-Card not MES formatted.");
         }
         return true;
 }

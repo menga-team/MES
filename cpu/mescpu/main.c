@@ -15,7 +15,7 @@ int main(void) {
         configure_systick();
         //controller_setup_timers();
         gpu_initiate_communication();
-        gpu_block_until_ready();
+        gpu_sync();
         sdcard_init_peripheral();
         while (true);
 }

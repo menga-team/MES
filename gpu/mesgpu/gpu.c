@@ -69,7 +69,11 @@ void gpu_init(void) {
 }
 
 void gpu_patch_font(void *patch, uint8_t start, uint8_t end) {
-        memcpy(patch, &console_font_6x8[start * 8], (end - start) * 8);
+        memcpy(&console_font_6x8[start * 8], patch, (end - start) * 8);
+}
+
+void gpu_blank(void *buffer, uint8_t blank_with) {
+        memset(buffer, blank_with, BUFFER_SIZE);
 }
 
 void gpu_reset(void) {

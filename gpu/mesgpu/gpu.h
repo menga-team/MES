@@ -36,7 +36,7 @@
 #define BUFFER_TO_VIDEO_RATIO 5
 #define BUFFER_WIDTH (H_DISPLAY_PIXELS / BUFFER_TO_VIDEO_RATIO)
 #define BUFFER_HEIGHT (V_DISPLAY_LINES / BUFFER_TO_VIDEO_RATIO)
-#define BUFFER_SIZE ((BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t)))
+#define BUFFER_SIZE ((BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / CHAR_BIT)
 #define BUFFER_BPP 3
 #define DRM_BUFFER_BPP 6
 #define PIXEL_MASK ((1 << BUFFER_BPP) - 1)
@@ -104,6 +104,7 @@
 #define OPERATION_ID_BLANK 0x0b
 
 #define OPERATION_ID(x) x[3]
+#define OPERATION_BUFFER(x) ((x[2] == 0x00) ? front_buffer : back_buffer)
 
 enum Stage {
     UNINITIALIZED = 0, READY = 1, UNHANDELED_OPERATION = 2, WAITING_FOR_DATA = 3, UNHANDELED_DATA = 4, WAITING_FOR_DMA = 5
@@ -127,6 +128,8 @@ uint8_t gpu_get_pixel(const void *buffer, uint16_t position);
 void gpu_set_pixel(void *buffer, uint16_t position, uint8_t data);
 
 void gpu_swap_buffers(void);
+
+void gpu_blank(void *buffer, uint8_t blank_with);
 
 void gpu_init(void);
 

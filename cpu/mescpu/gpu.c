@@ -7,9 +7,6 @@
 #include "time.h"
 #include "gpu.h"
 
-#define GPU_READY_PORT GPIOC
-#define GPU_READY GPIO15
-
 volatile bool spi_dma_transmit_ongoing = false;
 volatile Queue current_operation;
 
@@ -17,21 +14,28 @@ Operation gpu_operation_init(void) {
         return (Operation) {0x00, 0x00, 0x00, 0xff, 0x00, 0x00, 0x00, 0x00};
 }
 
-Operation gpu_operation_send_buf(uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy) {
-        return (Operation) {0x00, 0x00, 0x00, 0x00, xx, yy, sx, sy};
+Operation gpu_operation_send_buf(Buffer buffer, uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy) {
+        return (Operation) {0x00, 0x00, buffer, 0x00, xx, yy, sx, sy};
 }
 
-Operation gpu_operation_print_text(uint8_t fore, uint8_t back, uint16_t size, uint8_t ox, uint8_t oy) {
-        return (Operation) {fore, back, 0x00, 0x01, (size >> 8) & 0xff, size & 0xff, ox, oy};
+Operation gpu_operation_print_text(Buffer buffer, uint8_t fore, uint8_t back, uint8_t size, uint8_t ox, uint8_t oy) {
+        return (Operation) {fore, back, buffer, 0x01, 0x00, size, ox, oy};
 }
 
-void gpu_print_text(uint8_t ox, uint8_t oy, uint8_t foreground, uint8_t background, const char *text) {
-        while (!gpio_get(GPU_READY_PORT, GPU_READY));
-        while (!current_operation.ack);
-        uint16_t len = 0;
+Operation gpu_operation_reset(void) {
+        return (Operation) {0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00};
+}
+
+Operation gpu_operation_blank(Buffer bf, uint8_t blank_with) {
+        return (Operation) {0x00, 0x00, bf, 0x0b, 0x00, 0x00, 0x00, blank_with};
+}
+
+void gpu_print_text(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t foreground, uint8_t background, const char *text) {
+        gpu_block_until_ack();
+        uint8_t len = 0;
         while (text[len++] != 0);
         current_operation = (Queue) {
-                gpu_operation_print_text(foreground, background, len, ox, oy),
+                gpu_operation_print_text(buffer, foreground, background, len, ox, oy),
                 (uint8_t *) text,
                 len,
                 false,
@@ -39,6 +43,31 @@ void gpu_print_text(uint8_t ox, uint8_t oy, uint8_t foreground, uint8_t backgrou
         };
         gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
 }
+
+void gpu_reset(void) {
+        gpu_block_until_ack();
+        current_operation = (Queue) {
+                gpu_operation_reset(),
+                0,
+                0,
+                true,
+                false
+        };
+        gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
+}
+
+void gpu_blank(Buffer buffer, uint8_t blank_with) {
+        gpu_block_until_ack();
+        current_operation = (Queue) {
+                gpu_operation_blank(buffer, blank_with),
+                0,
+                0,
+                true,
+                false
+        };
+        gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
+}
+
 
 void gpu_initiate_communication(void) {
         RCC_APB1ENR &= ~RCC_APB1ENR_I2C1EN; // disable i2c if it happend to be enabled, see erata.
@@ -71,10 +100,14 @@ void gpu_initiate_communication(void) {
         exti_enable_request(EXTI15);
 }
 
-void gpu_block_until_ready(void) {
+void gpu_sync(void) {
+        // The next line is not really needed because by the time the cpu tries to sync to gpu should be already up
+        // and running, but when the cpu tries to resync when resetting the gpu, GPU READY might blink, because the GPU
+        // is setting up output pins. The universal solution is to just wait a bit before attempting to communicate.
+        block(10);
         Operation init = gpu_operation_init();
-        current_operation = (Queue) {init, 0, 0, true, true};
-        while (!gpio_get(GPU_READY_PORT, GPU_READY)) {
+        current_operation = (Queue) {init, 0, 0, true, false};
+        while (!current_operation.ack) {
                 gpio_toggle(GPIOC, GPIO13);
                 gpu_send_blocking((uint8_t *) &init, sizeof(Operation));
                 block(500);
@@ -120,10 +153,6 @@ void gpu_block_until_ack(void) {
 
 void exti15_10_isr(void) {
         exti_reset_request(EXTI15);
-//        for (int i = 0; i < 6; ++i) {
-//                gpio_toggle(GPIOC, GPIO13);
-//                for(int j = 0; j < 1000000; ++j) __asm__("nop");
-//        }
         if (!current_operation.data_sent) {
                 gpu_send_dma(
                         (uint32_t) current_operation.operation_data,

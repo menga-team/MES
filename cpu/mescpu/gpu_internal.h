@@ -3,6 +3,9 @@
 
 #include "stdint.h"
 
+#define GPU_READY_PORT GPIOC
+#define GPU_READY GPIO15
+
 typedef struct Operation Operation;
 typedef struct Queue Queue;
 
@@ -19,6 +22,11 @@ struct Operation {
     uint8_t _7;
 };
 
+enum Buffer {
+    FRONT_BUFFER = 0, BACK_BUFFER = 1
+} __attribute__ ((__packed__));
+
+typedef enum Buffer Buffer;
 
 /// The Queue holds information of the operation that is beeing currently transmitted.
 struct Queue {
@@ -40,13 +48,22 @@ Operation gpu_operation_init(void);
 /// @note When all parameters are 0 the GPU expects the whole video buffer. 160*120@3bpp (7200 bytes)
 /// @attention When sending the whole buffer, use 0 for all parameters. This operation is much faster.
 /// @related See `display_buf` if you want to display the buffer after sending it.
-/// @return 00 00 00 00 XX YY SX SY
-Operation gpu_operation_send_buf(uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy);
+/// @return 00 00 BF 00 XX YY SX SY
+Operation gpu_operation_send_buf(Buffer bf, uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy);
 
 /// @brief Prints text of length size at ox*oy.
 /// @attention Text needs to be NUL-Terminated.
-/// @return FF BB 00 01  XX XX OX OY
-Operation gpu_operation_print_text(uint8_t foreground, uint8_t background, uint16_t size, uint8_t ox, uint8_t oy);
+/// @return FF BB BF 01  00 XX OX OY
+Operation gpu_operation_print_text(Buffer bf, uint8_t foreground, uint8_t background, uint8_t size, uint8_t ox, uint8_t oy);
+
+/// @brief Will reset the GPU.
+/// @return 00 00 00 0a 00 00 00 00
+Operation gpu_operation_reset(void);
+
+/// @brief Will fill the Buffer with the specified value.
+/// @return 00 00 BF 0b 00 00 00 00
+Operation gpu_operation_blank(Buffer bf, uint8_t blank_with);
+
 
 /// @brief Halt execution of the programm and send data to GPU.
 void gpu_send_blocking(uint8_t *data, uint32_t len);
@@ -61,7 +78,7 @@ void gpu_send_dma(uint32_t adr, uint32_t len);
 void gpu_initiate_communication(void);
 
 /// Send INIT every second and wait for GPU HIGH.
-void gpu_block_until_ready(void);
+void gpu_sync(void);
 
 /// Will halt execution until GPU ack operation data.
 void gpu_block_until_ack(void);
