@@ -1,9 +1,11 @@
 import sys
+import os
 import serial
 import traceback
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout, QTabWidget, QGridLayout, QTextEdit
+from PyQt5.QtCore import Qt, QTimer, QStringListModel
+from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout, QTabWidget, QGridLayout, QTextEdit, QComboBox, QCompleter, QLineEdit
 
 
 class Tee:
@@ -82,7 +84,7 @@ class MainWindow(QWidget):
         for number, name, shortcut in self.button_args:
             button = QPushButton(name)
             button.setCheckable(True)
-            button.setShortcut(shortcut)
+            # button.setShortcut(shortcut)
             # if 32 > number:
             #     button.clicked.connect(lambda: self.setButton(new_number, button.isChecked()))
             # else:
@@ -165,21 +167,39 @@ class MainWindow(QWidget):
 
         # Set up main layout
         mainLayout = QGridLayout()
-        mainLayout.addWidget(self.tabWidget, 0, 0)
+        mainLayout.addWidget(self.tabWidget, 1, 0)
 
-        p = QPushButton("Send to Arduino")
-        p.clicked.connect(self.sendToArduino)
-        mainLayout.addWidget(p, 1, 0)
+        self.model = QStringListModel()
+        self.model.setStringList([f"/dev/{i}" for i in os.listdir("/dev/")])
+        self.completer = QCompleter()
+        self.completer.setModel(self.model)
+
+        self.device = QLineEdit()
+        self.device.setText("/dev/ACM0")
+        self.device.setCompleter(self.completer)
+        mainLayout.addWidget(self.device, 0, 0)
+
+        # self.device_combobox = QComboBox()
+        # self.device_combobox.addItems([f"/dev/{i}" for i in os.listdir("/dev/")])
+
+        self.toggle_checkablity = QPushButton("toggle checkability")
+        self.toggle_checkablity.setCheckable(True)
+        self.toggle_checkablity.setChecked(True)
+        self.toggle_checkablity.clicked.connect(lambda:[i.setCheckable(self.toggle_checkablity.isChecked()) for i in self.buttons])
+        mainLayout.addWidget(self.toggle_checkablity, 0, 1)
+
+        self.textEdit = QTextEdit()
+        self.textEdit.setReadOnly(True)
+        mainLayout.addWidget(self.textEdit, 1, 1)
 
         self.autosendButton = QPushButton("Autosend to Arduino")
         self.autosendButton.setCheckable(True)
         self.autosendButton.clicked.connect(lambda : print(f'{"enabled" if self.autosendButton.isChecked() else "disabled"} autosend'))
-        mainLayout.addWidget(self.autosendButton, 1, 1)
+        mainLayout.addWidget(self.autosendButton, 2, 1)
 
-        self.textEdit = QTextEdit()
-        self.textEdit.setReadOnly(True)
-        mainLayout.addWidget(self.textEdit, 0, 1)
-
+        p = QPushButton("Send to Arduino")
+        p.clicked.connect(self.sendToArduino)
+        mainLayout.addWidget(p, 2, 0)
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateConsoleOutput)
@@ -187,6 +207,18 @@ class MainWindow(QWidget):
         # Set timer interval to 100 milliseconds
         self.timer.start(100)
         self.setLayout(mainLayout)
+
+    def keyPressEvent(self, e: QKeyEvent):
+        for i in zip(self.buttons, [x[2] for x in self.button_args]):
+            # print(i)
+            if e.key() == i[1]:
+                i[0].setChecked(True)
+
+    def keyReleaseEvent(self, e: QKeyEvent):
+        for i in zip(self.buttons, [x[2] for x in self.button_args]):
+            # print(i)
+            if e.key() == i[1]:
+                i[0].setChecked(False)
 
     def setButton(self, index, status):
         newline = '\n'
@@ -201,29 +233,32 @@ class MainWindow(QWidget):
 
     def sendToArduino(self):
 
-        print("Sending : #", end="")
-        for state in self.buttonState:
-            print(int(state), end="")
-        for state in self.controllerState:
-            print(int(state), end="")
-        print("*")
+        print("Sending : <", end="")
+        print("".join([str(i) for i in self.buttonState]), end="")
+        print("".join([str(i) for i in self.controllerState]), end="")
+        # for state in self.buttonState:
+        #     print(bytes([int(state)]), end="")
+        # for state in self.controllerState:
+        #     print(bytes([int(state)]), end="")
+        print(">")
 
         # Open serial connection
         try:
-            with serial.Serial("/dev/ttyACM0", 9600) as ser:
+            with serial.Serial(self.device.text(), 9600) as ser:
                 # Send start byte
-                ser.write(b"#")
+                ser.write(b"<")
 
                 # Send button state
-                for state in self.buttonState:
-                    ser.write(bytes([int(state)]))
+                # for state in :
+                ser.write(bytes(self.buttonState))
+                ser.write(bytes(self.controllerState))
 
                 # Send controller state
-                for state in self.controllerState:
-                    ser.write(bytes([int(state)]))
+                # for state in self.controllerState:
+                #     ser.write(bytes([int(state)]))
 
                 # Send end byte
-                ser.write(b"*")
+                ser.write(b">")
         except Exception as e:
             tb = traceback.format_exc()
             print(tb)
