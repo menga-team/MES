@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <memory.h>
 #include "gpu.h"
+#include "mesgraphics.h"
 
 // Include error screen as 'error'
 #include "images/error.m3ifc"
@@ -105,6 +106,15 @@ void start_communication(void) {
         rcc_periph_clock_enable(RCC_DMA1);
         nvic_set_priority(NVIC_DMA1_CHANNEL2_IRQ, 1);
         nvic_enable_irq(NVIC_DMA1_CHANNEL2_IRQ);
+        dma_channel_reset(DMA1, DMA_CHANNEL2);
+        dma_set_peripheral_address(DMA1, DMA_CHANNEL2, (uint32_t) &SPI1_DR);
+        dma_set_read_from_peripheral(DMA1, DMA_CHANNEL2);
+        dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL2);
+        dma_set_peripheral_size(DMA1, DMA_CHANNEL2, DMA_CCR_PSIZE_8BIT);
+        dma_set_memory_size(DMA1, DMA_CHANNEL2, DMA_CCR_MSIZE_8BIT);
+        dma_set_priority(DMA1, DMA_CHANNEL2, DMA_CCR_PL_VERY_HIGH);
+        dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL2);
+        spi_enable_rx_dma(SPI1);
         dma_recieve_operation();
 }
 
@@ -113,17 +123,8 @@ void dma_recieve_operation(void) {
 }
 
 void dma_recieve(uint32_t adr, uint32_t len) {
-        dma_channel_reset(DMA1, DMA_CHANNEL2);
-        dma_set_peripheral_address(DMA1, DMA_CHANNEL2, (uint32_t) &SPI1_DR);
         dma_set_memory_address(DMA1, DMA_CHANNEL2, adr);
         dma_set_number_of_data(DMA1, DMA_CHANNEL2, len);
-        dma_set_read_from_peripheral(DMA1, DMA_CHANNEL2);
-        dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL2);
-        dma_set_peripheral_size(DMA1, DMA_CHANNEL2, DMA_CCR_PSIZE_8BIT);
-        dma_set_memory_size(DMA1, DMA_CHANNEL2, DMA_CCR_MSIZE_8BIT);
-        dma_set_priority(DMA1, DMA_CHANNEL2, DMA_CCR_PL_VERY_HIGH);
-        dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL2);
-        spi_enable_rx_dma(SPI1);
         dma_enable_channel(DMA1, DMA_CHANNEL2);
 }
 
@@ -198,7 +199,7 @@ void generic_error(void) {
         run = false;
         color_palette[0] = COLOR(0b000, 0b000, 0b111);
         color_palette[1] = COLOR(0b111, 0b111, 0b111);
-        memcpy(front_buffer, error, BUFFER_SIZE);
+        memcpy(front_buffer, error, SCREEN_BUFFER_SIZE);
 }
 
 void invalid_operation(uint8_t *invalid_op) {
@@ -239,12 +240,11 @@ void cpu_communication_timeout(void) {
         color_palette[1] = COLOR(0b110, 0b110, 0b110);
         color_palette[2] = COLOR(0b100, 0b100, 0b100);
         color_palette[3] = COLOR(0b111, 0b111, 0b111);
-        memcpy(front_buffer, cpu_timeout, BUFFER_SIZE);
+        memcpy(front_buffer, cpu_timeout, SCREEN_BUFFER_SIZE);
 }
 
 void dma1_channel2_isr(void) {
-        dma_disable_transfer_complete_interrupt(DMA1, DMA_CHANNEL2);
-        spi_disable_rx_dma(SPI1);
+        dma_clear_interrupt_flags(DMA1, DMA_CHANNEL2, DMA_ISR_TCIF_BIT);
         dma_disable_channel(DMA1, DMA_CHANNEL2);
         switch (processing_stage) {
                 case UNINITIALIZED:
@@ -262,7 +262,9 @@ void dma1_channel2_isr(void) {
                         processing_stage = UNHANDELED_DATA;
                         break;
                 case WAITING_FOR_DMA:
+                        GPIO_BRR(GPU_READY_PORT) = GPU_READY;
                         processing_stage = READY;
+                        dma_recieve_operation();
                         GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
                         break;
                 default:
@@ -290,56 +292,53 @@ void handle_operation(void) {
 void new_operation(void) {
         GPIO_BRR(GPU_READY_PORT) = GPU_READY;
         switch (OPERATION_ID(operation)) {
-                case OPERATION_ID_INIT: {
+                case OPERATION_ID_INIT:
                         gpu_write(front_buffer, 0, 0, 1, 0, "CPU synced!");
                         dma_recieve_operation();
                         processing_stage = READY;
                         break;
-                }
-                case OPERATION_ID_SWAP_BUF: {
+                case OPERATION_ID_SWAP_BUF:
                         gpu_swap_buffers();
                         dma_recieve_operation();
                         processing_stage = READY;
                         break;
-                }
-                case OPERATION_ID_SEND_BUF: {
+                case OPERATION_ID_DISPLAY_BUF:
+                case OPERATION_ID_SEND_BUF:
                         if (operation[4] == 0x00 && operation[5] == 0x00 &&
                             operation[6] == 0x00 && operation[7] == 0x00) {
+                                if (OPERATION_ID(operation) == OPERATION_ID_DISPLAY_BUF) { // TODO: stupid hack..
+                                        operation[2] = 0x01;
+                                }
                                 // recieve full frame via dma
-                                dma_recieve((uint32_t) front_buffer, BUFFER_SIZE);
+                                dma_recieve((uint32_t) OPERATION_BUFFER(operation), SCREEN_BUFFER_SIZE);
                                 processing_stage = WAITING_FOR_DMA;
                         } else {
                                 dma_recieve(
                                         (uint32_t) operation_data,
-                                        uround((operation[6] * operation[7] * BUFFER_BPP) / 8)
+                                        BUFFER_SIZE(operation[6], operation[7])
                                 );
                                 processing_stage = WAITING_FOR_DATA;
                         }
                         break;
-                }
-                case OPERATION_ID_PRINT_TEXT: {
+                case OPERATION_ID_PRINT_TEXT:
                         dma_recieve(
                                 (uint32_t) operation_data,
                                 operation[5]
                         );
                         processing_stage = WAITING_FOR_DATA;
                         break;
-                }
-                case OPERATION_ID_RESET: {
+                case OPERATION_ID_RESET:
                         gpu_reset();
                         processing_stage = READY; // won't be executed.
                         break;
-                }
-                case OPERATION_ID_BLANK: {
+                case OPERATION_ID_BLANK:
                         gpu_blank(OPERATION_BUFFER(operation), operation[7]);
                         processing_stage = READY;
                         break;
-                }
-                default: { // unimplemented operation
+                default: // unimplemented operation
                         invalid_operation(operation);
                         processing_stage = READY;
                         break;
-                }
         }
         GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
 }
@@ -347,6 +346,7 @@ void new_operation(void) {
 void new_data(void) {
         GPIO_BRR(GPU_READY_PORT) = GPU_READY;
         switch (OPERATION_ID(operation)) {
+                case OPERATION_ID_DISPLAY_BUF:
                 case OPERATION_ID_SEND_BUF: {
                         const uint8_t o_x = operation[4];
                         const uint8_t o_y = operation[5];
@@ -362,13 +362,15 @@ void new_data(void) {
                                         );
                                 }
                         }
+                        if(OPERATION_ID(operation) == OPERATION_ID_DISPLAY_BUF) {
+                                gpu_swap_buffers();
+                        }
                         break;
                 }
-                case OPERATION_ID_PRINT_TEXT: {
+                case OPERATION_ID_PRINT_TEXT:
                         gpu_write(OPERATION_BUFFER(operation), operation[6], operation[7], operation[0], operation[1],
                                   (char *) operation_data);
                         break;
-                }
         }
         dma_recieve_operation();
         processing_stage = READY;

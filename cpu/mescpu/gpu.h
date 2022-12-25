@@ -11,4 +11,8 @@ void gpu_reset(void);
 
 void gpu_blank(Buffer buffer, uint8_t blank_with);
 
+void gpu_send_buf(Buffer buffer, uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy, void *pixels);
+
+void gpu_display_buf(uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy, void *pixels);
+
 #endif //MES_GPU_H

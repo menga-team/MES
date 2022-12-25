@@ -73,7 +73,7 @@ void gpu_patch_font(void *patch, uint8_t start, uint8_t end) {
 }
 
 void gpu_blank(void *buffer, uint8_t blank_with) {
-        memset(buffer, blank_with, BUFFER_SIZE);
+        memset(buffer, blank_with, SCREEN_BUFFER_SIZE);
 }
 
 void gpu_reset(void) {

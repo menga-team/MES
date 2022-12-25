@@ -6,6 +6,7 @@
 #include <libopencm3/cm3/nvic.h>
 #include "time.h"
 #include "gpu.h"
+#include "mesgraphics.h"
 
 volatile bool spi_dma_transmit_ongoing = false;
 volatile Queue current_operation;
@@ -16,6 +17,10 @@ Operation gpu_operation_init(void) {
 
 Operation gpu_operation_send_buf(Buffer buffer, uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy) {
         return (Operation) {0x00, 0x00, buffer, 0x00, xx, yy, sx, sy};
+}
+
+Operation gpu_operation_display_buf(uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy) {
+        return (Operation) {0x00, 0x00, 0x00, 0x08, xx, yy, sx, sy};
 }
 
 Operation gpu_operation_print_text(Buffer buffer, uint8_t fore, uint8_t back, uint8_t size, uint8_t ox, uint8_t oy) {
@@ -56,6 +61,35 @@ void gpu_reset(void) {
         gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
 }
 
+void gpu_send_buf(Buffer buffer, uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy, void *pixels) {
+        gpu_block_until_ack();
+        Operation op = gpu_operation_send_buf(buffer, ox, oy, xx, yy);
+        if (xx == 160 && yy == 120) op._4 = op._5 = op._6 = op._7 = 0;
+        current_operation = (Queue) {
+                op,
+                (uint8_t *) pixels,
+                BUFFER_SIZE(xx, yy),
+                false,
+                false
+        };
+        gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
+}
+
+void gpu_display_buf(uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy, void *pixels) {
+        gpu_block_until_ack();
+        Operation op = gpu_operation_display_buf(ox, oy, xx, yy);
+        if (xx == 160 && yy == 120) op._4 = op._5 = op._6 = op._7 = 0;
+        current_operation = (Queue) {
+                op,
+                (uint8_t *) pixels,
+                BUFFER_SIZE(xx, yy),
+                false,
+                false
+        };
+        gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
+}
+
+
 void gpu_blank(Buffer buffer, uint8_t blank_with) {
         gpu_block_until_ack();
         current_operation = (Queue) {
@@ -67,7 +101,6 @@ void gpu_blank(Buffer buffer, uint8_t blank_with) {
         };
         gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
 }
-
 
 void gpu_initiate_communication(void) {
         RCC_APB1ENR &= ~RCC_APB1ENR_I2C1EN; // disable i2c if it happend to be enabled, see erata.
@@ -81,7 +114,7 @@ void gpu_initiate_communication(void) {
 
         spi_reset(SPI1);
         // TODO: Make spi clock faster when no longer testing
-        spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_8, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
+        spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_2, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
                         SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
         spi_enable_software_slave_management(SPI1);
         spi_set_nss_high(SPI1);
@@ -133,7 +166,7 @@ void gpu_send_dma(uint32_t adr, uint32_t len) {
                 dma_enable_memory_increment_mode(DMA1, DMA_CHANNEL3);
                 dma_set_peripheral_size(DMA1, DMA_CHANNEL3, DMA_CCR_PSIZE_8BIT);
                 dma_set_memory_size(DMA1, DMA_CHANNEL3, DMA_CCR_MSIZE_8BIT);
-                dma_set_priority(DMA1, DMA_CHANNEL3, DMA_CCR_PL_HIGH);
+                dma_set_priority(DMA1, DMA_CHANNEL3, DMA_CCR_PL_VERY_HIGH);
                 dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL3);
                 dma_enable_channel(DMA1, DMA_CHANNEL3);
                 spi_enable_tx_dma(SPI1);
@@ -141,6 +174,7 @@ void gpu_send_dma(uint32_t adr, uint32_t len) {
 }
 
 void dma1_channel3_isr(void) {
+        dma_clear_interrupt_flags(DMA1, DMA_CHANNEL2, DMA_ISR_TCIF_BIT);
         dma_disable_transfer_complete_interrupt(DMA1, DMA_CHANNEL3);
         spi_disable_tx_dma(SPI1);
         dma_disable_channel(DMA1, DMA_CHANNEL3);
