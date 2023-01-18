@@ -1,7 +1,7 @@
 #include <memory.h>
 #include <stdbool.h>
 #include "mesgraphics.h"
-#include "time.h"
+#include "timer.h"
 #include "gpu.h"
 
 static void vector3f_rotate(Vector3f *vec, float theta_x, float theta_y, float theta_z) {
@@ -98,6 +98,6 @@ int main(void) {
 
                 // send the frame and wait
                 gpu_send_buf(FRONT_BUFFER, buffer.x, buffer.y, 0, 0, buffer.data);
-                block(33 - (millis_since_boot() - start_time)); // 30fps
+                timer_block_ms(33 - (millis_since_boot() - start_time)); // 30fps
         }
 }
