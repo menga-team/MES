@@ -218,6 +218,7 @@ void invalid_operation(uint8_t *invalid_op) {
                 invalid_op[6],
                 invalid_op[7]);
         gpu_write(front_buffer, 8, 96, 1, 0, operation_string);
+        free(operation_string);
 }
 
 void unexpected_data(enum Stage c_stage) {
@@ -233,6 +234,7 @@ void unexpected_data(enum Stage c_stage) {
         sprintf(buf, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x ...",
                 data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10]);
         gpu_write(front_buffer, 0, 112, 1, 0, buf);
+        free(buf);
 }
 
 void cpu_communication_timeout(void) {
