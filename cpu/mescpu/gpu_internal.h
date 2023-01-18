@@ -38,6 +38,8 @@ extern volatile Queue current_operation;
 /// @return 00 00 00 ff 00 00 00 00
 Operation gpu_operation_init(void);
 
+Operation gpu_operation_swap_buf(void);
+
 /// @brief Inserts a buffer sx*sy at xx*yy.
 /// @note When all parameters are 0 the GPU expects the whole video buffer. 160*120@3bpp (7200 bytes)
 /// @attention When sending the whole buffer, use 0 for all parameters. This operation is much faster.

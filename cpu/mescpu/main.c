@@ -2,7 +2,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
 #include "main.h"
-#include "time.h"
+#include "timer.h"
 #include "gpu.h"
 //#include "controller.h"
 #include "sdcard.h"

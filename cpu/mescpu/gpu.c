@@ -4,7 +4,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/exti.h>
 #include <libopencm3/cm3/nvic.h>
-#include "time.h"
+#include "timer.h"
 #include "gpu.h"
 #include "mesgraphics.h"
 
@@ -21,6 +21,10 @@ Operation gpu_operation_send_buf(Buffer buffer, uint8_t xx, uint8_t yy, uint8_t 
 
 Operation gpu_operation_display_buf(uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy) {
         return (Operation) {0x00, 0x00, 0x00, 0x08, xx, yy, sx, sy};
+}
+
+Operation gpu_operation_swap_buf(void) {
+        return (Operation) {0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00};
 }
 
 Operation gpu_operation_print_text(Buffer buffer, uint8_t fore, uint8_t back, uint8_t size, uint8_t ox, uint8_t oy) {
@@ -89,6 +93,11 @@ void gpu_display_buf(uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy, void *pixel
         gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
 }
 
+void gpu_swap_buf(void) {
+        gpu_block_until_ack();
+        Operation op = gpu_operation_swap_buf();
+        gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
+}
 
 void gpu_blank(Buffer buffer, uint8_t blank_with) {
         gpu_block_until_ack();
@@ -113,7 +122,6 @@ void gpu_initiate_communication(void) {
         gpio_set_mode(GPIOB, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT, GPIO4);
 
         spi_reset(SPI1);
-        // TODO: Make spi clock faster when no longer testing
         spi_init_master(SPI1, SPI_CR1_BAUDRATE_FPCLK_DIV_2, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
                         SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
         spi_enable_software_slave_management(SPI1);

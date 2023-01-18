@@ -4,7 +4,7 @@
 #include "libopencm3/stm32/spi.h"
 #include "libopencm3/stm32/rcc.h"
 #include "gpu.h"
-#include "time.h"
+#include "timer.h"
 
 uint8_t sdcard_calculate_crc7(const uint8_t *data, uint32_t len) {
         uint8_t crc = 0;
