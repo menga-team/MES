@@ -249,12 +249,12 @@ enum SDInitResult sdcard_init(void) {
         sprintf(text, "OCR %02x %02x %02x %02x", ocr_register[0], ocr_register[1], ocr_register[2], ocr_register[3]);
         gpu_print_text(FRONT_BUFFER, 0, 8, 1, 0, text);
         sdcard_release();
-        uint32_t start_time = millis_since_boot();
+        uint32_t start_time = timer_get_ms();
         while (r1.in_idle_state) {
                 r1.repr = sdcard_send_app_command_blocking(SD_ACMD41_SD_SEND_OP_COND, 0x40000000, 2);
                 sdcard_release();
-                block(10);
-                if (millis_since_boot() > start_time + 1000) break;
+                timer_block_ms(10);
+                if (timer_get_ms() > start_time + 1000) break;
         }
         if (r1.in_idle_state) {
                 return SD_CARD_WAKEUP_TIMEOUT;

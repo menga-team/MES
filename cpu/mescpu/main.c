@@ -12,7 +12,7 @@ int main(void) {
         clock_peripherals();
         configure_io();
         //controller_configure_io();
-        configure_systick();
+        timer_start();
         //controller_setup_timers();
         gpu_initiate_communication();
         gpu_sync();

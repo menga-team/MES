@@ -137,13 +137,13 @@ void gpu_sync(void) {
         // The next line is not really needed because by the time the cpu tries to sync to gpu should be already up
         // and running, but when the cpu tries to resync when resetting the gpu, GPU READY might blink, because the GPU
         // is setting up output pins. The universal solution is to just wait a bit before attempting to communicate.
-        block(10);
+        timer_block_ms(10);
         Operation init = gpu_operation_init();
         current_operation = (Queue) {init, 0, 0, true, false};
         while (!current_operation.ack) {
                 gpio_toggle(GPIOC, GPIO13);
                 gpu_send_blocking((uint8_t *) &init, sizeof(Operation));
-                block(500);
+                timer_block_ms(500);
         }
         gpio_set(GPIOC, GPIO13);
 }
