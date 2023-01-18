@@ -8151,6 +8151,100 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 </deviceset>
 </devicesets>
 </library>
+<library name="BtoB_connector">
+<packages>
+<package name="3511220BMSS0BNA1_2.54MM_2X20_MALE">
+<pad name="P$1" x="0" y="0" drill="1" diameter="1.9304"/>
+<pad name="P$2" x="2.54" y="0" drill="1" diameter="1.9304"/>
+<pad name="P$3" x="5.08" y="0" drill="1" diameter="1.9304"/>
+<pad name="P$4" x="7.62" y="0" drill="1" diameter="1.9304"/>
+<pad name="P$5" x="10.16" y="0" drill="1" diameter="1.9304"/>
+<pad name="P$6" x="12.7" y="0" drill="1" diameter="1.9304"/>
+<pad name="P$7" x="15.24" y="0" drill="1" diameter="1.9304"/>
+<pad name="P$8" x="17.78" y="0" drill="1" diameter="1.9304"/>
+<pad name="P$9" x="20.32" y="0" drill="1" diameter="1.9304"/>
+<pad name="P$10" x="22.86" y="0" drill="1" diameter="1.9304"/>
+<pad name="P$11" x="0" y="2.54" drill="1" diameter="1.9304"/>
+<pad name="P$12" x="2.54" y="2.54" drill="1" diameter="1.9304"/>
+<pad name="P$13" x="5.08" y="2.54" drill="1" diameter="1.9304"/>
+<pad name="P$14" x="7.62" y="2.54" drill="1" diameter="1.9304"/>
+<pad name="P$15" x="10.16" y="2.54" drill="1" diameter="1.9304"/>
+<pad name="P$16" x="12.7" y="2.54" drill="1" diameter="1.9304"/>
+<pad name="P$17" x="15.24" y="2.54" drill="1" diameter="1.9304"/>
+<pad name="P$18" x="17.78" y="2.54" drill="1" diameter="1.9304"/>
+<pad name="P$19" x="20.32" y="2.54" drill="1" diameter="1.9304"/>
+<pad name="P$20" x="22.86" y="2.54" drill="1" diameter="1.9304"/>
+<hole x="-3.81" y="-2.54" drill="0.25"/>
+<hole x="26.67" y="-2.54" drill="0.25"/>
+</package>
+</packages>
+<symbols>
+<symbol name="3511220BMSS0BNA1_2.54MM_2X20_MALE">
+<wire x1="-7.62" y1="-12.7" x2="-7.62" y2="15.24" width="0.254" layer="94"/>
+<wire x1="-7.62" y1="15.24" x2="7.62" y2="15.24" width="0.254" layer="94"/>
+<wire x1="7.62" y1="15.24" x2="7.62" y2="-12.7" width="0.254" layer="94"/>
+<wire x1="7.62" y1="-12.7" x2="-7.62" y2="-12.7" width="0.254" layer="94"/>
+<pin name="P$1" x="12.7" y="-10.16" length="middle" rot="R180"/>
+<pin name="P$2" x="12.7" y="-7.62" length="middle" rot="R180"/>
+<pin name="P$3" x="12.7" y="-5.08" length="middle" rot="R180"/>
+<pin name="P$4" x="12.7" y="-2.54" length="middle" rot="R180"/>
+<pin name="P$5" x="12.7" y="0" length="middle" rot="R180"/>
+<pin name="P$6" x="12.7" y="2.54" length="middle" rot="R180"/>
+<pin name="P$7" x="12.7" y="5.08" length="middle" rot="R180"/>
+<pin name="P$8" x="12.7" y="7.62" length="middle" rot="R180"/>
+<pin name="P$9" x="12.7" y="10.16" length="middle" rot="R180"/>
+<pin name="P$10" x="12.7" y="12.7" length="middle" rot="R180"/>
+<pin name="P$11" x="-12.7" y="-10.16" length="middle"/>
+<pin name="P$12" x="-12.7" y="-7.62" length="middle"/>
+<pin name="P$13" x="-12.7" y="-5.08" length="middle"/>
+<pin name="P$14" x="-12.7" y="-2.54" length="middle"/>
+<pin name="P$15" x="-12.7" y="0" length="middle"/>
+<pin name="P$16" x="-12.7" y="2.54" length="middle"/>
+<pin name="P$17" x="-12.7" y="5.08" length="middle"/>
+<pin name="P$18" x="-12.7" y="7.62" length="middle"/>
+<pin name="P$19" x="-12.7" y="10.16" length="middle"/>
+<pin name="P$20" x="-12.7" y="12.7" length="middle"/>
+<text x="-2.54" y="17.78" size="1.27" layer="95">&gt;NAME</text>
+<text x="-2.54" y="-15.24" size="1.27" layer="96">&gt;VALUE</text>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="3511220BMSS0BNA1_2.54MM_2X20_MALE">
+<gates>
+<gate name="G$1" symbol="3511220BMSS0BNA1_2.54MM_2X20_MALE" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="3511220BMSS0BNA1_2.54MM_2X20_MALE">
+<connects>
+<connect gate="G$1" pin="P$1" pad="P$1"/>
+<connect gate="G$1" pin="P$10" pad="P$10"/>
+<connect gate="G$1" pin="P$11" pad="P$11"/>
+<connect gate="G$1" pin="P$12" pad="P$12"/>
+<connect gate="G$1" pin="P$13" pad="P$13"/>
+<connect gate="G$1" pin="P$14" pad="P$14"/>
+<connect gate="G$1" pin="P$15" pad="P$15"/>
+<connect gate="G$1" pin="P$16" pad="P$16"/>
+<connect gate="G$1" pin="P$17" pad="P$17"/>
+<connect gate="G$1" pin="P$18" pad="P$18"/>
+<connect gate="G$1" pin="P$19" pad="P$19"/>
+<connect gate="G$1" pin="P$2" pad="P$2"/>
+<connect gate="G$1" pin="P$20" pad="P$20"/>
+<connect gate="G$1" pin="P$3" pad="P$3"/>
+<connect gate="G$1" pin="P$4" pad="P$4"/>
+<connect gate="G$1" pin="P$5" pad="P$5"/>
+<connect gate="G$1" pin="P$6" pad="P$6"/>
+<connect gate="G$1" pin="P$7" pad="P$7"/>
+<connect gate="G$1" pin="P$8" pad="P$8"/>
+<connect gate="G$1" pin="P$9" pad="P$9"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -8256,6 +8350,7 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 <part name="R23" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="0"/>
 <part name="GND14" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND15" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
+<part name="U$1" library="BtoB_connector" deviceset="3511220BMSS0BNA1_2.54MM_2X20_MALE" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -9316,6 +9411,10 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 <instance part="J5" gate="G$1" x="210.82" y="71.12" smashed="yes">
 <attribute name="NAME" x="210.82" y="90.17" size="1.6764" layer="95" align="bottom-center"/>
 <attribute name="VALUE" x="210.82" y="63.5" size="1.6764" layer="96" align="bottom-center"/>
+</instance>
+<instance part="U$1" gate="G$1" x="218.44" y="147.32" smashed="yes">
+<attribute name="NAME" x="215.9" y="165.1" size="1.27" layer="95"/>
+<attribute name="VALUE" x="215.9" y="132.08" size="1.27" layer="96"/>
 </instance>
 </instances>
 <busses>
