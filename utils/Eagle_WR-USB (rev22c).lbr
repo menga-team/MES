@@ -5065,20 +5065,6 @@ follow the Milling Layer</text>
 <smd name="A10" x="1.75" y="5.93" dx="1.2" dy="0.3" layer="1" rot="R90"/>
 <smd name="A11" x="2.25" y="5.93" dx="1.2" dy="0.3" layer="1" rot="R90"/>
 <smd name="A12" x="2.75" y="5.93" dx="1.2" dy="0.3" layer="1" rot="R90"/>
-<pad name="B1" x="2.8" y="4.68" drill="0.4" diameter="0.65"/>
-<pad name="B2" x="2.4" y="3.98" drill="0.4" diameter="0.65"/>
-<pad name="B3" x="1.6" y="3.98" drill="0.4" diameter="0.65"/>
-<pad name="GND" x="2" y="4.68" drill="0.4" diameter="0.65"/>
-<pad name="B4" x="1.2" y="4.68" drill="0.4" diameter="0.65"/>
-<pad name="B5" x="0.8" y="3.98" drill="0.4" diameter="0.65"/>
-<pad name="B6" x="0.4" y="4.68" drill="0.4" diameter="0.65"/>
-<pad name="B7" x="-0.4" y="4.68" drill="0.4" diameter="0.65"/>
-<pad name="B8" x="-0.8" y="3.98" drill="0.4" diameter="0.65"/>
-<pad name="B9" x="-1.2" y="4.68" drill="0.4" diameter="0.65"/>
-<pad name="B10" x="-1.6" y="3.98" drill="0.4" diameter="0.65"/>
-<pad name="B11" x="-2.4" y="3.98" drill="0.4" diameter="0.65"/>
-<pad name="GND1" x="-2" y="4.68" drill="0.4" diameter="0.65"/>
-<pad name="B12" x="-2.8" y="4.68" drill="0.4" diameter="0.65"/>
 <pad name="S1" x="-4.27" y="3.53" drill="0.6" diameter="0.6" shape="long" rot="R90" stop="no"/>
 <pad name="S2" x="4.27" y="3.53" drill="0.6" diameter="0.6" shape="long" rot="R90" stop="no"/>
 <pad name="S3" x="4.27" y="-1.2" drill="0.6" diameter="0.6" shape="long" rot="R90" stop="no"/>
@@ -5109,7 +5095,6 @@ follow the Milling Layer</text>
 <text x="5.8" y="5.55" size="1.016" layer="25">&gt;NAME</text>
 <text x="5.9" y="3.65" size="1.016" layer="27">&gt;VALUE</text>
 <text x="-3.8" y="5.15" size="0.4064" layer="21">A1</text>
-<text x="3.3" y="4.55" size="0.4064" layer="21">B1</text>
 <text x="3.3" y="4.55" size="0.4064" layer="21">B1</text>
 <text x="-1.7" y="-3.95" size="0.6096" layer="48">PCB Edge</text>
 <text x="-4.23" y="3" size="0.1" layer="46" rot="R90">PCB cutout area</text>
@@ -5246,7 +5231,6 @@ follow the Milling Layer</text>
 <vertex x="4.87" y="-0.9" curve="180"/>
 </polygon>
 <polygon width="0.01" layer="30">
-<vertex x="-3.67" y="3.23" curve="-180"/>
 <vertex x="-4.87" y="3.23"/>
 <vertex x="-4.87" y="3.83" curve="-180"/>
 <vertex x="-3.67" y="3.83"/>
@@ -5881,44 +5865,32 @@ follow the Milling Layer</text>
 </symbol>
 <symbol name="USB3.1_TYPEC_CUSTOM">
 <description>USB 3.1 Type C</description>
-<pin name="GND" x="-17.78" y="-15.24" length="middle" direction="pas"/>
+<pin name="GND" x="17.78" y="-2.54" length="middle" direction="pas" rot="R180"/>
 <pin name="SSTXP1" x="-17.78" y="15.24" length="middle" direction="pas"/>
 <pin name="SSTXN1" x="-17.78" y="12.7" length="middle" direction="pas"/>
-<pin name="VBUS" x="-17.78" y="-7.62" length="middle" direction="pas"/>
+<pin name="VBUS" x="17.78" y="15.24" length="middle" direction="pas" rot="R180"/>
 <pin name="CC" x="-17.78" y="10.16" length="middle" direction="pas"/>
 <pin name="DP1" x="-17.78" y="7.62" length="middle" direction="pas"/>
 <pin name="DN1" x="-17.78" y="5.08" length="middle" direction="pas"/>
 <pin name="SBU1" x="-17.78" y="2.54" length="middle" direction="pas"/>
-<pin name="VBUS1" x="-17.78" y="-10.16" length="middle" direction="pas"/>
-<pin name="SSRXN2" x="17.78" y="-2.54" length="middle" direction="pas" rot="R180"/>
-<pin name="SSRXP2" x="17.78" y="0" length="middle" direction="pas" rot="R180"/>
-<pin name="GND1" x="-17.78" y="-17.78" length="middle" direction="pas"/>
-<pin name="GND2" x="17.78" y="-17.78" length="middle" direction="pas" rot="R180"/>
-<pin name="SSRXP1" x="-17.78" y="0" length="middle" direction="pas"/>
-<pin name="SSRXN1" x="-17.78" y="-2.54" length="middle" direction="pas"/>
-<pin name="VBUS2" x="17.78" y="-7.62" length="middle" direction="pas" rot="R180"/>
-<pin name="SBU2" x="17.78" y="2.54" length="middle" direction="pas" rot="R180"/>
-<pin name="VCONN" x="17.78" y="10.16" length="middle" direction="pas" rot="R180"/>
-<pin name="VBUS3" x="17.78" y="-10.16" length="middle" direction="pas" rot="R180"/>
-<pin name="SSTXN2" x="17.78" y="12.7" length="middle" direction="pas" rot="R180"/>
-<pin name="SSTXP2" x="17.78" y="15.24" length="middle" direction="pas" rot="R180"/>
-<pin name="GND3" x="17.78" y="-15.24" length="middle" direction="pas" rot="R180"/>
-<pin name="SHIELD" x="-17.78" y="-20.32" visible="pad" length="short" direction="pas"/>
-<pin name="SHIELD1" x="17.78" y="-20.32" visible="pad" length="short" direction="pas" rot="R180"/>
-<pin name="DP2" x="17.78" y="7.62" length="middle" direction="pas" rot="R180"/>
-<pin name="DN2" x="17.78" y="5.08" length="middle" direction="pas" rot="R180"/>
+<pin name="VBUS1" x="17.78" y="10.16" length="middle" direction="pas" rot="R180"/>
+<pin name="SSRXN2" x="-17.78" y="0" length="middle" direction="pas"/>
+<pin name="SSRXP2" x="-17.78" y="-2.54" length="middle" direction="pas"/>
+<pin name="GND1" x="17.78" y="0" length="middle" direction="pas" rot="R180"/>
+<pin name="SHIELD" x="-17.78" y="-5.08" visible="pad" length="short" direction="pas"/>
+<pin name="SHIELD1" x="17.78" y="-5.08" visible="pad" length="short" direction="pas" rot="R180"/>
 <wire x1="-12.7" y1="17.145" x2="12.7" y2="17.145" width="0.254" layer="94"/>
-<wire x1="12.7" y1="17.145" x2="12.7" y2="-20.32" width="0.254" layer="94"/>
-<wire x1="12.7" y1="-20.32" x2="-12.7" y2="-20.32" width="0.254" layer="94"/>
-<wire x1="-12.7" y1="-20.32" x2="-12.7" y2="17.145" width="0.254" layer="94"/>
-<wire x1="-15.24" y1="-20.32" x2="-13.335" y2="-20.32" width="0.254" layer="94" style="shortdash"/>
-<wire x1="-13.335" y1="-20.32" x2="-13.335" y2="17.78" width="0.254" layer="94" style="shortdash"/>
+<wire x1="12.7" y1="17.145" x2="12.7" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="12.7" y1="-5.08" x2="-12.7" y2="-5.08" width="0.254" layer="94"/>
+<wire x1="-12.7" y1="-5.08" x2="-12.7" y2="17.145" width="0.254" layer="94"/>
+<wire x1="-15.24" y1="-5.08" x2="-13.335" y2="-5.08" width="0.254" layer="94" style="shortdash"/>
+<wire x1="-13.335" y1="-5.08" x2="-13.335" y2="17.78" width="0.254" layer="94" style="shortdash"/>
 <wire x1="-13.335" y1="17.78" x2="13.335" y2="17.78" width="0.254" layer="94" style="shortdash"/>
-<wire x1="13.335" y1="17.78" x2="13.335" y2="-20.32" width="0.254" layer="94" style="shortdash"/>
-<wire x1="13.335" y1="-20.32" x2="15.24" y2="-20.32" width="0.254" layer="94" style="shortdash"/>
+<wire x1="13.335" y1="17.78" x2="13.335" y2="-5.08" width="0.254" layer="94" style="shortdash"/>
+<wire x1="13.335" y1="-5.08" x2="15.24" y2="-5.08" width="0.254" layer="94" style="shortdash"/>
 <text x="0" y="19.05" size="1.6764" layer="95" align="bottom-center">&gt;NAME</text>
 <text x="7.1" y="18.7" size="1.27" layer="94">Shield</text>
-<text x="0" y="-22.86" size="1.6764" layer="96" align="bottom-center">&gt;VALUE</text>
+<text x="0" y="-7.62" size="1.6764" layer="96" align="bottom-center">&gt;VALUE</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -9698,30 +9670,18 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 <connects>
 <connect gate="G$1" pin="CC" pad="A5"/>
 <connect gate="G$1" pin="DN1" pad="A7"/>
-<connect gate="G$1" pin="DN2" pad="B7"/>
 <connect gate="G$1" pin="DP1" pad="A6"/>
-<connect gate="G$1" pin="DP2" pad="B6"/>
 <connect gate="G$1" pin="GND" pad="A1"/>
 <connect gate="G$1" pin="GND1" pad="A12"/>
-<connect gate="G$1" pin="GND2" pad="B1"/>
-<connect gate="G$1" pin="GND3" pad="B12"/>
 <connect gate="G$1" pin="SBU1" pad="A8"/>
-<connect gate="G$1" pin="SBU2" pad="B8"/>
-<connect gate="G$1" pin="SHIELD" pad="GND GND1"/>
-<connect gate="G$1" pin="SHIELD1" pad="S1 S2 S3 S4"/>
-<connect gate="G$1" pin="SSRXN1" pad="B10"/>
+<connect gate="G$1" pin="SHIELD" pad="S3 S4"/>
+<connect gate="G$1" pin="SHIELD1" pad="S1 S2" route="any"/>
 <connect gate="G$1" pin="SSRXN2" pad="A10"/>
-<connect gate="G$1" pin="SSRXP1" pad="B11"/>
 <connect gate="G$1" pin="SSRXP2" pad="A11"/>
 <connect gate="G$1" pin="SSTXN1" pad="A3"/>
-<connect gate="G$1" pin="SSTXN2" pad="B3"/>
 <connect gate="G$1" pin="SSTXP1" pad="A2"/>
-<connect gate="G$1" pin="SSTXP2" pad="B2"/>
 <connect gate="G$1" pin="VBUS" pad="A4"/>
 <connect gate="G$1" pin="VBUS1" pad="A9"/>
-<connect gate="G$1" pin="VBUS2" pad="B4"/>
-<connect gate="G$1" pin="VBUS3" pad="B9"/>
-<connect gate="G$1" pin="VCONN" pad="B5"/>
 </connects>
 <technologies>
 <technology name=""/>
