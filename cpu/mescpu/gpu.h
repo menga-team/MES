@@ -3,6 +3,12 @@
 
 #include "gpu_internal.h"
 
+enum Buffer {
+    FRONT_BUFFER = 0, BACK_BUFFER = 1
+} __attribute__ ((__packed__));
+
+typedef enum Buffer Buffer;
+
 /// Prints text on the Monitor.
 void gpu_print_text(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t foreground, uint8_t background, const char *text);
 

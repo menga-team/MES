@@ -22,12 +22,6 @@ struct Operation {
     uint8_t _7;
 };
 
-enum Buffer {
-    FRONT_BUFFER = 0, BACK_BUFFER = 1
-} __attribute__ ((__packed__));
-
-typedef enum Buffer Buffer;
-
 /// The Queue holds information of the operation that is beeing currently transmitted.
 struct Queue {
     Operation operation;
@@ -49,14 +43,14 @@ Operation gpu_operation_init(void);
 /// @attention When sending the whole buffer, use 0 for all parameters. This operation is much faster.
 /// @related See `display_buf` if you want to display the buffer after sending it.
 /// @return 00 00 BF 00 XX YY SX SY
-Operation gpu_operation_send_buf(Buffer bf, uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy);
+Operation gpu_operation_send_buf(uint8_t bf, uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy);
 
 Operation gpu_operation_display_buf(uint8_t xx, uint8_t yy, uint8_t sx, uint8_t sy);
 
 /// @brief Prints text of length size at ox*oy.
 /// @attention Text needs to be NUL-Terminated.
 /// @return FF BB BF 01  00 XX OX OY
-Operation gpu_operation_print_text(Buffer bf, uint8_t foreground, uint8_t background, uint8_t size, uint8_t ox, uint8_t oy);
+Operation gpu_operation_print_text(uint8_t bf, uint8_t foreground, uint8_t background, uint8_t size, uint8_t ox, uint8_t oy);
 
 /// @brief Will reset the GPU.
 /// @return 00 00 00 0a 00 00 00 00
@@ -64,7 +58,7 @@ Operation gpu_operation_reset(void);
 
 /// @brief Will fill the Buffer with the specified value.
 /// @return 00 00 BF 0b 00 00 00 00
-Operation gpu_operation_blank(Buffer bf, uint8_t blank_with);
+Operation gpu_operation_blank(uint8_t bf, uint8_t blank_with);
 
 /// @brief Halt execution of the programm and send data to GPU.
 void gpu_send_blocking(uint8_t *data, uint32_t len);
