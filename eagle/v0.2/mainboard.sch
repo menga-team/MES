@@ -7931,11 +7931,9 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 <attribute name="VALUE" x="45.72" y="97.79" size="1.778" layer="96"/>
 </instance>
 <instance part="CPU2" gate="A" x="54.61" y="125.73" smashed="yes" rot="R180">
-<attribute name="NAME" x="60.96" y="99.695" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="60.96" y="156.21" size="1.778" layer="96" rot="R180"/>
 </instance>
 <instance part="GPU1" gate="A" x="199.39" y="125.73" smashed="yes">
-<attribute name="NAME" x="193.04" y="151.765" size="1.778" layer="95"/>
 <attribute name="VALUE" x="193.04" y="95.25" size="1.778" layer="96"/>
 </instance>
 <instance part="GPU2" gate="A" x="201.93" y="123.19" smashed="yes" rot="R180">
@@ -8116,6 +8114,566 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 <wire x1="71.12" y1="33.02" x2="78.74" y2="33.02" width="0.1524" layer="91"/>
 <junction x="71.12" y="33.02"/>
 <junction x="78.74" y="33.02"/>
+</segment>
+</net>
+<net name="PB12_CPU" class="0">
+<segment>
+<pinref part="CPU1" gate="A" pin="1"/>
+<wire x1="49.53" y1="151.13" x2="43.18" y2="151.13" width="0.1524" layer="91"/>
+<label x="43.18" y="151.13" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB13_CPU" class="0">
+<segment>
+<pinref part="CPU1" gate="A" pin="2"/>
+<wire x1="49.53" y1="148.59" x2="43.18" y2="148.59" width="0.1524" layer="91"/>
+<label x="43.18" y="148.59" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB14_CPU" class="0">
+<segment>
+<pinref part="CPU1" gate="A" pin="3"/>
+<wire x1="49.53" y1="146.05" x2="43.18" y2="146.05" width="0.1524" layer="91"/>
+<label x="43.18" y="146.05" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB15_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="143.51" x2="43.18" y2="143.51" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="4"/>
+<label x="43.18" y="143.51" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PA8_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="140.97" x2="43.18" y2="140.97" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="5"/>
+<label x="43.18" y="140.97" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PA9_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="138.43" x2="43.18" y2="138.43" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="6"/>
+<label x="43.18" y="138.43" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PA10_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="135.89" x2="43.18" y2="135.89" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="7"/>
+<label x="43.18" y="135.89" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PA11_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="133.35" x2="43.18" y2="133.35" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="8"/>
+<label x="43.18" y="133.35" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PA12_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="130.81" x2="43.18" y2="130.81" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="9"/>
+<label x="43.18" y="130.81" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PA15_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="128.27" x2="43.18" y2="128.27" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="10"/>
+<label x="43.18" y="128.27" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB3_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="123.19" x2="190.5" y2="123.19" width="0.1524" layer="91"/>
+<label x="190.5" y="123.19" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="11"/>
+</segment>
+</net>
+<net name="PB4_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="120.65" x2="190.5" y2="120.65" width="0.1524" layer="91"/>
+<label x="190.5" y="120.65" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="12"/>
+</segment>
+</net>
+<net name="PB5_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="118.11" x2="190.5" y2="118.11" width="0.1524" layer="91"/>
+<label x="190.5" y="118.11" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="13"/>
+</segment>
+</net>
+<net name="PB6_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="115.57" x2="190.5" y2="115.57" width="0.1524" layer="91"/>
+<label x="190.5" y="115.57" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="14"/>
+</segment>
+</net>
+<net name="PB7_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="113.03" x2="190.5" y2="113.03" width="0.1524" layer="91"/>
+<label x="190.5" y="113.03" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="15"/>
+</segment>
+</net>
+<net name="PB8_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="110.49" x2="190.5" y2="110.49" width="0.1524" layer="91"/>
+<label x="190.5" y="110.49" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="16"/>
+</segment>
+</net>
+<net name="PB9_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="107.95" x2="190.5" y2="107.95" width="0.1524" layer="91"/>
+<label x="190.5" y="107.95" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="17"/>
+</segment>
+</net>
+<net name="5V_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="107.95" x2="43.18" y2="107.95" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="18"/>
+<label x="43.18" y="107.95" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="GND1_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="151.13" x2="57.15" y2="151.13" width="0.1524" layer="91"/>
+<pinref part="CPU2" gate="A" pin="20"/>
+<label x="63.5" y="151.13" size="1.27" layer="95" xref="yes"/>
+</segment>
+</net>
+<net name="3V3_1_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="102.87" x2="43.18" y2="102.87" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="20"/>
+<label x="43.18" y="102.87" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="GND_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="105.41" x2="43.18" y2="105.41" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="19"/>
+<label x="43.18" y="105.41" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="GND2_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="148.59" x2="57.15" y2="148.59" width="0.1524" layer="91"/>
+<label x="63.5" y="148.59" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="19"/>
+</segment>
+</net>
+<net name="PB11_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="140.97" x2="57.15" y2="140.97" width="0.1524" layer="91"/>
+<label x="63.5" y="140.97" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="16"/>
+</segment>
+</net>
+<net name="PB10_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="138.43" x2="57.15" y2="138.43" width="0.1524" layer="91"/>
+<label x="63.5" y="138.43" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="15"/>
+</segment>
+</net>
+<net name="PB0_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="133.35" x2="57.15" y2="133.35" width="0.1524" layer="91"/>
+<label x="63.5" y="133.35" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="13"/>
+</segment>
+</net>
+<net name="PA7_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="130.81" x2="57.15" y2="130.81" width="0.1524" layer="91"/>
+<label x="63.5" y="130.81" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="12"/>
+</segment>
+</net>
+<net name="PA6_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="128.27" x2="57.15" y2="128.27" width="0.1524" layer="91"/>
+<label x="63.5" y="128.27" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="11"/>
+</segment>
+</net>
+<net name="PA5_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="125.73" x2="57.15" y2="125.73" width="0.1524" layer="91"/>
+<label x="63.5" y="125.73" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="10"/>
+</segment>
+</net>
+<net name="PA4_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="123.19" x2="57.15" y2="123.19" width="0.1524" layer="91"/>
+<label x="63.5" y="123.19" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="9"/>
+</segment>
+</net>
+<net name="PA3_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="120.65" x2="57.15" y2="120.65" width="0.1524" layer="91"/>
+<label x="63.5" y="120.65" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="8"/>
+</segment>
+</net>
+<net name="PA1_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="115.57" x2="57.15" y2="115.57" width="0.1524" layer="91"/>
+<label x="63.5" y="115.57" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="6"/>
+</segment>
+</net>
+<net name="PA0_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="113.03" x2="57.15" y2="113.03" width="0.1524" layer="91"/>
+<label x="63.5" y="113.03" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="5"/>
+</segment>
+</net>
+<net name="PC15_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="110.49" x2="57.15" y2="110.49" width="0.1524" layer="91"/>
+<label x="63.5" y="110.49" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="4"/>
+</segment>
+</net>
+<net name="PC14_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="107.95" x2="57.15" y2="107.95" width="0.1524" layer="91"/>
+<label x="63.5" y="107.95" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="3"/>
+</segment>
+</net>
+<net name="PC13_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="105.41" x2="57.15" y2="105.41" width="0.1524" layer="91"/>
+<label x="63.5" y="105.41" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="2"/>
+</segment>
+</net>
+<net name="VBAT_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="102.87" x2="57.15" y2="102.87" width="0.1524" layer="91"/>
+<label x="63.5" y="102.87" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="1"/>
+</segment>
+</net>
+<net name="PA2_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="118.11" x2="57.15" y2="118.11" width="0.1524" layer="91"/>
+<label x="63.5" y="118.11" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="7"/>
+</segment>
+</net>
+<net name="PB1_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="135.89" x2="57.15" y2="135.89" width="0.1524" layer="91"/>
+<label x="63.5" y="135.89" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="14"/>
+</segment>
+</net>
+<net name="3V3_2_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="143.51" x2="57.15" y2="143.51" width="0.1524" layer="91"/>
+<label x="63.5" y="143.51" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="17"/>
+</segment>
+</net>
+<net name="NRST_CPU" class="0">
+<segment>
+<wire x1="63.5" y1="146.05" x2="57.15" y2="146.05" width="0.1524" layer="91"/>
+<label x="63.5" y="146.05" size="1.27" layer="95" xref="yes"/>
+<pinref part="CPU2" gate="A" pin="18"/>
+</segment>
+</net>
+<net name="PB3_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="125.73" x2="43.18" y2="125.73" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="11"/>
+<label x="43.18" y="125.73" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB4_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="123.19" x2="43.18" y2="123.19" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="12"/>
+<label x="43.18" y="123.19" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB5_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="120.65" x2="43.18" y2="120.65" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="13"/>
+<label x="43.18" y="120.65" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB6_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="118.11" x2="43.18" y2="118.11" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="14"/>
+<label x="43.18" y="118.11" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB7_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="115.57" x2="43.18" y2="115.57" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="15"/>
+<label x="43.18" y="115.57" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB8_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="113.03" x2="43.18" y2="113.03" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="16"/>
+<label x="43.18" y="113.03" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB9_CPU" class="0">
+<segment>
+<wire x1="49.53" y1="110.49" x2="43.18" y2="110.49" width="0.1524" layer="91"/>
+<pinref part="CPU1" gate="A" pin="17"/>
+<label x="43.18" y="110.49" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+</net>
+<net name="PB12_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="148.59" x2="190.5" y2="148.59" width="0.1524" layer="91"/>
+<label x="190.5" y="148.59" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="1"/>
+</segment>
+</net>
+<net name="PB13_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="146.05" x2="190.5" y2="146.05" width="0.1524" layer="91"/>
+<label x="190.5" y="146.05" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="2"/>
+</segment>
+</net>
+<net name="PB14_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="143.51" x2="190.5" y2="143.51" width="0.1524" layer="91"/>
+<label x="190.5" y="143.51" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="3"/>
+</segment>
+</net>
+<net name="PB15_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="140.97" x2="190.5" y2="140.97" width="0.1524" layer="91"/>
+<label x="190.5" y="140.97" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="4"/>
+</segment>
+</net>
+<net name="PA8_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="138.43" x2="190.5" y2="138.43" width="0.1524" layer="91"/>
+<label x="190.5" y="138.43" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="5"/>
+</segment>
+</net>
+<net name="PA9_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="135.89" x2="190.5" y2="135.89" width="0.1524" layer="91"/>
+<label x="190.5" y="135.89" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="6"/>
+</segment>
+</net>
+<net name="PA10_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="133.35" x2="190.5" y2="133.35" width="0.1524" layer="91"/>
+<label x="190.5" y="133.35" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="7"/>
+</segment>
+</net>
+<net name="PA11_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="130.81" x2="190.5" y2="130.81" width="0.1524" layer="91"/>
+<label x="190.5" y="130.81" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="8"/>
+</segment>
+</net>
+<net name="PA12_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="128.27" x2="190.5" y2="128.27" width="0.1524" layer="91"/>
+<label x="190.5" y="128.27" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="9"/>
+</segment>
+</net>
+<net name="PA15_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="125.73" x2="190.5" y2="125.73" width="0.1524" layer="91"/>
+<label x="190.5" y="125.73" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="10"/>
+</segment>
+</net>
+<net name="5V_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="105.41" x2="190.5" y2="105.41" width="0.1524" layer="91"/>
+<label x="190.5" y="105.41" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="18"/>
+</segment>
+</net>
+<net name="GND_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="102.87" x2="190.5" y2="102.87" width="0.1524" layer="91"/>
+<label x="190.5" y="102.87" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="19"/>
+</segment>
+</net>
+<net name="3V3_1_GPU" class="0">
+<segment>
+<wire x1="196.85" y1="100.33" x2="190.5" y2="100.33" width="0.1524" layer="91"/>
+<label x="190.5" y="100.33" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="GPU1" gate="A" pin="20"/>
+</segment>
+</net>
+<net name="GND1_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="148.59" x2="204.47" y2="148.59" width="0.1524" layer="91"/>
+<label x="210.82" y="148.59" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="20"/>
+</segment>
+</net>
+<net name="GND2_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="146.05" x2="204.47" y2="146.05" width="0.1524" layer="91"/>
+<label x="210.82" y="146.05" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="19"/>
+</segment>
+</net>
+<net name="NRST_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="143.51" x2="204.47" y2="143.51" width="0.1524" layer="91"/>
+<label x="210.82" y="143.51" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="18"/>
+</segment>
+</net>
+<net name="3V3_2_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="140.97" x2="204.47" y2="140.97" width="0.1524" layer="91"/>
+<label x="210.82" y="140.97" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="17"/>
+</segment>
+</net>
+<net name="PB11_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="138.43" x2="204.47" y2="138.43" width="0.1524" layer="91"/>
+<label x="210.82" y="138.43" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="16"/>
+</segment>
+</net>
+<net name="PB10_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="135.89" x2="204.47" y2="135.89" width="0.1524" layer="91"/>
+<label x="210.82" y="135.89" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="15"/>
+</segment>
+</net>
+<net name="PB1_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="133.35" x2="204.47" y2="133.35" width="0.1524" layer="91"/>
+<label x="210.82" y="133.35" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="14"/>
+</segment>
+</net>
+<net name="PB0_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="130.81" x2="204.47" y2="130.81" width="0.1524" layer="91"/>
+<label x="210.82" y="130.81" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="13"/>
+</segment>
+</net>
+<net name="PA7_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="128.27" x2="204.47" y2="128.27" width="0.1524" layer="91"/>
+<label x="210.82" y="128.27" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="12"/>
+</segment>
+</net>
+<net name="PA6_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="125.73" x2="204.47" y2="125.73" width="0.1524" layer="91"/>
+<label x="210.82" y="125.73" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="11"/>
+</segment>
+</net>
+<net name="PA5_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="123.19" x2="204.47" y2="123.19" width="0.1524" layer="91"/>
+<label x="210.82" y="123.19" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="10"/>
+</segment>
+</net>
+<net name="PA4_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="120.65" x2="204.47" y2="120.65" width="0.1524" layer="91"/>
+<label x="210.82" y="120.65" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="9"/>
+</segment>
+</net>
+<net name="PA3_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="118.11" x2="204.47" y2="118.11" width="0.1524" layer="91"/>
+<label x="210.82" y="118.11" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="8"/>
+</segment>
+</net>
+<net name="PA2_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="115.57" x2="204.47" y2="115.57" width="0.1524" layer="91"/>
+<label x="210.82" y="115.57" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="7"/>
+</segment>
+</net>
+<net name="PA1_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="113.03" x2="204.47" y2="113.03" width="0.1524" layer="91"/>
+<label x="210.82" y="113.03" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="6"/>
+</segment>
+</net>
+<net name="PA0_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="110.49" x2="204.47" y2="110.49" width="0.1524" layer="91"/>
+<label x="210.82" y="110.49" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="5"/>
+</segment>
+</net>
+<net name="PC15_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="107.95" x2="204.47" y2="107.95" width="0.1524" layer="91"/>
+<label x="210.82" y="107.95" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="4"/>
+</segment>
+</net>
+<net name="PC14_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="105.41" x2="204.47" y2="105.41" width="0.1524" layer="91"/>
+<label x="210.82" y="105.41" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="3"/>
+</segment>
+</net>
+<net name="PC13_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="102.87" x2="204.47" y2="102.87" width="0.1524" layer="91"/>
+<label x="210.82" y="102.87" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="2"/>
+</segment>
+</net>
+<net name="VBAT_GPU" class="0">
+<segment>
+<wire x1="210.82" y1="100.33" x2="204.47" y2="100.33" width="0.1524" layer="91"/>
+<label x="210.82" y="100.33" size="1.27" layer="95" xref="yes"/>
+<pinref part="GPU2" gate="A" pin="1"/>
 </segment>
 </net>
 </nets>
@@ -9513,13 +10071,6 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 <label x="58.42" y="76.2" size="1.778" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
-<net name="SYNC" class="0">
-<segment>
-<pinref part="IC5" gate="A" pin="Y"/>
-<wire x1="144.78" y1="-60.96" x2="149.86" y2="-60.96" width="0.1524" layer="91"/>
-<label x="149.86" y="-60.96" size="1.778" layer="95" xref="yes"/>
-</segment>
-</net>
 <net name="N$61" class="0">
 <segment>
 <pinref part="IC7" gate="A" pin="RCK"/>
@@ -9596,13 +10147,6 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 <wire x1="68.58" y1="88.9" x2="58.42" y2="88.9" width="0.1524" layer="91"/>
 <pinref part="IC1" gate="A" pin="D2"/>
 <label x="58.42" y="88.9" size="1.778" layer="95" rot="R180" xref="yes"/>
-</segment>
-</net>
-<net name="DATA" class="0">
-<segment>
-<pinref part="IC6" gate="A" pin="Y"/>
-<wire x1="142.24" y1="12.7" x2="149.86" y2="12.7" width="0.1524" layer="91"/>
-<label x="149.86" y="12.7" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 </nets>
