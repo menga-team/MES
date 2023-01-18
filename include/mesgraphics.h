@@ -8,7 +8,7 @@
 
 #define BUFFER_BPP 3
 #define BUFFER_SIZE(X, Y) (lroundf(3 * ((X * Y) / 8)))
-#define BUFFER_POSITION(RECT, X, Y) (Y * RECT->x + X)
+#define BUFFER_POSITION(RECT, X, Y) (Y * RECT->width + X)
 #define PIXEL_MASK ((1 << BUFFER_BPP) - 1)
 
 #define vector3_subtract(L, R) (L)->x -= (R)->x; (L)->y -= (R)->y; (L)->z -= (R)->z
@@ -16,8 +16,8 @@
 #define vector3_divide(L, R) (L)->x /= (R); (L)->y /= (R); (L)->z /= (R)
 
 struct RectangularBuffer {
-    uint8_t x;
-    uint8_t y;
+    uint8_t width;
+    uint8_t height;
     void *data;
 };
 
@@ -69,16 +69,16 @@ static Vector3 vector3f_round(Vector3f *vec) {
         return (Vector3) {lroundf(vec->x), lroundf(vec->y), lroundf(vec->z)};
 }
 
-static RectangularBuffer buffer_create(uint8_t x, uint8_t y) {
+static RectangularBuffer buffer_create(uint8_t width, uint8_t height) {
         return (RectangularBuffer) {
-                x, y, malloc(BUFFER_SIZE(x, y))
+                width, height, malloc(BUFFER_SIZE(width, height))
         };
 }
 
-static void buffer_resize(RectangularBuffer *rect, uint8_t x, uint8_t y) {
-        rect->x = x;
-        rect->y = y;
-        rect->data = realloc(rect->data, BUFFER_SIZE(x, y));
+static void buffer_resize(RectangularBuffer *rect, uint8_t width, uint8_t height) {
+        rect->width = width;
+        rect->height = height;
+        rect->data = realloc(rect->data, BUFFER_SIZE(width, height));
 }
 
 static void buffer_destory(RectangularBuffer *rect) {
