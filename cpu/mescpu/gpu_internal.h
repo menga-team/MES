@@ -2,6 +2,7 @@
 #define MES_GPU_INTERNAL_H
 
 #include "stdint.h"
+#include "stdbool.h"
 
 #define GPU_READY_PORT GPIOC
 #define GPU_READY GPIO15
