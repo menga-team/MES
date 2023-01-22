@@ -1,3 +1,9 @@
 [submodule "libopencm3"]
 	path = libopencm3
 	url = https://github.com/libopencm3/libopencm3.git
+[submodule "games/hello_world/udynlink"]
+	path = games/hello_world/udynlink
+	url = https://github.com/menga-team/udynlink.git
+[submodule "cpu/mescpu/udynlink"]
+	path = cpu/mescpu/udynlink
+	url = https://github.com/menga-team/udynlink.git

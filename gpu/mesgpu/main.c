@@ -331,10 +331,13 @@ void new_operation(void) {
                         break;
                 case OPERATION_ID_RESET:
                         gpu_reset();
-                        processing_stage = READY; // won't be executed.
+                        // won't be executed. vvvv
+                        dma_recieve_operation();
+                        processing_stage = READY;
                         break;
                 case OPERATION_ID_BLANK:
                         gpu_blank(OPERATION_BUFFER(operation), operation[7]);
+                        dma_recieve_operation();
                         processing_stage = READY;
                         break;
                 default: // unimplemented operation

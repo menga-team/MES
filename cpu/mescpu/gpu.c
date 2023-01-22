@@ -53,6 +53,19 @@ void gpu_print_text(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t foreground, u
         gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
 }
 
+void gpu_print_text_blocking(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t foreground, uint8_t bg, const char *text) {
+        while (!gpio_get(GPU_READY_PORT, GPU_READY));
+        uint8_t len = 0;
+        while (text[len++] != 0);
+        Operation op = gpu_operation_print_text(buffer, foreground, bg, len, ox, oy);
+        gpu_send_blocking((uint8_t *) &op, sizeof(Operation));
+        while (gpio_get(GPU_READY_PORT, GPU_READY));
+        while (!gpio_get(GPU_READY_PORT, GPU_READY));
+        gpu_send_blocking((uint8_t*)text, len);
+        while (gpio_get(GPU_READY_PORT, GPU_READY));
+        while (!gpio_get(GPU_READY_PORT, GPU_READY));
+}
+
 void gpu_reset(void) {
         gpu_block_until_ack();
         current_operation = (Queue) {
@@ -95,7 +108,13 @@ void gpu_display_buf(uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy, void *pixel
 
 void gpu_swap_buf(void) {
         gpu_block_until_ack();
-        Operation op = gpu_operation_swap_buf();
+        current_operation = (Queue) {
+                gpu_operation_swap_buf(),
+                0,
+                0,
+                true,
+                false
+        };
         gpu_send_blocking((uint8_t *) &current_operation.operation, sizeof(Operation));
 }
 

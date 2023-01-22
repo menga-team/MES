@@ -81,4 +81,8 @@ void gpu_sync(void);
 /// Will halt execution until GPU ack operation data.
 void gpu_block_until_ack(void);
 
+/// @warning Don't use this function unless you know that you need it.
+/// @related gpu_print_text
+void gpu_print_text_blocking(uint8_t buffer, uint8_t ox, uint8_t oy, uint8_t foreground, uint8_t bg, const char *text);
+
 #endif //MES_GPU_INTERNAL_H
