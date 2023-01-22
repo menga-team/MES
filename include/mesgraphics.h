@@ -7,7 +7,7 @@
 #include <stdbool.h>
 
 #define BUFFER_BPP 3
-#define BUFFER_SIZE(X, Y) ((uint16_t)ceil((float)(3 * (X * Y)) / 8.0))
+#define BUFFER_SIZE(X, Y) (((uint16_t)ceil((float)(BUFFER_BPP * ((X) * (Y))) / 8.0) % BUFFER_BPP) * 3 + ((BUFFER_BPP * ((X) * (Y))) / 8))
 #define BUFFER_POSITION(RECT, X, Y) ((Y) * (RECT)->width + (X))
 #define PIXEL_MASK ((1 << BUFFER_BPP) - 1)
 
