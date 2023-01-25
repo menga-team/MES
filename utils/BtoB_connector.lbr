@@ -101,61 +101,61 @@
 <symbols>
 <symbol name="3511220BMSS0BNA1_2.54MM_2X20_MALE">
 <wire x1="-7.62" y1="-12.7" x2="-7.62" y2="15.24" width="0.254" layer="94"/>
-<wire x1="-7.62" y1="15.24" x2="7.62" y2="15.24" width="0.254" layer="94"/>
-<wire x1="7.62" y1="15.24" x2="7.62" y2="-12.7" width="0.254" layer="94"/>
-<wire x1="7.62" y1="-12.7" x2="-7.62" y2="-12.7" width="0.254" layer="94"/>
-<pin name="P$1" x="12.7" y="-10.16" length="middle" rot="R180"/>
-<pin name="P$2" x="12.7" y="-7.62" length="middle" rot="R180"/>
-<pin name="P$3" x="12.7" y="-5.08" length="middle" rot="R180"/>
-<pin name="P$4" x="12.7" y="-2.54" length="middle" rot="R180"/>
-<pin name="P$5" x="12.7" y="0" length="middle" rot="R180"/>
-<pin name="P$6" x="12.7" y="2.54" length="middle" rot="R180"/>
-<pin name="P$7" x="12.7" y="5.08" length="middle" rot="R180"/>
-<pin name="P$8" x="12.7" y="7.62" length="middle" rot="R180"/>
-<pin name="P$9" x="12.7" y="10.16" length="middle" rot="R180"/>
-<pin name="P$10" x="12.7" y="12.7" length="middle" rot="R180"/>
+<wire x1="-7.62" y1="15.24" x2="15.24" y2="15.24" width="0.254" layer="94"/>
+<wire x1="15.24" y1="15.24" x2="15.24" y2="-12.7" width="0.254" layer="94"/>
+<wire x1="15.24" y1="-12.7" x2="-7.62" y2="-12.7" width="0.254" layer="94"/>
+<pin name="P$1" x="20.32" y="-10.16" length="middle" rot="R180"/>
+<pin name="P$2" x="20.32" y="-7.62" length="middle" rot="R180"/>
+<pin name="SIG7" x="20.32" y="-5.08" length="middle" rot="R180"/>
+<pin name="SIG6" x="20.32" y="-2.54" length="middle" rot="R180"/>
+<pin name="SIG5" x="20.32" y="0" length="middle" rot="R180"/>
+<pin name="SIG4" x="20.32" y="2.54" length="middle" rot="R180"/>
+<pin name="SIG3" x="20.32" y="5.08" length="middle" rot="R180"/>
+<pin name="SIG2" x="20.32" y="7.62" length="middle" rot="R180"/>
+<pin name="SIG1" x="20.32" y="10.16" length="middle" rot="R180"/>
+<pin name="SIG0" x="20.32" y="12.7" length="middle" rot="R180"/>
 <pin name="P$11" x="-12.7" y="-10.16" length="middle"/>
-<pin name="P$12" x="-12.7" y="-7.62" length="middle"/>
-<pin name="P$13" x="-12.7" y="-5.08" length="middle"/>
-<pin name="P$14" x="-12.7" y="-2.54" length="middle"/>
-<pin name="P$15" x="-12.7" y="0" length="middle"/>
-<pin name="P$16" x="-12.7" y="2.54" length="middle"/>
-<pin name="P$17" x="-12.7" y="5.08" length="middle"/>
-<pin name="P$18" x="-12.7" y="7.62" length="middle"/>
-<pin name="P$19" x="-12.7" y="10.16" length="middle"/>
-<pin name="P$20" x="-12.7" y="12.7" length="middle"/>
-<text x="-2.54" y="17.78" size="1.27" layer="95">&gt;NAME</text>
-<text x="-2.54" y="-15.24" size="1.27" layer="96">&gt;VALUE</text>
+<pin name="DOUBLE" x="-12.7" y="-7.62" length="middle"/>
+<pin name="ID3" x="-12.7" y="-5.08" length="middle"/>
+<pin name="ID2" x="-12.7" y="-2.54" length="middle"/>
+<pin name="ID1" x="-12.7" y="0" length="middle"/>
+<pin name="ID0" x="-12.7" y="2.54" length="middle"/>
+<pin name="HOT_PLUG" x="-12.7" y="5.08" length="middle"/>
+<pin name="GND" x="-12.7" y="7.62" length="middle"/>
+<pin name="5V" x="-12.7" y="10.16" length="middle"/>
+<pin name="3V3" x="-12.7" y="12.7" length="middle"/>
+<text x="2.54" y="17.78" size="1.27" layer="95">&gt;NAME</text>
+<text x="2.54" y="-15.24" size="1.27" layer="96">&gt;VALUE</text>
 </symbol>
 </symbols>
 <devicesets>
 <deviceset name="3511220BMSS0BNA1_2.54MM_2X20_MALE">
 <gates>
-<gate name="G$1" symbol="3511220BMSS0BNA1_2.54MM_2X20_MALE" x="0" y="0"/>
+<gate name="G$1" symbol="3511220BMSS0BNA1_2.54MM_2X20_MALE" x="2.54" y="5.08"/>
 </gates>
 <devices>
 <device name="" package="3511220BMSS0BNA1_2.54MM_2X20_MALE">
 <connects>
-<connect gate="G$1" pin="P$1" pad="P$1"/>
-<connect gate="G$1" pin="P$10" pad="P$10"/>
-<connect gate="G$1" pin="P$11" pad="P$11"/>
-<connect gate="G$1" pin="P$12" pad="P$12"/>
-<connect gate="G$1" pin="P$13" pad="P$13"/>
-<connect gate="G$1" pin="P$14" pad="P$14"/>
-<connect gate="G$1" pin="P$15" pad="P$15"/>
-<connect gate="G$1" pin="P$16" pad="P$16"/>
-<connect gate="G$1" pin="P$17" pad="P$17"/>
-<connect gate="G$1" pin="P$18" pad="P$18"/>
-<connect gate="G$1" pin="P$19" pad="P$19"/>
-<connect gate="G$1" pin="P$2" pad="P$2"/>
-<connect gate="G$1" pin="P$20" pad="P$20"/>
-<connect gate="G$1" pin="P$3" pad="P$3"/>
-<connect gate="G$1" pin="P$4" pad="P$4"/>
-<connect gate="G$1" pin="P$5" pad="P$5"/>
-<connect gate="G$1" pin="P$6" pad="P$6"/>
-<connect gate="G$1" pin="P$7" pad="P$7"/>
-<connect gate="G$1" pin="P$8" pad="P$8"/>
-<connect gate="G$1" pin="P$9" pad="P$9"/>
+<connect gate="G$1" pin="3V3" pad="P$1"/>
+<connect gate="G$1" pin="5V" pad="P$2"/>
+<connect gate="G$1" pin="DOUBLE" pad="P$9"/>
+<connect gate="G$1" pin="GND" pad="P$3"/>
+<connect gate="G$1" pin="HOT_PLUG" pad="P$4"/>
+<connect gate="G$1" pin="ID0" pad="P$5"/>
+<connect gate="G$1" pin="ID1" pad="P$6"/>
+<connect gate="G$1" pin="ID2" pad="P$7"/>
+<connect gate="G$1" pin="ID3" pad="P$8"/>
+<connect gate="G$1" pin="P$1" pad="P$10"/>
+<connect gate="G$1" pin="P$11" pad="P$20"/>
+<connect gate="G$1" pin="P$2" pad="P$19"/>
+<connect gate="G$1" pin="SIG0" pad="P$11"/>
+<connect gate="G$1" pin="SIG1" pad="P$12"/>
+<connect gate="G$1" pin="SIG2" pad="P$13"/>
+<connect gate="G$1" pin="SIG3" pad="P$14"/>
+<connect gate="G$1" pin="SIG4" pad="P$15"/>
+<connect gate="G$1" pin="SIG5" pad="P$16"/>
+<connect gate="G$1" pin="SIG6" pad="P$17"/>
+<connect gate="G$1" pin="SIG7" pad="P$18"/>
 </connects>
 <technologies>
 <technology name=""/>
