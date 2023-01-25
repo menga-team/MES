@@ -11166,21 +11166,9 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 <wire x1="55.88" y1="40.64" x2="50.8" y2="40.64" width="0.1524" layer="91"/>
 <wire x1="50.8" y1="40.64" x2="50.8" y2="43.18" width="0.1524" layer="91"/>
 <wire x1="50.8" y1="43.18" x2="50.8" y2="45.72" width="0.1524" layer="91"/>
-<wire x1="50.8" y1="45.72" x2="50.8" y2="48.26" width="0.1524" layer="91"/>
-<wire x1="50.8" y1="48.26" x2="50.8" y2="50.8" width="0.1524" layer="91"/>
-<wire x1="50.8" y1="50.8" x2="50.8" y2="53.34" width="0.1524" layer="91"/>
-<wire x1="50.8" y1="53.34" x2="55.88" y2="53.34" width="0.1524" layer="91"/>
-<wire x1="50.8" y1="50.8" x2="55.88" y2="50.8" width="0.1524" layer="91"/>
-<junction x="50.8" y="50.8"/>
-<wire x1="50.8" y1="48.26" x2="55.88" y2="48.26" width="0.1524" layer="91"/>
-<junction x="50.8" y="48.26"/>
 <wire x1="55.88" y1="45.72" x2="50.8" y2="45.72" width="0.1524" layer="91"/>
-<junction x="50.8" y="45.72"/>
 <wire x1="50.8" y1="43.18" x2="55.88" y2="43.18" width="0.1524" layer="91"/>
 <junction x="50.8" y="43.18"/>
-<pinref part="J4" gate="G$1" pin="CC"/>
-<pinref part="J4" gate="G$1" pin="DP1"/>
-<pinref part="J4" gate="G$1" pin="DN1"/>
 <pinref part="J4" gate="G$1" pin="SBU1"/>
 <pinref part="J4" gate="G$1" pin="SSRXN2"/>
 <pinref part="J4" gate="G$1" pin="SSRXP2"/>
@@ -11190,6 +11178,18 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 <wire x1="50.8" y1="38.1" x2="55.88" y2="38.1" width="0.1524" layer="91"/>
 <wire x1="46.99" y1="38.1" x2="50.8" y2="38.1" width="0.1524" layer="91"/>
 <junction x="50.8" y="38.1"/>
+<wire x1="50.8" y1="45.72" x2="50.8" y2="53.34" width="0.1524" layer="91"/>
+<junction x="50.8" y="45.72"/>
+<pinref part="J4" gate="G$1" pin="SSTXP1"/>
+<wire x1="50.8" y1="53.34" x2="50.8" y2="55.88" width="0.1524" layer="91"/>
+<wire x1="50.8" y1="55.88" x2="50.8" y2="58.42" width="0.1524" layer="91"/>
+<wire x1="50.8" y1="58.42" x2="55.88" y2="58.42" width="0.1524" layer="91"/>
+<pinref part="J4" gate="G$1" pin="SSTXN1"/>
+<wire x1="55.88" y1="55.88" x2="50.8" y2="55.88" width="0.1524" layer="91"/>
+<junction x="50.8" y="55.88"/>
+<pinref part="J4" gate="G$1" pin="CC"/>
+<wire x1="55.88" y1="53.34" x2="50.8" y2="53.34" width="0.1524" layer="91"/>
+<junction x="50.8" y="53.34"/>
 </segment>
 <segment>
 <pinref part="J4" gate="G$1" pin="SHIELD1"/>
@@ -11240,16 +11240,16 @@ Updated by Ella Wu 2021-09-28&lt;br&gt;
 </net>
 <net name="CONTROLLER_OUT" class="0">
 <segment>
-<wire x1="55.88" y1="58.42" x2="48.26" y2="58.42" width="0.1524" layer="91"/>
-<label x="48.26" y="58.42" size="1.27" layer="95" rot="R180" xref="yes"/>
-<pinref part="J4" gate="G$1" pin="SSTXP1"/>
+<wire x1="55.88" y1="50.8" x2="45.72" y2="50.8" width="0.1524" layer="91"/>
+<label x="45.72" y="50.8" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="J4" gate="G$1" pin="DP1"/>
 </segment>
 </net>
 <net name="CLOCK" class="0">
 <segment>
-<pinref part="J4" gate="G$1" pin="SSTXN1"/>
-<wire x1="55.88" y1="55.88" x2="50.8" y2="55.88" width="0.1524" layer="91"/>
-<label x="50.8" y="55.88" size="1.27" layer="95" rot="R180" xref="yes"/>
+<wire x1="55.88" y1="48.26" x2="48.26" y2="48.26" width="0.1524" layer="91"/>
+<label x="48.26" y="48.26" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="J4" gate="G$1" pin="DN1"/>
 </segment>
 </net>
 </nets>

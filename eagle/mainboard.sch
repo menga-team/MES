@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="50" unitdist="mil" unit="mil" style="dots" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -8208,20 +8208,8 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/L77HDE15SD1CH
 <wire x1="22.86" y1="66.04" x2="21.59" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="USB-CONTROLLER4" gate="G$1" pin="SHIELD"/>
 <pinref part="USB-CONTROLLER4" gate="G$1" pin="SSRXN2"/>
-<pinref part="USB-CONTROLLER4" gate="G$1" pin="DN1"/>
-<pinref part="USB-CONTROLLER4" gate="G$1" pin="DP1"/>
-<pinref part="USB-CONTROLLER4" gate="G$1" pin="CC"/>
-<wire x1="20.32" y1="81.28" x2="22.86" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="20.32" y1="78.74" x2="20.32" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="20.32" y1="78.74" x2="22.86" y2="78.74" width="0.1524" layer="91"/>
-<junction x="20.32" y="78.74"/>
-<wire x1="20.32" y1="76.2" x2="20.32" y2="78.74" width="0.1524" layer="91"/>
-<wire x1="20.32" y1="76.2" x2="22.86" y2="76.2" width="0.1524" layer="91"/>
-<junction x="20.32" y="76.2"/>
-<wire x1="20.32" y1="73.66" x2="20.32" y2="76.2" width="0.1524" layer="91"/>
 <pinref part="USB-CONTROLLER4" gate="G$1" pin="SBU1"/>
 <wire x1="22.86" y1="73.66" x2="20.32" y2="73.66" width="0.1524" layer="91"/>
-<junction x="20.32" y="73.66"/>
 <wire x1="20.32" y1="71.12" x2="20.32" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="20.32" y1="71.12" x2="22.86" y2="71.12" width="0.1524" layer="91"/>
 <junction x="20.32" y="71.12"/>
@@ -8234,6 +8222,18 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/L77HDE15SD1CH
 <junction x="20.32" y="66.04"/>
 <pinref part="GND17" gate="1" pin="GND"/>
 <wire x1="20.32" y1="63.5" x2="20.32" y2="66.04" width="0.1524" layer="91"/>
+<wire x1="20.32" y1="73.66" x2="20.32" y2="81.28" width="0.1524" layer="91"/>
+<junction x="20.32" y="73.66"/>
+<pinref part="USB-CONTROLLER4" gate="G$1" pin="SSTXP1"/>
+<wire x1="20.32" y1="81.28" x2="20.32" y2="83.82" width="0.1524" layer="91"/>
+<wire x1="20.32" y1="83.82" x2="20.32" y2="86.36" width="0.1524" layer="91"/>
+<wire x1="20.32" y1="86.36" x2="22.86" y2="86.36" width="0.1524" layer="91"/>
+<pinref part="USB-CONTROLLER4" gate="G$1" pin="SSTXN1"/>
+<wire x1="22.86" y1="83.82" x2="20.32" y2="83.82" width="0.1524" layer="91"/>
+<junction x="20.32" y="83.82"/>
+<pinref part="USB-CONTROLLER4" gate="G$1" pin="CC"/>
+<wire x1="22.86" y1="81.28" x2="20.32" y2="81.28" width="0.1524" layer="91"/>
+<junction x="20.32" y="81.28"/>
 </segment>
 <segment>
 <wire x1="60.96" y1="66.04" x2="60.96" y2="68.58" width="0.1524" layer="91"/>
@@ -8274,29 +8274,29 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/L77HDE15SD1CH
 <wire x1="22.86" y1="139.7" x2="20.32" y2="139.7" width="0.1524" layer="91"/>
 <wire x1="20.32" y1="139.7" x2="20.32" y2="142.24" width="0.1524" layer="91"/>
 <wire x1="20.32" y1="142.24" x2="20.32" y2="144.78" width="0.1524" layer="91"/>
-<wire x1="20.32" y1="144.78" x2="20.32" y2="147.32" width="0.1524" layer="91"/>
-<wire x1="20.32" y1="147.32" x2="20.32" y2="149.86" width="0.1524" layer="91"/>
-<wire x1="20.32" y1="149.86" x2="20.32" y2="152.4" width="0.1524" layer="91"/>
-<wire x1="20.32" y1="152.4" x2="22.86" y2="152.4" width="0.1524" layer="91"/>
-<wire x1="20.32" y1="149.86" x2="22.86" y2="149.86" width="0.1524" layer="91"/>
-<junction x="20.32" y="149.86"/>
-<wire x1="20.32" y1="147.32" x2="22.86" y2="147.32" width="0.1524" layer="91"/>
-<junction x="20.32" y="147.32"/>
 <wire x1="22.86" y1="144.78" x2="20.32" y2="144.78" width="0.1524" layer="91"/>
-<junction x="20.32" y="144.78"/>
 <wire x1="20.32" y1="142.24" x2="22.86" y2="142.24" width="0.1524" layer="91"/>
 <junction x="20.32" y="142.24"/>
 <wire x1="20.32" y1="139.7" x2="20.32" y2="137.16" width="0.1524" layer="91"/>
 <junction x="20.32" y="139.7"/>
 <wire x1="20.32" y1="137.16" x2="22.86" y2="137.16" width="0.1524" layer="91"/>
 <junction x="20.32" y="137.16"/>
-<pinref part="USB-CONTROLLER3" gate="G$1" pin="CC"/>
-<pinref part="USB-CONTROLLER3" gate="G$1" pin="DP1"/>
-<pinref part="USB-CONTROLLER3" gate="G$1" pin="DN1"/>
 <pinref part="USB-CONTROLLER3" gate="G$1" pin="SBU1"/>
 <pinref part="USB-CONTROLLER3" gate="G$1" pin="SSRXN2"/>
 <pinref part="USB-CONTROLLER3" gate="G$1" pin="SSRXP2"/>
 <pinref part="USB-CONTROLLER3" gate="G$1" pin="SHIELD"/>
+<wire x1="20.32" y1="144.78" x2="20.32" y2="152.4" width="0.1524" layer="91"/>
+<junction x="20.32" y="144.78"/>
+<pinref part="USB-CONTROLLER3" gate="G$1" pin="SSTXP1"/>
+<wire x1="20.32" y1="152.4" x2="20.32" y2="154.94" width="0.1524" layer="91"/>
+<wire x1="20.32" y1="154.94" x2="20.32" y2="157.48" width="0.1524" layer="91"/>
+<wire x1="20.32" y1="157.48" x2="22.86" y2="157.48" width="0.1524" layer="91"/>
+<pinref part="USB-CONTROLLER3" gate="G$1" pin="SSTXN1"/>
+<wire x1="22.86" y1="154.94" x2="20.32" y2="154.94" width="0.1524" layer="91"/>
+<junction x="20.32" y="154.94"/>
+<pinref part="USB-CONTROLLER3" gate="G$1" pin="CC"/>
+<wire x1="22.86" y1="152.4" x2="20.32" y2="152.4" width="0.1524" layer="91"/>
+<junction x="20.32" y="152.4"/>
 </segment>
 <segment>
 <wire x1="193.04" y1="73.66" x2="190.5" y2="73.66" width="0.1524" layer="91"/>
@@ -8357,20 +8357,8 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/L77HDE15SD1CH
 </segment>
 <segment>
 <pinref part="USB-CONTROLLER1" gate="G$1" pin="SSRXN2"/>
-<pinref part="USB-CONTROLLER1" gate="G$1" pin="DN1"/>
-<pinref part="USB-CONTROLLER1" gate="G$1" pin="DP1"/>
-<pinref part="USB-CONTROLLER1" gate="G$1" pin="CC"/>
-<wire x1="104.14" y1="81.28" x2="106.68" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="104.14" y1="78.74" x2="104.14" y2="81.28" width="0.1524" layer="91"/>
-<wire x1="104.14" y1="78.74" x2="106.68" y2="78.74" width="0.1524" layer="91"/>
-<junction x="104.14" y="78.74"/>
-<wire x1="104.14" y1="76.2" x2="104.14" y2="78.74" width="0.1524" layer="91"/>
-<wire x1="104.14" y1="76.2" x2="106.68" y2="76.2" width="0.1524" layer="91"/>
-<junction x="104.14" y="76.2"/>
-<wire x1="104.14" y1="73.66" x2="104.14" y2="76.2" width="0.1524" layer="91"/>
 <pinref part="USB-CONTROLLER1" gate="G$1" pin="SBU1"/>
 <wire x1="106.68" y1="73.66" x2="104.14" y2="73.66" width="0.1524" layer="91"/>
-<junction x="104.14" y="73.66"/>
 <wire x1="104.14" y1="71.12" x2="104.14" y2="73.66" width="0.1524" layer="91"/>
 <wire x1="104.14" y1="71.12" x2="106.68" y2="71.12" width="0.1524" layer="91"/>
 <junction x="104.14" y="71.12"/>
@@ -8384,14 +8372,20 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/L77HDE15SD1CH
 <wire x1="104.14" y1="66.04" x2="104.14" y2="68.58" width="0.1524" layer="91"/>
 <wire x1="106.68" y1="66.04" x2="104.14" y2="66.04" width="0.1524" layer="91"/>
 <junction x="104.14" y="66.04"/>
+<wire x1="104.14" y1="73.66" x2="104.14" y2="81.28" width="0.1524" layer="91"/>
+<junction x="104.14" y="73.66"/>
+<pinref part="USB-CONTROLLER1" gate="G$1" pin="SSTXP1"/>
+<wire x1="104.14" y1="81.28" x2="104.14" y2="83.82" width="0.1524" layer="91"/>
+<wire x1="104.14" y1="83.82" x2="104.14" y2="86.36" width="0.1524" layer="91"/>
+<wire x1="104.14" y1="86.36" x2="106.68" y2="86.36" width="0.1524" layer="91"/>
+<pinref part="USB-CONTROLLER1" gate="G$1" pin="SSTXN1"/>
+<wire x1="106.68" y1="83.82" x2="104.14" y2="83.82" width="0.1524" layer="91"/>
+<junction x="104.14" y="83.82"/>
+<pinref part="USB-CONTROLLER1" gate="G$1" pin="CC"/>
+<wire x1="106.68" y1="81.28" x2="104.14" y2="81.28" width="0.1524" layer="91"/>
+<junction x="104.14" y="81.28"/>
 </segment>
 <segment>
-<pinref part="USB-CONTROLLER2" gate="G$1" pin="DP1"/>
-<pinref part="USB-CONTROLLER2" gate="G$1" pin="CC"/>
-<wire x1="106.68" y1="152.4" x2="109.22" y2="152.4" width="0.1524" layer="91"/>
-<wire x1="106.68" y1="149.86" x2="106.68" y2="152.4" width="0.1524" layer="91"/>
-<wire x1="106.68" y1="149.86" x2="109.22" y2="149.86" width="0.1524" layer="91"/>
-<junction x="106.68" y="149.86"/>
 <pinref part="USB-CONTROLLER2" gate="G$1" pin="SSRXN2"/>
 <pinref part="USB-CONTROLLER2" gate="G$1" pin="SSRXP2"/>
 <wire x1="109.22" y1="139.7" x2="106.68" y2="139.7" width="0.1524" layer="91"/>
@@ -8401,12 +8395,6 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/L77HDE15SD1CH
 <wire x1="106.68" y1="142.24" x2="106.68" y2="144.78" width="0.1524" layer="91"/>
 <pinref part="USB-CONTROLLER2" gate="G$1" pin="SBU1"/>
 <wire x1="109.22" y1="144.78" x2="106.68" y2="144.78" width="0.1524" layer="91"/>
-<junction x="106.68" y="144.78"/>
-<wire x1="106.68" y1="144.78" x2="106.68" y2="147.32" width="0.1524" layer="91"/>
-<wire x1="106.68" y1="147.32" x2="106.68" y2="149.86" width="0.1524" layer="91"/>
-<junction x="106.68" y="147.32"/>
-<wire x1="106.68" y1="147.32" x2="109.22" y2="147.32" width="0.1524" layer="91"/>
-<pinref part="USB-CONTROLLER2" gate="G$1" pin="DN1"/>
 <pinref part="USB-CONTROLLER2" gate="G$1" pin="SHIELD"/>
 <wire x1="109.22" y1="137.16" x2="106.68" y2="137.16" width="0.1524" layer="91"/>
 <wire x1="106.68" y1="137.16" x2="106.68" y2="139.7" width="0.1524" layer="91"/>
@@ -8414,6 +8402,18 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/L77HDE15SD1CH
 <pinref part="GND21" gate="1" pin="GND"/>
 <wire x1="106.68" y1="134.62" x2="106.68" y2="137.16" width="0.1524" layer="91"/>
 <junction x="106.68" y="137.16"/>
+<wire x1="106.68" y1="144.78" x2="106.68" y2="152.4" width="0.1524" layer="91"/>
+<junction x="106.68" y="144.78"/>
+<pinref part="USB-CONTROLLER2" gate="G$1" pin="SSTXP1"/>
+<wire x1="106.68" y1="152.4" x2="106.68" y2="154.94" width="0.1524" layer="91"/>
+<wire x1="106.68" y1="154.94" x2="106.68" y2="157.48" width="0.1524" layer="91"/>
+<wire x1="106.68" y1="157.48" x2="109.22" y2="157.48" width="0.1524" layer="91"/>
+<pinref part="USB-CONTROLLER2" gate="G$1" pin="SSTXN1"/>
+<wire x1="109.22" y1="154.94" x2="106.68" y2="154.94" width="0.1524" layer="91"/>
+<junction x="106.68" y="154.94"/>
+<pinref part="USB-CONTROLLER2" gate="G$1" pin="CC"/>
+<wire x1="109.22" y1="152.4" x2="106.68" y2="152.4" width="0.1524" layer="91"/>
+<junction x="106.68" y="152.4"/>
 </segment>
 <segment>
 <pinref part="POWER-IN" gate="G$1" pin="GND1"/>
@@ -8500,47 +8500,26 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/L77HDE15SD1CH
 <junction x="160.02" y="157.48"/>
 </segment>
 </net>
-<net name="C1_DATA" class="0">
-<segment>
-<wire x1="106.68" y1="86.36" x2="104.14" y2="86.36" width="0.1524" layer="91"/>
-<label x="104.14" y="86.36" size="1.27" layer="95" rot="MR0" xref="yes"/>
-<pinref part="USB-CONTROLLER1" gate="G$1" pin="SSTXP1"/>
-</segment>
-</net>
-<net name="C3_DATA" class="0">
-<segment>
-<wire x1="22.86" y1="157.48" x2="20.32" y2="157.48" width="0.1524" layer="91"/>
-<label x="20.32" y="157.48" size="1.27" layer="95" rot="R180" xref="yes"/>
-<pinref part="USB-CONTROLLER3" gate="G$1" pin="SSTXP1"/>
-</segment>
-</net>
-<net name="C4_DATA" class="0">
-<segment>
-<wire x1="22.86" y1="86.36" x2="20.32" y2="86.36" width="0.1524" layer="91"/>
-<label x="20.32" y="86.36" size="1.27" layer="95" rot="MR0" xref="yes"/>
-<pinref part="USB-CONTROLLER4" gate="G$1" pin="SSTXP1"/>
-</segment>
-</net>
 <net name="C_CLOCK" class="0">
 <segment>
-<wire x1="22.86" y1="154.94" x2="20.32" y2="154.94" width="0.1524" layer="91"/>
-<label x="20.32" y="154.94" size="1.27" layer="95" rot="R180" xref="yes"/>
-<pinref part="USB-CONTROLLER3" gate="G$1" pin="SSTXN1"/>
+<wire x1="22.86" y1="76.2" x2="17.78" y2="76.2" width="0.1524" layer="91"/>
+<label x="17.78" y="76.2" size="1.27" layer="95" rot="MR0" xref="yes"/>
+<pinref part="USB-CONTROLLER4" gate="G$1" pin="DN1"/>
 </segment>
 <segment>
-<wire x1="22.86" y1="83.82" x2="20.32" y2="83.82" width="0.1524" layer="91"/>
-<label x="20.32" y="83.82" size="1.27" layer="95" rot="MR0" xref="yes"/>
-<pinref part="USB-CONTROLLER4" gate="G$1" pin="SSTXN1"/>
+<wire x1="22.86" y1="147.32" x2="17.78" y2="147.32" width="0.1524" layer="91"/>
+<label x="17.78" y="147.32" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="USB-CONTROLLER3" gate="G$1" pin="DN1"/>
 </segment>
 <segment>
-<wire x1="106.68" y1="83.82" x2="104.14" y2="83.82" width="0.1524" layer="91"/>
-<label x="104.14" y="83.82" size="1.27" layer="95" rot="MR0" xref="yes"/>
-<pinref part="USB-CONTROLLER1" gate="G$1" pin="SSTXN1"/>
+<label x="104.14" y="147.32" size="1.27" layer="95" rot="R180" xref="yes"/>
+<wire x1="104.14" y1="147.32" x2="109.22" y2="147.32" width="0.1524" layer="91"/>
+<pinref part="USB-CONTROLLER2" gate="G$1" pin="DN1"/>
 </segment>
 <segment>
-<label x="106.68" y="154.94" size="1.27" layer="95" rot="R180" xref="yes"/>
-<wire x1="106.68" y1="154.94" x2="109.22" y2="154.94" width="0.1524" layer="91"/>
-<pinref part="USB-CONTROLLER2" gate="G$1" pin="SSTXN1"/>
+<wire x1="106.68" y1="76.2" x2="101.6" y2="76.2" width="0.1524" layer="91"/>
+<label x="101.6" y="76.2" size="1.27" layer="95" rot="MR0" xref="yes"/>
+<pinref part="USB-CONTROLLER1" gate="G$1" pin="DN1"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -8577,13 +8556,6 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/L77HDE15SD1CH
 <wire x1="142.24" y1="81.28" x2="143.51" y2="81.28" width="0.1524" layer="91"/>
 <wire x1="143.51" y1="81.28" x2="143.51" y2="86.36" width="0.1524" layer="91"/>
 <junction x="143.51" y="86.36"/>
-</segment>
-</net>
-<net name="C2_DATA" class="0">
-<segment>
-<label x="106.68" y="157.48" size="1.27" layer="95" rot="R180" xref="yes"/>
-<wire x1="106.68" y1="157.48" x2="109.22" y2="157.48" width="0.1524" layer="91"/>
-<pinref part="USB-CONTROLLER2" gate="G$1" pin="SSTXP1"/>
 </segment>
 </net>
 <net name="N$2" class="0">
@@ -8641,6 +8613,34 @@ Source: &lt;a href="https://componentsearchengine.com/Datasheets/1/L77HDE15SD1CH
 <label x="25.4" y="33.02" size="1.27" layer="95" rot="R180" xref="yes"/>
 <wire x1="29.21" y1="33.02" x2="25.4" y2="33.02" width="0.1524" layer="91"/>
 <pinref part="VGA" gate="G$1" pin="2"/>
+</segment>
+</net>
+<net name="C4_DATA" class="0">
+<segment>
+<wire x1="22.86" y1="78.74" x2="17.78" y2="78.74" width="0.1524" layer="91"/>
+<label x="17.78" y="78.74" size="1.27" layer="95" rot="MR0" xref="yes"/>
+<pinref part="USB-CONTROLLER4" gate="G$1" pin="DP1"/>
+</segment>
+</net>
+<net name="C3_DATA" class="0">
+<segment>
+<wire x1="22.86" y1="149.86" x2="17.78" y2="149.86" width="0.1524" layer="91"/>
+<label x="17.78" y="149.86" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="USB-CONTROLLER3" gate="G$1" pin="DP1"/>
+</segment>
+</net>
+<net name="C2_DATA" class="0">
+<segment>
+<label x="104.14" y="149.86" size="1.27" layer="95" rot="R180" xref="yes"/>
+<wire x1="104.14" y1="149.86" x2="109.22" y2="149.86" width="0.1524" layer="91"/>
+<pinref part="USB-CONTROLLER2" gate="G$1" pin="DP1"/>
+</segment>
+</net>
+<net name="C1_DATA" class="0">
+<segment>
+<wire x1="106.68" y1="78.74" x2="101.6" y2="78.74" width="0.1524" layer="91"/>
+<label x="101.6" y="78.74" size="1.27" layer="95" rot="MR0" xref="yes"/>
+<pinref part="USB-CONTROLLER1" gate="G$1" pin="DP1"/>
 </segment>
 </net>
 </nets>
