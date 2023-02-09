@@ -120,6 +120,7 @@ extern uint32_t pxs;
 extern uint8_t operation[OPERATION_LENGTH];
 extern uint8_t operation_data[OPERATION_DATA_LENGTH];
 extern volatile enum Stage processing_stage;
+extern volatile uint16_t gpu_ready_port;
 extern const char *stage_pretty_names[6];
 extern volatile bool run;
 

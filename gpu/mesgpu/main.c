@@ -116,6 +116,7 @@ void start_communication(void) {
         dma_enable_transfer_complete_interrupt(DMA1, DMA_CHANNEL2);
         spi_enable_rx_dma(SPI1);
         dma_recieve_operation();
+        gpu_ready_port = 0;
 }
 
 void dma_recieve_operation(void) {
@@ -184,6 +185,7 @@ void tim2_isr(void) {
 void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
         if (TIM3_CNT > V_BACK_PORCH_LINES + V_SYNC_PULSE_LINES - 2 &&
             TIM3_CNT < V_BACK_PORCH_LINES + V_SYNC_PULSE_LINES + V_DISPLAY_LINES - 2) {
+                GPIO_BRR(GPU_READY_PORT) = GPU_READY;
                 buffer_line = ((TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 2) / 5);
                 line = (const void *) front_buffer + (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
 
@@ -191,12 +193,15 @@ void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
 
                 // some monitors sample their black voltage level in the back porch, so we need to stop outputting color
                 GPIO_BRR(GPIO_COLOR_PORT) = GPIO_ALL;
+        } else {
+                GPIO_ODR(GPU_READY_PORT) = gpu_ready_port;
         }
         TIM_SR(TIM1) = 0x0000;
 }
 
 void generic_error(void) {
         run = false;
+        gpu_ready_port = 0;
         color_palette[0] = COLOR(0b000, 0b000, 0b111);
         color_palette[1] = COLOR(0b111, 0b111, 0b111);
         memcpy(front_buffer, error, SCREEN_BUFFER_SIZE);
@@ -264,10 +269,9 @@ void dma1_channel2_isr(void) {
                         processing_stage = UNHANDELED_DATA;
                         break;
                 case WAITING_FOR_DMA:
-                        GPIO_BRR(GPU_READY_PORT) = GPU_READY;
                         processing_stage = READY;
                         dma_recieve_operation();
-                        GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+                        gpu_ready_port = GPU_READY;
                         break;
                 default:
                         unexpected_data(processing_stage);
@@ -292,6 +296,7 @@ void handle_operation(void) {
 }
 
 void new_operation(void) {
+        gpu_ready_port = 0;
         GPIO_BRR(GPU_READY_PORT) = GPU_READY;
         switch (OPERATION_ID(operation)) {
                 case OPERATION_ID_INIT:
@@ -345,10 +350,11 @@ void new_operation(void) {
                         processing_stage = READY;
                         break;
         }
-        GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+        gpu_ready_port = GPU_READY;
 }
 
 void new_data(void) {
+        gpu_ready_port = 0;
         GPIO_BRR(GPU_READY_PORT) = GPU_READY;
         switch (OPERATION_ID(operation)) {
                 case OPERATION_ID_DISPLAY_BUF:
@@ -367,7 +373,7 @@ void new_data(void) {
                                         );
                                 }
                         }
-                        if(OPERATION_ID(operation) == OPERATION_ID_DISPLAY_BUF) {
+                        if (OPERATION_ID(operation) == OPERATION_ID_DISPLAY_BUF) {
                                 gpu_swap_buffers();
                         }
                         break;
@@ -379,5 +385,5 @@ void new_data(void) {
         }
         dma_recieve_operation();
         processing_stage = READY;
-        GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+        gpu_ready_port = GPU_READY;
 }

@@ -21,6 +21,7 @@ uint8_t operation[OPERATION_LENGTH];
 uint8_t operation_data[OPERATION_DATA_LENGTH];
 
 volatile enum Stage processing_stage = UNINITIALIZED;
+volatile uint16_t gpu_ready_port = 0;
 
 const char *stage_pretty_names[6] = {
         "Uninitialized",
