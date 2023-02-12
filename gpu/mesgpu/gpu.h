@@ -7,16 +7,16 @@
 #define MES_GPU_H
 
 // relevant timings:
-// http://tinyvga.com/vga-timing/800x600@60Hz
-#define H_DISPLAY_PIXELS 800
-#define H_FRONT_PORCH_PIXELS 40
-#define H_SYNC_PULSE_PIXELS 128
-#define H_BACK_PORCH_PIXELS 88
+// http://tinyvga.com/vga-timing/640x480@60Hz
+#define H_DISPLAY_PIXELS 640
+#define H_FRONT_PORCH_PIXELS 16
+#define H_SYNC_PULSE_PIXELS 96
+#define H_BACK_PORCH_PIXELS 48
 
-#define V_DISPLAY_LINES 600
-#define V_FRONT_PORCH_LINES 1
-#define V_SYNC_PULSE_LINES 4
-#define V_BACK_PORCH_LINES 23
+#define V_DISPLAY_LINES 480
+#define V_FRONT_PORCH_LINES 10
+#define V_SYNC_PULSE_LINES 2
+#define V_BACK_PORCH_LINES 33
 
 #define H_WHOLE_LINE_PIXELS (H_DISPLAY_PIXELS + H_FRONT_PORCH_PIXELS + H_SYNC_PULSE_PIXELS + H_BACK_PORCH_PIXELS)
 #define V_WHOLE_FRAME_LINES (V_DISPLAY_LINES + V_FRONT_PORCH_LINES + V_SYNC_PULSE_LINES + V_BACK_PORCH_LINES)
@@ -25,15 +25,15 @@
 #define V_SYNC_PULSE_LINES_PIXELS (V_SYNC_PULSE_LINES * H_WHOLE_LINE_PIXELS)
 #define V_BACK_PORCH_LINES_PIXELS (V_BACK_PORCH_LINES * H_WHOLE_LINE_PIXELS)
 #define WHOLE_DISPLAY_PIXELS (V_WHOLE_FRAME_LINES*H_WHOLE_LINE_PIXELS)
-#define PIXEL_CLOCK 40000000
+#define PIXEL_CLOCK 25175000
 // 0 -> idle high, active low
 // 1 -> idle low, active high
-#define H_SYNC_POLARITY 1
-#define V_SYNC_POLARITY 1
+#define H_SYNC_POLARITY 0
+#define V_SYNC_POLARITY 0
 
 // pixel buffer
 #define VGA_OUT_REFRESH_RATE 60
-#define BUFFER_TO_VIDEO_RATIO 5
+#define BUFFER_TO_VIDEO_RATIO 4
 #define BUFFER_WIDTH (H_DISPLAY_PIXELS / BUFFER_TO_VIDEO_RATIO)
 #define BUFFER_HEIGHT (V_DISPLAY_LINES / BUFFER_TO_VIDEO_RATIO)
 #define SCREEN_BUFFER_SIZE ((BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / CHAR_BIT)
@@ -67,9 +67,6 @@
 
 #define GPU_READY_PORT GPIOC
 #define GPU_READY GPIO15
-
-// -11 because we need some time to get ready
-#define PREPARE_DISPLAY ((H_SYNC_PULSE_PIXELS / 5 + H_BACK_PORCH_PIXELS / 5) - 11) // 42-11 (43.2)
 
 #define BUFFER_A_ADDRESS 0x20000000
 #define BUFFER_B_ADDRESS 0x20001c20
@@ -115,6 +112,7 @@ extern uint8_t buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT 
 extern uint8_t buffer_b[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t))];
 extern uint8_t *front_buffer, *back_buffer;
 extern uint8_t buffer_line;
+extern int8_t sub_line;
 extern const void *line;
 extern uint32_t pxs;
 extern uint8_t operation[OPERATION_LENGTH];

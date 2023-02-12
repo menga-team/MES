@@ -12,7 +12,8 @@ uint8_t __attribute__((section (".buffer_b"))) buffer_b[
         (BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) / (CHAR_BIT * sizeof(uint8_t))];
 uint8_t *front_buffer, *back_buffer;
 
-uint8_t buffer_line = 0;
+uint8_t buffer_line;
+int8_t sub_line;
 const void *line;
 
 uint32_t pxs = 0;
@@ -25,7 +26,7 @@ volatile uint16_t gpu_ready_port = 0;
 
 const char *stage_pretty_names[6] = {
         "Uninitialized",
-        "Waiting for operation",
+        "Ready",
         "New operation",
         "Waiting for data",
         "New data",

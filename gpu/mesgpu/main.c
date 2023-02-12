@@ -76,17 +76,6 @@ void setup_output(void) {
 }
 
 void setup_video(void) {
-        // good for debugging pixel sizes
-//        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++) {
-//                gpu_set_pixel(buffer_a, i, i % 2);
-//                if (i % 8 == 0)
-//                        gpu_set_pixel(buffer_a, i, 0b110);
-//                if (i % 7 == 0)
-//                        gpu_set_pixel(buffer_a, i, 0b111);
-//        }
-        // stripes
-//        for (uint16_t i = 0; i < BUFFER_HEIGHT * BUFFER_WIDTH; i++)
-//                gpu_set_pixel(buffer_a, i, i % 8);
         gpu_blank(front_buffer, 0x00);
 }
 
@@ -131,37 +120,58 @@ void dma_recieve(uint32_t adr, uint32_t len) {
 
 void start_video(void) {
         // timers are driven by a 72MHz clock
-        // TIM1 -> Horizontal sync
+        // TIM1 -> H-SYNC & scanline interrupt
         rcc_periph_clock_enable(RCC_TIM1);
         rcc_periph_reset_pulse(RST_TIM1);
         timer_enable_break_main_output(TIM1);
         timer_set_mode(TIM1, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-        // 0 = 1, so we need to subtract 1 to get the expected result.
-        // tim1 is driven by rcc_apb2_frequency (72MHz)
-        timer_set_prescaler(TIM1, uround(rcc_apb2_frequency / (PIXEL_CLOCK / (double) BUFFER_TO_VIDEO_RATIO)) - 1);
-        timer_set_period(TIM1, H_WHOLE_LINE_PIXELS / 5); // 211 (211.2)
+        // 25175000/4 = 6293750
+        // 72000000/6293750 = 11.44 = 11
+        timer_set_prescaler(
+                TIM1,
+                uround((double) rcc_apb2_frequency / (double) (PIXEL_CLOCK / BUFFER_TO_VIDEO_RATIO)) - 1
+        );
+        timer_set_period(TIM1, (H_WHOLE_LINE_PIXELS / BUFFER_TO_VIDEO_RATIO) - 1);
         timer_disable_preload(TIM1);
         timer_continuous_mode(TIM1);
         timer_set_counter(TIM1, 0);
         timer_enable_oc_preload(TIM1, TIM_OC1);
         timer_enable_oc_output(TIM1, TIM_OC1);
         timer_set_oc_mode(TIM1, TIM_OC1, TIM_OCM_PWM1);
-        // This OC is responsible for the PWM signal, we are high until we reach OC1.
-        timer_set_oc_value(TIM1, TIM_OC1, H_SYNC_PULSE_PIXELS / BUFFER_TO_VIDEO_RATIO); // 25 (25.6)
-        if (H_SYNC_POLARITY) timer_set_oc_polarity_high(TIM1, TIM_OC1);
-        else timer_set_oc_polarity_low(TIM1, TIM_OC1);
+        // This OC is responsible for the horizontal sync pulse...
+        // We will send the sync pulse at the beging because it is easier.
+        // The backporch will follow after it, and the front porch is at the end.
+        timer_set_oc_value(TIM1, TIM_OC1, (H_SYNC_PULSE_PIXELS / BUFFER_TO_VIDEO_RATIO) - 1);
+#       if H_SYNC_POLARITY == 1
+        timer_set_oc_polarity_high(TIM1, TIM_OC1);
+#       else
+        timer_set_oc_polarity_low(TIM1, TIM_OC1);
+#       endif
         nvic_enable_irq(NVIC_TIM1_CC_IRQ);
         nvic_set_priority(NVIC_TIM1_CC_IRQ, 0);
         // OC2 will let us know when we need to start preparing and outputting the image
-        timer_set_oc_value(TIM1, TIM_OC2, PREPARE_DISPLAY);
+        // Start a little sooner because we are doing more than just outputting the pixels.
+        timer_set_oc_value(
+                TIM1,
+                TIM_OC2,
+                ((H_SYNC_PULSE_PIXELS + H_BACK_PORCH_PIXELS) / BUFFER_TO_VIDEO_RATIO) - 9
+        );
         timer_enable_irq(TIM1, TIM_DIER_CC2IE);
-
-        // TIM3 -> Vertical sync
+        // TIM3 -> V-SYNC & line count
         rcc_periph_clock_enable(RCC_TIM3);
         rcc_periph_reset_pulse(RST_TIM3);
         timer_set_mode(TIM3, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
-        // +6 is trial and error, because our hsync is not perfect we also need to change the vsync up a bit.
-        timer_set_prescaler(TIM3, uround(rcc_apb2_frequency / (PIXEL_CLOCK / (double) H_WHOLE_LINE_PIXELS)) + 6);
+        // 25175000/4 = 6293750
+        // 6293750/200 = 31468.75
+        // 72000000.0/31468.75 = 228.8 = 229
+        timer_set_prescaler(
+                TIM3,
+                uround(
+                        (double) rcc_apb2_frequency /
+                        (double) ((double) (PIXEL_CLOCK / BUFFER_TO_VIDEO_RATIO) /
+                                  (double) (H_WHOLE_LINE_PIXELS / BUFFER_TO_VIDEO_RATIO))
+                ) - 1
+        );
         timer_set_period(TIM3, V_WHOLE_FRAME_LINES - 1);
         timer_disable_preload(TIM3);
         timer_continuous_mode(TIM3);
@@ -170,33 +180,48 @@ void start_video(void) {
         timer_enable_oc_preload(TIM3, TIM_OC3);
         timer_enable_oc_output(TIM3, TIM_OC3);
         timer_set_oc_mode(TIM3, TIM_OC3, TIM_OCM_PWM1);
-        if (V_SYNC_POLARITY) timer_set_oc_polarity_high(TIM3, TIM_OC3);
-        else timer_set_oc_polarity_low(TIM3, TIM_OC3);
-
-        // enable both counters
+#       if V_SYNC_POLARITY == 1
+        timer_set_oc_polarity_high(TIM3, TIM_OC3);
+#       else
+        timer_set_oc_polarity_low(TIM3, TIM_OC3);
+#       endif
+        // initialize line counters
+        buffer_line = 0;
+        sub_line = -1;
+        // start timers
         timer_enable_counter(TIM3);
         timer_enable_counter(TIM1);
 }
 
-void tim2_isr(void) {
-        TIM_SR(TIM2) = 0x0000;
-}
-
-void __attribute__ ((optimize("O3"))) tim1_cc_isr(void) {
-        if (TIM3_CNT > V_BACK_PORCH_LINES + V_SYNC_PULSE_LINES - 2 &&
-            TIM3_CNT < V_BACK_PORCH_LINES + V_SYNC_PULSE_LINES + V_DISPLAY_LINES - 2) {
+void __attribute__((optimize("O3"))) tim1_cc_isr(void) {
+        TIM_SR(TIM1) = 0x0000;
+        if (TIM3_CNT > V_SYNC_PULSE_LINES + V_BACK_PORCH_LINES - 3 &&
+            TIM3_CNT < V_SYNC_PULSE_LINES + V_BACK_PORCH_LINES + V_DISPLAY_LINES - 20) {
+                // while drawing we don't want to communicate, because DMA and CPU can only access memory
+                // one at a time. When we are recieving data and drawing at the same time, artifacts will appear.
                 GPIO_BRR(GPU_READY_PORT) = GPU_READY;
-                buffer_line = ((TIM3_CNT - V_SYNC_PULSE_LINES - V_BACK_PORCH_LINES + 2) / 5);
+
+                // Increment subline
+                sub_line++;
+
+                // Send the scanline
                 line = (const void *) front_buffer + (buffer_line * (BUFFER_WIDTH / 8) * BUFFER_BPP);
 
 #               include "scanline.g.c"
 
-                // some monitors sample their black voltage level in the back porch, so we need to stop outputting color
+                // Some monitors sample their black voltage level in the back porch, so we need to stop outputting color.
                 GPIO_BRR(GPIO_COLOR_PORT) = GPIO_ALL;
+
+                // Branches are last because we don't want variable execution time before sending the pixels.
+                if (sub_line == BUFFER_TO_VIDEO_RATIO) {
+                        buffer_line++;
+                        sub_line = 0;
+                }
+                if (buffer_line == BUFFER_HEIGHT) buffer_line = 0;
         } else {
+                // we don't want to send a possible GPU_READY after finishing a line, because that's just to many interrupts.
                 GPIO_ODR(GPU_READY_PORT) = gpu_ready_port;
         }
-        TIM_SR(TIM1) = 0x0000;
 }
 
 void generic_error(void) {
@@ -243,6 +268,9 @@ void unexpected_data(enum Stage c_stage) {
 }
 
 void cpu_communication_timeout(void) {
+        // FIXME: When a timeout is displayed the lines are in the wrong order.
+        //      This is probably because the pixels get copied in a interrupt.
+        //      A solution could be to copy the pixels via DMA or to copy the pixels outside of the interrupt.
         color_palette[0] = COLOR(0b000, 0b000, 0b000);
         color_palette[1] = COLOR(0b110, 0b110, 0b110);
         color_palette[2] = COLOR(0b100, 0b100, 0b100);
@@ -271,6 +299,7 @@ void dma1_channel2_isr(void) {
                 case WAITING_FOR_DMA:
                         processing_stage = READY;
                         dma_recieve_operation();
+                        GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
                         gpu_ready_port = GPU_READY;
                         break;
                 default:
@@ -281,17 +310,14 @@ void dma1_channel2_isr(void) {
 
 void handle_operation(void) {
         switch (processing_stage) {
-                case UNHANDELED_OPERATION: {
+                case UNHANDELED_OPERATION:
                         new_operation();
                         break;
-                }
-                case UNHANDELED_DATA: {
+                case UNHANDELED_DATA:
                         new_data();
                         break;
-                }
-                default: {
+                default:
                         break;
-                }
         }
 }
 
@@ -300,7 +326,7 @@ void new_operation(void) {
         GPIO_BRR(GPU_READY_PORT) = GPU_READY;
         switch (OPERATION_ID(operation)) {
                 case OPERATION_ID_INIT:
-                        gpu_write(front_buffer, 0, 0, 1, 0, "CPU synced!");
+                        gpu_write(front_buffer, 0, 0, 1, 0, "GPU READY");
                         dma_recieve_operation();
                         processing_stage = READY;
                         break;
@@ -313,7 +339,7 @@ void new_operation(void) {
                 case OPERATION_ID_SEND_BUF:
                         if (operation[4] == 0x00 && operation[5] == 0x00 &&
                             operation[6] == 0x00 && operation[7] == 0x00) {
-                                if (OPERATION_ID(operation) == OPERATION_ID_DISPLAY_BUF) { // TODO: stupid hack..
+                                if (OPERATION_ID(operation) == OPERATION_ID_DISPLAY_BUF) { // TODO: stupid hack...
                                         operation[2] = 0x01;
                                 }
                                 // recieve full frame via dma
@@ -326,7 +352,8 @@ void new_operation(void) {
                                 );
                                 processing_stage = WAITING_FOR_DATA;
                         }
-                        break;
+                        GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
+                        return;
                 case OPERATION_ID_PRINT_TEXT:
                         dma_recieve(
                                 (uint32_t) operation_data,
