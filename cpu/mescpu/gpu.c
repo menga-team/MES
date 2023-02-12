@@ -61,7 +61,7 @@ void gpu_print_text_blocking(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t fore
         gpu_send_blocking((uint8_t *) &op, sizeof(Operation));
         while (gpio_get(GPU_READY_PORT, GPU_READY));
         while (!gpio_get(GPU_READY_PORT, GPU_READY));
-        gpu_send_blocking((uint8_t*)text, len);
+        gpu_send_blocking((uint8_t *) text, len);
         while (gpio_get(GPU_READY_PORT, GPU_READY));
         while (!gpio_get(GPU_READY_PORT, GPU_READY));
 }
@@ -210,6 +210,11 @@ void dma1_channel3_isr(void) {
 
 void gpu_block_until_ack(void) {
         while (!current_operation.ack);
+}
+
+void gpu_wait_for_next_ready(void) {
+        current_operation.ack = false;
+        gpu_block_until_ack();
 }
 
 void exti15_10_isr(void) {
