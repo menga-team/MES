@@ -9,4 +9,4 @@ void timer_block_ms(uint32_t interval);
 
 uint32_t timer_get_ms(void);
 
-#endif //MES_TIME_H
+#endif // MES_TIME_H

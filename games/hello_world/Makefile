@@ -1,5 +1,5 @@
 PROJECT		= hello-world
-CFILES		= src/main.c src/second_file.c
+CFILES		= src/main.c # src/second_file.c
 INCLUDES	= -I../../include -I../../cpu/mescpu
 MODULE_NAME	= game
 
@@ -20,7 +20,7 @@ clean:
 	-rm src/*.o
 	-rm src/*.elf
 	-rm src/*.bin
-	rm $(MODULE_NAME).bin
+	-rm $(MODULE_NAME).bin
 
 all: $(MODULE_NAME).bin
 .PHONY: all clean
