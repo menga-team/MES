@@ -1,5 +1,5 @@
 PROJECT		= hello-world
-CFILES		= src/main.c # src/second_file.c
+CFILES		= src/main.c src/second_file.c
 INCLUDES	= -I../../include -I../../cpu/mescpu
 MODULE_NAME	= game
 

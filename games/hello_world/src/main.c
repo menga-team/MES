@@ -3,6 +3,7 @@
 
 static const char *GLOBAL_VAR = "GLOBAL";
 
+
 uint8_t start(void) {
     gpu_blank(FRONT_BUFFER, 0);
     gpu_print_text(FRONT_BUFFER, 0, 0, 7, 0, "I am .LC0 from main.o!");
