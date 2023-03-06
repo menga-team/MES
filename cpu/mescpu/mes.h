@@ -11,6 +11,7 @@
 #define USFR_IS_DIVBYZERO(X) (X & 0b0000001000000000)
 
 extern const char *GAME_ENTRY;
+extern const uint32_t REVISION;
 
 void configure_io(void);
 

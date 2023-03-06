@@ -1,5 +1,5 @@
-#include "main.h"
 #include "gpu.h"
+#include "mes.h"
 #include "mesgraphics.h"
 #include "sdcard.h"
 #include "timer.h"
@@ -18,6 +18,7 @@ uint32_t __attribute__((section(".get_lot_base"))) (*const get_lot_base)(
     uint32_t) = &udynlink_get_lot_base;
 
 const char *GAME_ENTRY = "start";
+const uint32_t REVISION = 0;
 
 const uint8_t hello_world[] __attribute__((aligned(4))) = {
     0x55, 0x44, 0x4c, 0x4d, 0x0a, 0x00, 0x0a, 0x00, 0xc8, 0x00, 0x00, 0x00,

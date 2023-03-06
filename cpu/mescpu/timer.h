@@ -3,6 +3,8 @@
 
 #include "stdint.h"
 
+extern volatile uint32_t system_ms;
+
 void timer_start(void);
 
 void timer_block_ms(uint32_t interval);
