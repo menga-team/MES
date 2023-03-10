@@ -1,0 +1,3 @@
+In order to built the CPU you must first create a dummy
+`bin/symbols.inc` (just create a empty file), then run `make
+bin/symbols.inc` and compile again.
