@@ -126,7 +126,7 @@ $(PROJECT).elf: $(OBJS) $(LDSCRIPT) $(LIBDEPS)
 	@printf "  LD\t$@\n"
 	$(Q)$(LD) $(TGT_LDFLAGS) $(LDFLAGS) $(OBJS) $(LDLIBS) -o $@
 
-$(BUILD_DIR)/symbols.inc: $(PROJECT).elf
+$(BUILD_DIR)/symbols.inc: %.elf
 	python extract_symbols.py $(PROJECT).elf > $(BUILD_DIR)/symbols.inc
 
 %.bin: %.elf

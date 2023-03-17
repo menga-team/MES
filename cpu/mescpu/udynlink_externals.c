@@ -16,7 +16,7 @@
 #include <udynlink.h>
 #include <timer.h>
 #include <controller.h>
-#include <main.h>
+#include <mes.h>
 
 void *udynlink_external_malloc(size_t size) { return malloc(size); }
 
