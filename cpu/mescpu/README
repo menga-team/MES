@@ -1,3 +1,7 @@
-In order to built the CPU you must first create a dummy
-`bin/symbols.inc` (just create a empty file), then run `make
-bin/symbols.inc` and compile again.
+In order to build the CPU you must first create a dummy
+`bin/symbols.inc` (`touch bin/symbos.inc`).  Then you need to compile
+using `make mescpu.elf`, finally run `make bin/symbols.inc`.  Now you
+can flash it with `make flash` or simply build it using `make mescpu.bin`.
+
+If you don't want any game preloaded use `make remove-game` to remove
+the game.

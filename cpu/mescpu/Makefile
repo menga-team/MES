@@ -139,6 +139,9 @@ $(BUILD_DIR)/symbols.inc: $(PROJECT).elf
 %.list: %.elf
 	$(OBJDUMP) -S $< > $@
 
+remove-game:
+	python create_dummy_game.py dummy_game > dummy_game.h
+
 %.flash: %.bin
 	@printf "  FLASH\t$<\n"
 	st-flash write $(*).bin 0x08000000
