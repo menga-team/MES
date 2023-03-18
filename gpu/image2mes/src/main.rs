@@ -101,6 +101,22 @@ fn run() -> anyhow::Result<()> {
             }
         }
     }
+
+    // fill the remaining bytes if the image size is not dividable by 3
+    for byte in bv.as_raw_slice().chunks_exact(3).remainder().iter().rev() {
+        match opt.output_type {
+            OutputType::CArray | OutputType::Code => {
+                write!(&mut out, "0x{:02x}, ", byte)?;
+            }
+            OutputType::HexNumber => {
+                write!(&mut out, "{:02x}", byte)?;
+            }
+            OutputType::Binary => {
+                out.write(&[*byte])?;
+            }
+        }
+    }
+
     if opt.output_type == OutputType::Code {
         writeln!(
             &mut out,
