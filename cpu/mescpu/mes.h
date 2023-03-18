@@ -1,7 +1,7 @@
 #ifndef MES_MAIN_H
 #define MES_MAIN_H
 
-#include<stdint.h>
+#include <stdint.h>
 
 #define USFR_IS_UNDEFSTR(X) (X & 0b0000000000000001)
 #define USFR_IS_INVSTATE(X) (X & 0b0000000000000010)
