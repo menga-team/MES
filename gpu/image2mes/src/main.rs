@@ -58,6 +58,10 @@ fn run() -> anyhow::Result<()> {
         }
     }
 
+    while (bv.len() / 3) % 8 != 0 {
+        bv.push(false);
+    }
+
     let mut out: Box<dyn Write> = if opt.output_file == "-" {
         Box::new(io::stdout())
     } else if let Ok(fd) = File::create(opt.output_file) {
@@ -80,7 +84,7 @@ fn run() -> anyhow::Result<()> {
     if opt.output_type == OutputType::Code {
         write!(
             &mut out,
-            "uint8_t __attribute__((section (\".rodata\"))) image[{}] = {{\n\t",
+            "const uint8_t image[{}] = {{\n\t",
             bv.as_raw_slice().len()
         )?;
     }
@@ -98,21 +102,6 @@ fn run() -> anyhow::Result<()> {
             }
             OutputType::Binary => {
                 out.write(&[bytes[2], bytes[1], bytes[0]])?;
-            }
-        }
-    }
-
-    // fill the remaining bytes if the image size is not dividable by 3
-    for byte in bv.as_raw_slice().chunks_exact(3).remainder().iter().rev() {
-        match opt.output_type {
-            OutputType::CArray | OutputType::Code => {
-                write!(&mut out, "0x{:02x}, ", byte)?;
-            }
-            OutputType::HexNumber => {
-                write!(&mut out, "{:02x}", byte)?;
-            }
-            OutputType::Binary => {
-                out.write(&[*byte])?;
             }
         }
     }
