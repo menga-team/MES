@@ -13534,21 +13534,17 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 </net>
 <net name="GND" class="0">
 <segment>
-<wire x1="26.67" y1="140.97" x2="26.67" y2="143.51" width="0.1524" layer="91"/>
 <wire x1="29.21" y1="146.05" x2="26.67" y2="146.05" width="0.1524" layer="91"/>
 <wire x1="26.67" y1="146.05" x2="26.67" y2="148.59" width="0.1524" layer="91"/>
 <wire x1="26.67" y1="148.59" x2="26.67" y2="151.13" width="0.1524" layer="91"/>
 <wire x1="29.21" y1="151.13" x2="26.67" y2="151.13" width="0.1524" layer="91"/>
 <wire x1="26.67" y1="148.59" x2="29.21" y2="148.59" width="0.1524" layer="91"/>
 <junction x="26.67" y="148.59"/>
-<wire x1="26.67" y1="146.05" x2="26.67" y2="143.51" width="0.1524" layer="91"/>
+<wire x1="26.67" y1="146.05" x2="26.67" y2="140.97" width="0.1524" layer="91"/>
 <junction x="26.67" y="146.05"/>
-<wire x1="26.67" y1="143.51" x2="29.21" y2="143.51" width="0.1524" layer="91"/>
-<junction x="26.67" y="143.51"/>
 <pinref part="USB-CONTROLLER3" gate="G$1" pin="SBU1"/>
 <pinref part="USB-CONTROLLER3" gate="G$1" pin="SSRXN2"/>
 <pinref part="USB-CONTROLLER3" gate="G$1" pin="SSRXP2"/>
-<pinref part="USB-CONTROLLER3" gate="G$1" pin="SHIELD"/>
 <wire x1="26.67" y1="151.13" x2="26.67" y2="161.29" width="0.1524" layer="91"/>
 <junction x="26.67" y="151.13"/>
 <pinref part="USB-CONTROLLER3" gate="G$1" pin="SSTXP1"/>
@@ -13560,17 +13556,13 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <pinref part="GND8" gate="1" pin="GND"/>
 </segment>
 <segment>
-<wire x1="67.31" y1="143.51" x2="67.31" y2="146.05" width="0.1524" layer="91"/>
 <wire x1="67.31" y1="146.05" x2="67.31" y2="148.59" width="0.1524" layer="91"/>
 <wire x1="67.31" y1="148.59" x2="64.77" y2="148.59" width="0.1524" layer="91"/>
 <wire x1="64.77" y1="146.05" x2="67.31" y2="146.05" width="0.1524" layer="91"/>
 <junction x="67.31" y="146.05"/>
-<wire x1="64.77" y1="143.51" x2="67.31" y2="143.51" width="0.1524" layer="91"/>
-<junction x="67.31" y="143.51"/>
-<wire x1="67.31" y1="140.97" x2="67.31" y2="143.51" width="0.1524" layer="91"/>
+<wire x1="67.31" y1="140.97" x2="67.31" y2="146.05" width="0.1524" layer="91"/>
 <pinref part="USB-CONTROLLER3" gate="G$1" pin="GND"/>
 <pinref part="USB-CONTROLLER3" gate="G$1" pin="GND1"/>
-<pinref part="USB-CONTROLLER3" gate="G$1" pin="SHIELD1"/>
 <pinref part="GND9" gate="1" pin="GND"/>
 </segment>
 <segment>
@@ -13588,12 +13580,8 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <wire x1="113.03" y1="148.59" x2="113.03" y2="151.13" width="0.1524" layer="91"/>
 <pinref part="USB-CONTROLLER2" gate="G$1" pin="SBU1"/>
 <wire x1="115.57" y1="151.13" x2="113.03" y2="151.13" width="0.1524" layer="91"/>
-<pinref part="USB-CONTROLLER2" gate="G$1" pin="SHIELD"/>
-<wire x1="115.57" y1="143.51" x2="113.03" y2="143.51" width="0.1524" layer="91"/>
-<wire x1="113.03" y1="143.51" x2="113.03" y2="146.05" width="0.1524" layer="91"/>
 <junction x="113.03" y="146.05"/>
-<wire x1="113.03" y1="140.97" x2="113.03" y2="143.51" width="0.1524" layer="91"/>
-<junction x="113.03" y="143.51"/>
+<wire x1="113.03" y1="140.97" x2="113.03" y2="146.05" width="0.1524" layer="91"/>
 <wire x1="113.03" y1="151.13" x2="113.03" y2="161.29" width="0.1524" layer="91"/>
 <junction x="113.03" y="151.13"/>
 <pinref part="USB-CONTROLLER2" gate="G$1" pin="SSTXP1"/>
@@ -13605,31 +13593,23 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <pinref part="GND14" gate="1" pin="GND"/>
 </segment>
 <segment>
-<wire x1="153.67" y1="143.51" x2="153.67" y2="146.05" width="0.1524" layer="91"/>
 <wire x1="153.67" y1="146.05" x2="153.67" y2="148.59" width="0.1524" layer="91"/>
 <wire x1="153.67" y1="148.59" x2="151.13" y2="148.59" width="0.1524" layer="91"/>
 <wire x1="151.13" y1="146.05" x2="153.67" y2="146.05" width="0.1524" layer="91"/>
 <junction x="153.67" y="146.05"/>
-<wire x1="151.13" y1="143.51" x2="153.67" y2="143.51" width="0.1524" layer="91"/>
-<junction x="153.67" y="143.51"/>
-<wire x1="153.67" y1="140.97" x2="153.67" y2="143.51" width="0.1524" layer="91"/>
+<wire x1="153.67" y1="140.97" x2="153.67" y2="146.05" width="0.1524" layer="91"/>
 <pinref part="USB-CONTROLLER2" gate="G$1" pin="GND"/>
 <pinref part="USB-CONTROLLER2" gate="G$1" pin="GND1"/>
-<pinref part="USB-CONTROLLER2" gate="G$1" pin="SHIELD1"/>
 <pinref part="GND16" gate="1" pin="GND"/>
 </segment>
 <segment>
-<wire x1="153.67" y1="101.6" x2="153.67" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="153.67" y1="104.14" x2="153.67" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="153.67" y1="106.68" x2="151.13" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="151.13" y1="104.14" x2="153.67" y2="104.14" width="0.1524" layer="91"/>
 <junction x="153.67" y="104.14"/>
-<wire x1="151.13" y1="101.6" x2="153.67" y2="101.6" width="0.1524" layer="91"/>
-<junction x="153.67" y="101.6"/>
-<wire x1="153.67" y1="99.06" x2="153.67" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="153.67" y1="99.06" x2="153.67" y2="104.14" width="0.1524" layer="91"/>
 <pinref part="USB-CONTROLLER1" gate="G$1" pin="GND"/>
 <pinref part="USB-CONTROLLER1" gate="G$1" pin="GND1"/>
-<pinref part="USB-CONTROLLER1" gate="G$1" pin="SHIELD1"/>
 <pinref part="GND17" gate="1" pin="GND"/>
 </segment>
 <segment>
@@ -13648,11 +13628,7 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <wire x1="115.57" y1="104.14" x2="113.03" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="113.03" y1="104.14" x2="113.03" y2="106.68" width="0.1524" layer="91"/>
 <junction x="113.03" y="104.14"/>
-<wire x1="113.03" y1="99.06" x2="113.03" y2="101.6" width="0.1524" layer="91"/>
-<pinref part="USB-CONTROLLER1" gate="G$1" pin="SHIELD"/>
-<wire x1="113.03" y1="101.6" x2="113.03" y2="104.14" width="0.1524" layer="91"/>
-<wire x1="115.57" y1="101.6" x2="113.03" y2="101.6" width="0.1524" layer="91"/>
-<junction x="113.03" y="101.6"/>
+<wire x1="113.03" y1="99.06" x2="113.03" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="113.03" y1="109.22" x2="113.03" y2="119.38" width="0.1524" layer="91"/>
 <junction x="113.03" y="109.22"/>
 <pinref part="USB-CONTROLLER1" gate="G$1" pin="SSTXP1"/>
@@ -13669,17 +13645,13 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <pinref part="C3" gate="G$1" pin="2"/>
 </segment>
 <segment>
-<wire x1="69.85" y1="101.6" x2="69.85" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="69.85" y1="104.14" x2="69.85" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="69.85" y1="106.68" x2="67.31" y2="106.68" width="0.1524" layer="91"/>
 <wire x1="67.31" y1="104.14" x2="69.85" y2="104.14" width="0.1524" layer="91"/>
 <junction x="69.85" y="104.14"/>
-<wire x1="67.31" y1="101.6" x2="69.85" y2="101.6" width="0.1524" layer="91"/>
-<junction x="69.85" y="101.6"/>
-<wire x1="69.85" y1="99.06" x2="69.85" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="69.85" y1="99.06" x2="69.85" y2="104.14" width="0.1524" layer="91"/>
 <pinref part="USB-CONTROLLER4" gate="G$1" pin="GND"/>
 <pinref part="USB-CONTROLLER4" gate="G$1" pin="GND1"/>
-<pinref part="USB-CONTROLLER4" gate="G$1" pin="SHIELD1"/>
 <pinref part="GND21" gate="1" pin="GND"/>
 </segment>
 <segment>
@@ -13693,8 +13665,7 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <wire x1="31.75" y1="104.14" x2="29.21" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="29.21" y1="104.14" x2="29.21" y2="106.68" width="0.1524" layer="91"/>
 <junction x="29.21" y="104.14"/>
-<wire x1="29.21" y1="99.06" x2="29.21" y2="101.6" width="0.1524" layer="91"/>
-<wire x1="29.21" y1="101.6" x2="29.21" y2="104.14" width="0.1524" layer="91"/>
+<wire x1="29.21" y1="99.06" x2="29.21" y2="104.14" width="0.1524" layer="91"/>
 <wire x1="29.21" y1="109.22" x2="29.21" y2="119.38" width="0.1524" layer="91"/>
 <junction x="29.21" y="109.22"/>
 <pinref part="USB-CONTROLLER4" gate="G$1" pin="SSTXP1"/>
@@ -13703,9 +13674,6 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <pinref part="USB-CONTROLLER4" gate="G$1" pin="SSTXN1"/>
 <wire x1="31.75" y1="119.38" x2="29.21" y2="119.38" width="0.1524" layer="91"/>
 <junction x="29.21" y="119.38"/>
-<pinref part="USB-CONTROLLER4" gate="G$1" pin="SHIELD"/>
-<wire x1="31.75" y1="101.6" x2="29.21" y2="101.6" width="0.1524" layer="91"/>
-<junction x="29.21" y="101.6"/>
 <pinref part="GND22" gate="1" pin="GND"/>
 </segment>
 <segment>
@@ -13778,11 +13746,7 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <wire x1="353.06" y1="134.62" x2="350.52" y2="134.62" width="0.1524" layer="91"/>
 <wire x1="353.06" y1="134.62" x2="353.06" y2="137.16" width="0.1524" layer="91"/>
 <junction x="353.06" y="134.62"/>
-<pinref part="POWER-IN" gate="G$1" pin="SHIELD1"/>
-<wire x1="353.06" y1="132.08" x2="350.52" y2="132.08" width="0.1524" layer="91"/>
-<wire x1="353.06" y1="132.08" x2="353.06" y2="134.62" width="0.1524" layer="91"/>
-<wire x1="353.06" y1="129.54" x2="353.06" y2="132.08" width="0.1524" layer="91"/>
-<junction x="353.06" y="132.08"/>
+<wire x1="353.06" y1="129.54" x2="353.06" y2="134.62" width="0.1524" layer="91"/>
 <pinref part="GND37" gate="1" pin="GND"/>
 </segment>
 <segment>
@@ -13814,8 +13778,6 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <pinref part="POWER-IN" gate="G$1" pin="SBU1"/>
 <pinref part="POWER-IN" gate="G$1" pin="SSRXN2"/>
 <wire x1="312.42" y1="129.54" x2="312.42" y2="132.08" width="0.1524" layer="91"/>
-<wire x1="314.96" y1="132.08" x2="312.42" y2="132.08" width="0.1524" layer="91"/>
-<pinref part="POWER-IN" gate="G$1" pin="SHIELD"/>
 <wire x1="312.42" y1="137.16" x2="312.42" y2="134.62" width="0.1524" layer="91"/>
 <junction x="312.42" y="132.08"/>
 <pinref part="POWER-IN" gate="G$1" pin="SSRXP2"/>
@@ -14485,11 +14447,7 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <wire x1="77.47" y1="127" x2="74.93" y2="127" width="0.1524" layer="91"/>
 <wire x1="77.47" y1="127" x2="77.47" y2="129.54" width="0.1524" layer="91"/>
 <junction x="77.47" y="127"/>
-<pinref part="CONTROLLER-IN" gate="G$1" pin="SHIELD1"/>
-<wire x1="77.47" y1="124.46" x2="74.93" y2="124.46" width="0.1524" layer="91"/>
-<wire x1="77.47" y1="124.46" x2="77.47" y2="127" width="0.1524" layer="91"/>
-<wire x1="77.47" y1="121.92" x2="77.47" y2="124.46" width="0.1524" layer="91"/>
-<junction x="77.47" y="124.46"/>
+<wire x1="77.47" y1="121.92" x2="77.47" y2="127" width="0.1524" layer="91"/>
 <pinref part="GND2" gate="1" pin="GNDA"/>
 </segment>
 <segment>
@@ -14508,8 +14466,6 @@ SparkFun BigTime Watch Kit&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;
 <pinref part="CONTROLLER-IN" gate="G$1" pin="SBU1"/>
 <pinref part="CONTROLLER-IN" gate="G$1" pin="SSRXN2"/>
 <wire x1="36.83" y1="121.92" x2="36.83" y2="124.46" width="0.1524" layer="91"/>
-<wire x1="39.37" y1="124.46" x2="36.83" y2="124.46" width="0.1524" layer="91"/>
-<pinref part="CONTROLLER-IN" gate="G$1" pin="SHIELD"/>
 <wire x1="36.83" y1="129.54" x2="36.83" y2="127" width="0.1524" layer="91"/>
 <junction x="36.83" y="124.46"/>
 <pinref part="CONTROLLER-IN" gate="G$1" pin="SSRXP2"/>
