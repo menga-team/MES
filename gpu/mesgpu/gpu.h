@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <libopencm3/stm32/gpio.h>
 #include <limits.h>
 #include <stdint.h>
@@ -106,8 +105,12 @@
 #define OPERATION_ID_RESET 0x0a
 #define OPERATION_ID_BLANK 0x0b
 
+#define INTERNAL_SHOW_STARTUP 0x01
+#define INTERNAL_ADJUST_BRIGHTNESS 0x02
+
 #define OPERATION_ID(x) x[3]
 #define OPERATION_BUFFER(x) ((x[2] == 0x00) ? front_buffer : back_buffer)
+#define INTERNAL_OPERATION(x) (x[0] == 0xff)
 
 enum Stage {
     UNINITIALIZED = 0,
@@ -118,7 +121,7 @@ enum Stage {
     WAITING_FOR_DMA = 5
 } __attribute__((__packed__));
 
-extern uint16_t color_palette[1 << DRM_BUFFER_BPP];
+extern uint16_t color_palette[1 << BUFFER_BPP];
 extern uint8_t buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) /
                         (CHAR_BIT * sizeof(uint8_t))];
 extern uint8_t buffer_b[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) /
@@ -134,6 +137,8 @@ extern volatile enum Stage processing_stage;
 extern volatile uint16_t gpu_ready_port;
 extern const char *stage_pretty_names[6];
 extern volatile bool run;
+
+void gpu_reset_palette(void);
 
 uint8_t gpu_get_pixel(const void *buffer, uint16_t position);
 

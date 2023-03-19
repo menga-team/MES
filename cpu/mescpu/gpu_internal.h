@@ -71,6 +71,10 @@ Operation gpu_operation_reset(void);
 /// @return 00 00 BF 0b 00 00 00 00
 Operation gpu_operation_blank(uint8_t bf, uint8_t blank_with);
 
+Operation gpu_operation_show_startup(void);
+
+Operation gpu_operation_adjust_brightness(void);
+
 /// @brief Halt execution of the programm and send data to GPU.
 void gpu_send_blocking(uint8_t *data, uint32_t len);
 

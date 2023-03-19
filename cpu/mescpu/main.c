@@ -56,8 +56,8 @@ uint8_t run_game(void *adr) {
             break;
         case UDYNLINK_ERR_LOAD_UNKNOWN_SYMBOL:
             error_str = "p_error: UNKNOWN_SYMBOL";
-	    // print the unknown symbol...
-	    gpu_print_text(FRONT_BUFFER, 0, 32, 1, 0, unknown_symbol);
+            // print the unknown symbol...
+            gpu_print_text(FRONT_BUFFER, 0, 32, 1, 0, unknown_symbol);
             break;
         case UDYNLINK_ERR_LOAD_DUPLICATE_NAME:
             error_str = "p_error: DUPLICATE_NAME";
@@ -97,6 +97,17 @@ int main(void) {
         // run the flashed copy of the game instead.
         run_game((void *)hello_world);
     } else {
+        // normal startup, display a boot animation
+        timer_block_ms(1000); // wait for monitor
+        gpu_wait_for_next_ready();
+        gpu_show_startup();
+        gpu_wait_for_next_ready();
+		timer_block_ms(1000);
+        gpu_wait_for_next_ready();
+        gpu_adjust_brightness();
+        gpu_wait_for_next_ready();
+        timer_block_ms(500);
+        gpu_wait_for_next_ready();
         gpu_print_text(FRONT_BUFFER, 0, 0, 1, 0, "DYN LOADING UNIMPLEMENTED!");
     }
 

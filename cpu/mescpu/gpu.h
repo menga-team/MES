@@ -34,4 +34,10 @@ void gpu_display_buf(uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy,
 /// Will block until next GPU READY is recieved, useful for frame timing.
 void gpu_wait_for_next_ready(void);
 
+/// Will display a startup animation.
+void gpu_show_startup(void);
+
+/// Will display a brightness adjustment screen and fade it out.
+void gpu_adjust_brightness(void);
+
 #endif // MES_GPU_H

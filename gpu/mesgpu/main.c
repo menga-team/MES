@@ -10,12 +10,17 @@
 #include <libopencm3/stm32/timer.h>
 #include <memory.h>
 #include <mesmath.h>
+#include <stdint.h>
 #include <stdio.h>
 
 // Include error screen as 'error'
 #include "images/error.m3ifc"
 // Include cpu timeout screen as 'cpu_timeout'
 #include "images/cpu_timeout.m3ifc"
+// The boot screen
+#include "images/splash_screen.m3ifc"
+// The adjust brightness screen
+#include "images/adjust_brightness.m3ifc"
 
 int main(void) {
     rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
@@ -335,6 +340,83 @@ void handle_operation(void) {
 void new_operation(void) {
     gpu_ready_port = 0;
     GPIO_BRR(GPU_READY_PORT) = GPU_READY;
+    if (INTERNAL_OPERATION(operation)) {
+
+        switch (OPERATION_ID(operation)) {
+        case INTERNAL_SHOW_STARTUP:
+            memcpy(front_buffer, splash_screen, SCREEN_BUFFER_SIZE);
+            uint8_t su_colors[4][3] = {
+                {0b000, 0b000, 0b000},
+                {0b111, 0b001, 0b001},
+                {0b101, 0b101, 0b101},
+                {0b111, 0b111, 0b111},
+            };
+
+            // set the inital palette
+            for (uint8_t i = 0; i < 4; ++i)
+                color_palette[i] =
+                    COLOR(su_colors[i][0], su_colors[i][1], su_colors[i][2]);
+
+            // not going to start a timer just for that...
+            for (uint32_t i = 0; i < 5000000; ++i)
+                __asm__("nop");
+
+            // fade out
+            while (su_colors[3][0] != 0) { // [3] is white
+                for (uint8_t i = 0; i < 4; ++i) {
+                    for (uint8_t j = 0; j < 3; ++j) {
+                        if (su_colors[i][j] != 0)
+                            su_colors[i][j]--;
+                    }
+                    color_palette[i] = COLOR(su_colors[i][0], su_colors[i][1],
+                                             su_colors[i][2]);
+                }
+                for (uint32_t i = 0; i < 200000; ++i)
+                    __asm__("nop");
+            }
+            gpu_blank(front_buffer, 0x00);
+            gpu_reset_palette();
+            break;
+        case INTERNAL_ADJUST_BRIGHTNESS:
+            memcpy(front_buffer, adjust_brightness, SCREEN_BUFFER_SIZE);
+            uint8_t ab_colors[8][3] = {
+                {0b000, 0b000, 0b000}, {0b110, 0b110, 0b110},
+                {0b101, 0b101, 0b101}, {0b111, 0b111, 0b111},
+                {0b100, 0b100, 0b100}, {0b011, 0b011, 0b011},
+                {0b010, 0b010, 0b010}, {0b001, 0b001, 0b001},
+            };
+
+            // set the inital palette
+            for (uint8_t i = 0; i < 8; ++i)
+                color_palette[i] =
+                    COLOR(ab_colors[i][0], ab_colors[i][1], ab_colors[i][2]);
+
+            for (uint32_t i = 0; i < 10000000; ++i)
+                __asm__("nop");
+
+            // fade out
+            while (ab_colors[3][0] != 0) { // [3] is white
+                for (uint8_t i = 0; i < 8; ++i) {
+                    for (uint8_t j = 0; j < 3; ++j) {
+                        if (ab_colors[i][j] != 0)
+                            ab_colors[i][j]--;
+                    }
+                    color_palette[i] = COLOR(ab_colors[i][0], ab_colors[i][1],
+                                             ab_colors[i][2]);
+                }
+                for (uint32_t i = 0; i < 500000; ++i)
+                    __asm__("nop");
+            }
+            gpu_blank(front_buffer, 0x00);
+            gpu_reset_palette();
+            break;
+        }
+
+		dma_recieve_operation();
+        processing_stage = READY;
+        gpu_ready_port = GPU_READY;
+        return;
+    }
     switch (OPERATION_ID(operation)) {
     case OPERATION_ID_INIT:
         gpu_write(front_buffer, 0, 0, 1, 0, "GPU READY");

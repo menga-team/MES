@@ -1,10 +1,11 @@
 #include "gpu.h"
 #include "font.h"
+#include <assert.h>
 #include <memory.h>
 
 // the bits per pixel (bpp) define how large the palette can be.
 // colorid => port
-uint16_t color_palette[1 << DRM_BUFFER_BPP]; // 2^BUFFER_BPP
+uint16_t color_palette[1 << BUFFER_BPP]; // 2^BUFFER_BPP
 
 uint8_t __attribute__((section(".buffer_a")))
 buffer_a[(BUFFER_WIDTH * BUFFER_HEIGHT * BUFFER_BPP) /
@@ -57,6 +58,12 @@ void gpu_init(void) {
     // at least 3 bits.
     assert(BUFFER_BPP >= 3);
     // define standard color palette.
+	gpu_reset_palette();
+    front_buffer = buffer_a;
+    back_buffer = buffer_b;
+}
+
+void gpu_reset_palette(void) {
     color_palette[0] = COLOR(0b000, 0b000, 0b000); // black
     color_palette[1] = COLOR(0b111, 0b111, 0b111); // white
     color_palette[2] = COLOR(0b111, 0b000, 0b000); // red
@@ -65,8 +72,6 @@ void gpu_init(void) {
     color_palette[5] = COLOR(0b111, 0b111, 0b000); // yellow
     color_palette[6] = COLOR(0b111, 0b000, 0b111); // magenta
     color_palette[7] = COLOR(0b000, 0b111, 0b111); // cyan
-    front_buffer = buffer_a;
-    back_buffer = buffer_b;
 }
 
 void gpu_patch_font(void *patch, uint8_t start, uint8_t end) {

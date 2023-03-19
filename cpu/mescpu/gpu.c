@@ -1,4 +1,5 @@
 #include "gpu.h"
+#include "gpu_internal.h"
 #include "mesgraphics.h"
 #include "timer.h"
 #include <libopencm3/cm3/nvic.h>
@@ -7,6 +8,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/spi.h>
+#include <stdint.h>
 
 volatile bool spi_dma_transmit_ongoing = false;
 volatile Queue current_operation;
@@ -41,6 +43,16 @@ Operation gpu_operation_reset(void) {
 Operation gpu_operation_blank(Buffer bf, uint8_t blank_with) {
     return (Operation){0x00, 0x00, bf, 0x0b, 0x00, 0x00, 0x00, blank_with};
 }
+
+Operation gpu_operation_show_startup(void) {
+    return (Operation){0xff, 0xff, 0xff, 0x01, 0xff, 0xff, 0xff, 0xff};
+}
+
+
+Operation gpu_operation_adjust_brightness(void) {
+    return (Operation){0xff, 0xff, 0xff, 0x02, 0xff, 0xff, 0xff, 0xff};
+}
+
 
 void gpu_print_text(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t foreground,
                     uint8_t background, const char *text) {
@@ -121,6 +133,23 @@ void gpu_blank(Buffer buffer, uint8_t blank_with) {
     gpu_send_blocking((uint8_t *)&current_operation.operation,
                       sizeof(Operation));
 }
+
+void gpu_show_startup(void) {
+    gpu_block_until_ack();
+    current_operation =
+        (Queue){gpu_operation_show_startup(), 0, 0, true, false};
+    gpu_send_blocking((uint8_t *)&current_operation.operation,
+                      sizeof(Operation));
+}
+
+void gpu_adjust_brightness(void) {
+    gpu_block_until_ack();
+    current_operation =
+        (Queue){gpu_operation_adjust_brightness(), 0, 0, true, false};
+    gpu_send_blocking((uint8_t *)&current_operation.operation,
+                      sizeof(Operation));
+}
+
 
 void gpu_initiate_communication(void) {
     RCC_APB1ENR &= ~RCC_APB1ENR_I2C1EN; // disable i2c if it happend to be
