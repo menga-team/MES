@@ -404,7 +404,7 @@ void new_operation(void) {
                     color_palette[i] = COLOR(ab_colors[i][0], ab_colors[i][1],
                                              ab_colors[i][2]);
                 }
-                for (uint32_t i = 0; i < 500000; ++i)
+                for (uint32_t i = 0; i < 300000; ++i)
                     __asm__("nop");
             }
             gpu_blank(front_buffer, 0x00);
