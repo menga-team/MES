@@ -79,6 +79,55 @@ uint8_t run_game(void *adr) {
     p_main();
 }
 
+static void startup_animation(void) {
+    timer_block_ms(1000);
+    gpu_wait_for_next_ready();
+    gpu_show_startup();
+    gpu_wait_for_next_ready();
+    timer_block_ms(1000);
+    gpu_wait_for_next_ready();
+    gpu_adjust_brightness();
+    gpu_wait_for_next_ready();
+    timer_block_ms(500);
+    gpu_wait_for_next_ready();
+}
+
+static void wait_for_sdcard(void) {
+    uint16_t color_palette[8] = {
+        COLOR(0b000, 0b000, 0b000), COLOR(0b001, 0b001, 0b010),
+        COLOR(0b010, 0b010, 0b100), COLOR(0b111, 0b001, 0b001),
+        COLOR(0b011, 0b011, 0b011), COLOR(0b011, 0b011, 0b101),
+        COLOR(0b111, 0b111, 0b111), COLOR(0b000, 0b000, 0b000),
+    };
+    gpu_wait_for_next_ready();
+    gpu_update_palette(color_palette);
+    bool game_ready = false;
+    int8_t offset = 0;
+    bool elevate = true;
+    while (!game_ready) {
+        gpu_wait_for_next_ready();
+        gpu_blank(BACK_BUFFER, 0x00);
+        gpu_draw_sdcard(BACK_BUFFER, 62, 36 + offset);
+        gpu_swap_buf();
+
+        if (offset > 1) {
+            elevate = false;
+            timer_block_ms(300);
+        } else if (offset < -1) {
+            elevate = true;
+            timer_block_ms(300);
+        }
+
+        if (elevate) {
+            offset++;
+        } else {
+            offset--;
+        }
+
+        timer_block_ms(200);
+    }
+}
+
 int main(void) {
     rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
     clock_peripherals();
@@ -97,17 +146,9 @@ int main(void) {
         // run the flashed copy of the game instead.
         run_game((void *)hello_world);
     } else {
-        // normal startup, display a boot animation
-        timer_block_ms(1000); // wait for monitor
-        gpu_wait_for_next_ready();
-        gpu_show_startup();
-        gpu_wait_for_next_ready();
-		timer_block_ms(1000);
-        gpu_wait_for_next_ready();
-        gpu_adjust_brightness();
-        gpu_wait_for_next_ready();
-        timer_block_ms(500);
-        gpu_wait_for_next_ready();
+        // normal startup, display a boot animation.
+        startup_animation();
+        wait_for_sdcard();
         gpu_print_text(FRONT_BUFFER, 0, 0, 1, 0, "DYN LOADING UNIMPLEMENTED!");
     }
 

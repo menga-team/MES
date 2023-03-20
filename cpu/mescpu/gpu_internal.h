@@ -75,6 +75,10 @@ Operation gpu_operation_show_startup(void);
 
 Operation gpu_operation_adjust_brightness(void);
 
+Operation gpu_operation_draw_sdcard(uint8_t bf, uint8_t x, uint8_t y);
+
+Operation gpu_operation_update_palette(void);
+
 /// @brief Halt execution of the programm and send data to GPU.
 void gpu_send_blocking(uint8_t *data, uint32_t len);
 

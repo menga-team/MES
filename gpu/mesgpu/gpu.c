@@ -1,6 +1,5 @@
 #include "gpu.h"
 #include "font.h"
-#include <assert.h>
 #include <memory.h>
 
 // the bits per pixel (bpp) define how large the palette can be.
@@ -27,9 +26,10 @@ uint8_t operation_data[OPERATION_DATA_LENGTH];
 volatile enum Stage processing_stage = UNINITIALIZED;
 volatile uint16_t gpu_ready_port = 0;
 
-const char *stage_pretty_names[6] = {"Uninitialized", "Ready",
-                                     "New operation", "Waiting for data",
-                                     "New data",      "Waiting for DMA"};
+const char *stage_pretty_names[6] = {
+    "Uninitialized",    "Ready",    "New operation",
+    "Waiting for data", "New data", "Waiting for DMA",
+};
 
 volatile bool run = true;
 
@@ -54,11 +54,8 @@ void gpu_swap_buffers(void) {
 }
 
 void gpu_init(void) {
-    // there are 8 standard colors, so the palette needs to be index-able with
-    // at least 3 bits.
-    assert(BUFFER_BPP >= 3);
     // define standard color palette.
-	gpu_reset_palette();
+    gpu_reset_palette();
     front_buffer = buffer_a;
     back_buffer = buffer_b;
 }
@@ -125,5 +122,16 @@ void gpu_write(void *buffer, uint8_t x, uint8_t y, uint8_t fg, uint8_t bg,
         }
         x += 6;
         i++;
+    }
+}
+
+void gpu_insert_buf(void *buffer, const uint8_t *image, const uint8_t width,
+                    const uint8_t height, const uint8_t x, const uint8_t y) {
+    // TODO: Optimise
+    for (uint8_t c_x = 0; c_x < width; ++c_x) {
+        for (uint8_t c_y = 0; c_y < height; ++c_y) {
+            gpu_set_pixel(buffer, (y + c_y) * BUFFER_WIDTH + x + c_x,
+                          gpu_get_pixel(image, c_y * width + c_x));
+        }
     }
 }

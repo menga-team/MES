@@ -48,11 +48,17 @@ Operation gpu_operation_show_startup(void) {
     return (Operation){0xff, 0xff, 0xff, 0x01, 0xff, 0xff, 0xff, 0xff};
 }
 
-
 Operation gpu_operation_adjust_brightness(void) {
     return (Operation){0xff, 0xff, 0xff, 0x02, 0xff, 0xff, 0xff, 0xff};
 }
 
+Operation gpu_operation_draw_sdcard(Buffer bf, uint8_t x, uint8_t y) {
+    return (Operation){0xff, 0xff, bf, 0x03, 0xff, 0xff, x, y};
+}
+
+Operation gpu_operation_update_palette(void) {
+    return (Operation){0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00};
+}
 
 void gpu_print_text(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t foreground,
                     uint8_t background, const char *text) {
@@ -90,7 +96,9 @@ void gpu_print_text_blocking(Buffer buffer, uint8_t ox, uint8_t oy,
 
 void gpu_reset(void) {
     gpu_block_until_ack();
-    current_operation = (Queue){gpu_operation_reset(), 0, 0, true, false};
+    current_operation = (Queue){
+        gpu_operation_reset(), 0, 0, true, false,
+    };
     gpu_send_blocking((uint8_t *)&current_operation.operation,
                       sizeof(Operation));
 }
@@ -101,8 +109,9 @@ void gpu_send_buf(Buffer buffer, uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy,
     Operation op = gpu_operation_send_buf(buffer, ox, oy, xx, yy);
     if (xx == 160 && yy == 120)
         op._4 = op._5 = op._6 = op._7 = 0;
-    current_operation =
-        (Queue){op, (uint8_t *)pixels, BUFFER_SIZE(xx, yy), false, false};
+    current_operation = (Queue){
+        op, (uint8_t *)pixels, BUFFER_SIZE(xx, yy), false, false,
+    };
     gpu_send_blocking((uint8_t *)&current_operation.operation,
                       sizeof(Operation));
 }
@@ -113,43 +122,70 @@ void gpu_display_buf(uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy,
     Operation op = gpu_operation_display_buf(ox, oy, xx, yy);
     if (xx == 160 && yy == 120)
         op._4 = op._5 = op._6 = op._7 = 0;
-    current_operation =
-        (Queue){op, (uint8_t *)pixels, BUFFER_SIZE(xx, yy), false, false};
+    current_operation = (Queue){
+        op, (uint8_t *)pixels, BUFFER_SIZE(xx, yy), false, false,
+    };
     gpu_send_blocking((uint8_t *)&current_operation.operation,
                       sizeof(Operation));
 }
 
 void gpu_swap_buf(void) {
     gpu_block_until_ack();
-    current_operation = (Queue){gpu_operation_swap_buf(), 0, 0, true, false};
+    current_operation = (Queue){
+        gpu_operation_swap_buf(), 0, 0, true, false,
+    };
     gpu_send_blocking((uint8_t *)&current_operation.operation,
                       sizeof(Operation));
 }
 
 void gpu_blank(Buffer buffer, uint8_t blank_with) {
     gpu_block_until_ack();
-    current_operation =
-        (Queue){gpu_operation_blank(buffer, blank_with), 0, 0, true, false};
+    current_operation = (Queue){
+        gpu_operation_blank(buffer, blank_with), 0, 0, true, false,
+    };
     gpu_send_blocking((uint8_t *)&current_operation.operation,
                       sizeof(Operation));
 }
 
 void gpu_show_startup(void) {
     gpu_block_until_ack();
-    current_operation =
-        (Queue){gpu_operation_show_startup(), 0, 0, true, false};
+    current_operation = (Queue){
+        gpu_operation_show_startup(), 0, 0, true, false,
+    };
     gpu_send_blocking((uint8_t *)&current_operation.operation,
                       sizeof(Operation));
 }
 
 void gpu_adjust_brightness(void) {
     gpu_block_until_ack();
-    current_operation =
-        (Queue){gpu_operation_adjust_brightness(), 0, 0, true, false};
+    current_operation = (Queue){
+        gpu_operation_adjust_brightness(), 0, 0, true, false,
+    };
     gpu_send_blocking((uint8_t *)&current_operation.operation,
                       sizeof(Operation));
 }
 
+void gpu_draw_sdcard(Buffer buffer, uint8_t x, uint8_t y) {
+    gpu_block_until_ack();
+    current_operation = (Queue){
+        gpu_operation_draw_sdcard(buffer, x, y), 0, 0, true, false,
+    };
+    gpu_send_blocking((uint8_t *)&current_operation.operation,
+                      sizeof(Operation));
+}
+
+void gpu_update_palette(const uint16_t *new_palette) {
+    gpu_block_until_ack();
+    current_operation = (Queue){
+        gpu_operation_update_palette(),
+        (uint8_t *)new_palette,
+        sizeof(uint16_t) * 8,
+        false,
+        false,
+    };
+    gpu_send_blocking((uint8_t *)&current_operation.operation,
+                      sizeof(Operation));
+}
 
 void gpu_initiate_communication(void) {
     RCC_APB1ENR &= ~RCC_APB1ENR_I2C1EN; // disable i2c if it happend to be

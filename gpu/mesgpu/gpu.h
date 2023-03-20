@@ -76,7 +76,7 @@
 #define BUFFER_B_ADDRESS 0x20001c20
 
 #define OPERATION_LENGTH 8
-#define OPERATION_DATA_LENGTH 512
+#define OPERATION_DATA_LENGTH 2048
 
 /**
  * @param red: 0b000 - 0b111
@@ -107,6 +107,7 @@
 
 #define INTERNAL_SHOW_STARTUP 0x01
 #define INTERNAL_ADJUST_BRIGHTNESS 0x02
+#define INTERNAL_DRAW_SDCARD 0x03
 
 #define OPERATION_ID(x) x[3]
 #define OPERATION_BUFFER(x) ((x[2] == 0x00) ? front_buffer : back_buffer)
@@ -152,6 +153,9 @@ void gpu_init(void);
 
 void gpu_write(void *buffer, uint8_t x, uint8_t y, uint8_t fg, uint8_t bg,
                const char *text);
+
+void gpu_insert_buf(void *buffer, const uint8_t *image, const uint8_t widgh,
+                    const uint8_t height, const uint8_t x, const uint8_t y);
 
 void gpu_patch_font(void *patch, uint8_t start, uint8_t end);
 

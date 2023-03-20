@@ -21,6 +21,8 @@
 #include "images/splash_screen.m3ifc"
 // The adjust brightness screen
 #include "images/adjust_brightness.m3ifc"
+// Sdcard icon
+#include "images/sdcard.m3ifc"
 
 int main(void) {
     rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
@@ -410,16 +412,23 @@ void new_operation(void) {
             gpu_blank(front_buffer, 0x00);
             gpu_reset_palette();
             break;
+        case INTERNAL_DRAW_SDCARD:
+            gpu_insert_buf(OPERATION_BUFFER(operation), sdcard, SDCARD_WIDTH,
+                           SDCARD_HEIGHT, operation[6], operation[7]);
+            break;
+        default:
+            invalid_operation(operation);
+            break;
         }
 
-		dma_recieve_operation();
+        dma_recieve_operation();
         processing_stage = READY;
         gpu_ready_port = GPU_READY;
         return;
     }
     switch (OPERATION_ID(operation)) {
     case OPERATION_ID_INIT:
-        gpu_write(front_buffer, 0, 0, 1, 0, "GPU READY");
+        gpu_write(front_buffer, 0, 0, 1, 0, "GPU INITIALIZED");
         dma_recieve_operation();
         processing_stage = READY;
         break;
@@ -451,6 +460,10 @@ void new_operation(void) {
         dma_recieve((uint32_t)operation_data, operation[5]);
         processing_stage = WAITING_FOR_DATA;
         break;
+	case OPERATION_ID_CHANGE_PALETTE:
+		dma_recieve((uint32_t)color_palette, sizeof(color_palette));
+		processing_stage = WAITING_FOR_DMA;
+		break;
     case OPERATION_ID_RESET:
         gpu_reset();
         // won't be executed. vvvv
@@ -476,18 +489,12 @@ void new_data(void) {
     switch (OPERATION_ID(operation)) {
     case OPERATION_ID_DISPLAY_BUF:
     case OPERATION_ID_SEND_BUF: {
-        const uint8_t o_x = operation[4];
-        const uint8_t o_y = operation[5];
-        const uint8_t s_x = operation[6];
-        const uint8_t s_y = operation[7];
-        // TODO: Optimize
-        for (uint8_t c_x = 0; c_x < s_x; ++c_x) {
-            for (uint8_t c_y = 0; c_y < s_y; ++c_y) {
-                gpu_set_pixel(OPERATION_BUFFER(operation),
-                              (o_y + c_y) * BUFFER_WIDTH + o_x + c_x,
-                              gpu_get_pixel(operation_data, c_y * s_y + c_x));
-            }
-        }
+        const uint8_t x = operation[4];
+        const uint8_t y = operation[5];
+        const uint8_t width = operation[6];
+        const uint8_t height = operation[7];
+        gpu_insert_buf(OPERATION_BUFFER(operation), operation_data, width,
+                       height, x, y);
         if (OPERATION_ID(operation) == OPERATION_ID_DISPLAY_BUF) {
             gpu_swap_buffers();
         }
