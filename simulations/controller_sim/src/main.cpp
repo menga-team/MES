@@ -1,8 +1,7 @@
 #include <Arduino.h>
 
 const int clockPin = DD3;  // Clock input pin
-const int dataPin = DD4;   // Data output pin
-const int controlPin = DD5;  // Control output pin
+const int controller_pins[4] = {DD4, DD5, DD6, DD7}
 
 bool newdata = false;
 static boolean recvInProgress = false;
@@ -70,18 +69,21 @@ void checkSerial() {
 }
 
 void update_output() {
-    if (counter == 0) {
-        digitalWrite(dataPin, buttonState[0]);
-        digitalWrite(controlPin, HIGH);
-    } else if (counter <= 4) {
-        digitalWrite(dataPin, buttonState[counter]);
-        digitalWrite(controlPin, controllerState[counter - 1]);
-    } else {
-        digitalWrite(dataPin, buttonState[counter]);
-        digitalWrite(controlPin, LOW);
+    if (counter < 7) {
+        for (int i = 0; i < 4; i++) {
+            digitalWrite(controller_pins[i], 0);
+        }
+    } else if (counter == 7) {
+        for (int i = 0; i < 4; i++) {
+            digitalWrite(controller_pins[i], controllerState[i]);
+        }
+    }else if (counter > 7){
+        for (int i = 0; i < 4; i++) {
+            digitalWrite(controller_pins[i], buttonState[(i*4)+(counter-8)]);
+        }
     }
     counter++;
-    if (counter > 31) {
+    if (counter >= 16) {
         counter = 0;
     }
 }

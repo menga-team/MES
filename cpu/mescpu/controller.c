@@ -8,8 +8,9 @@
 #include <stdint.h>
 
 uint8_t active_controller[4] = {0, 0, 0, 0};
-uint8_t buttons[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+uint8_t controller_timer[4] = {32, 32, 32, 32};
+uint8_t controller_bits[4] = {0, 0, 0, 0};
+uint8_t buttons[32] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int counter = 0;
 
 void controller_setup_timers(void) {
@@ -42,31 +43,52 @@ void controller_setup_timers(void) {
 }
 
 void tim1_cc_isr(void) {
-    // gets executed at the rising edge.
-    TIM_SR(TIM1) = 0x0000;
-    uint8_t data_bit = gpio_get(DATA_PORT, DATA_PIN);
-    uint8_t sync_bit = gpio_get(SYNC_PORT, SYNC_PIN);
-    if (counter == 0) { // we wait for the syncbit to start counting
-        if (sync_bit) {
-            counter++;
+        // gets executed at the rising edge.
+        TIM_SR(TIM1) = 0x0000; // needed for timer
+
+        uint8_t controller_bits[0] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_0);
+        uint8_t controller_bits[1] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_1);
+        uint8_t controller_bits[2] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_2);
+        uint8_t controller_bits[3] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_3);
+        for (int i = 0; i < 4; i++){
+            if (controller_timer[i] >= 32){
+                active_controller[i] = 0;
+            }
+            if (controller_timer[i] >= 8){
+                if (controller_bits[i]){
+                    controller_timer[i] = 0;
+                    active_controller[i] = 1;
+                }
+            }
+            if (controller_timer[i] < 8){
+                buttons[(i*8)+controller_timer[i]] = controller_bits[i]
+            }
+            if (active_controller[i]){
+                controller_timer[i]++;
+            }
+
         }
-    } else if (counter < 5) { // if we are registering the controller status,
-                              // save sync_bit in he controller array
-        active_controller[counter - 1] = sync_bit;
-    } else { // if an unexpected sync_bit arrives reset the counter and start
-             // again
-        if (sync_bit) {
-            counter = 1;
-        }
-    }
-    if (counter >
-        0) { // if we are counting, save the data_bit in the buttons array
-        buttons[counter - 1] = data_bit;
-        counter++;
-        if (counter >= 31) {
-            counter = 0 // when we reach the last bit reset the counter
-        }
-    }
+
+//        uint8_t data_bit = gpio_get(DATA_PORT, DATA_PIN);
+//        uint8_t controller_0_bit = gpio_get(SYNC_PORT, SYNC_PIN);
+//        if (counter == 0) { // we wait for the syncbit to start counting
+//                if (sync_bit) {
+//                        counter++;
+//                }
+//        } else if (counter < 5) { // if we are registering the controller status, save sync_bit in he controller array
+//                active_controller[counter - 1] = sync_bit;
+//        } else { // if an unexpected sync_bit arrives reset the counter and start again
+//                if (sync_bit) {
+//                        counter = 1;
+//                }
+//        }
+//        if (counter > 0) { // if we are counting, save the data_bit in the buttons array
+//                buttons[counter - 1] = data_bit;
+//                counter++;
+//                if (counter >= 31) {
+//                    counter = 0 //when we reach the last bit reset the counter
+//                }
+//        }
 }
 
 uint8_t controller_get_button_by_controller_and_index(int controller,
