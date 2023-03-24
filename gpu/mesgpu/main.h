@@ -1,7 +1,7 @@
-#include <stdint.h>
+#include "gpu.h"
 #include <libopencm3/stm32/gpio.h>
 #include <malloc.h>
-#include "gpu.h"
+#include <stdint.h>
 
 #ifndef MES_MAIN_H
 #define MES_MAIN_H
@@ -10,7 +10,7 @@ void cpu_communication_timeout(void);
 
 void generic_error(void);
 
-void invalid_operation(uint8_t* invalid_op);
+void invalid_operation(uint8_t *invalid_op);
 
 void unexpected_data(enum Stage c_stage);
 

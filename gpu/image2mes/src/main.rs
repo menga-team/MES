@@ -41,21 +41,25 @@ fn run() -> anyhow::Result<()> {
                     bv.push(false);
                     bv.push(*bit);
                 }
-            },
+            }
             png::BitDepth::Two => {
                 for bits in bytes[i].view_bits::<Msb0>().chunks_exact(2) {
                     bv.push(false);
                     bv.push(bits[0]);
                     bv.push(bits[1]);
                 }
-            },
+            }
             png::BitDepth::Four => {
                 bv.extend(&bytes[i].view_bits::<Msb0>()[1..=3]);
-                bv.extend(&bytes[i].view_bits::<Msb0>()[5..=7]);        
-            },
+                bv.extend(&bytes[i].view_bits::<Msb0>()[5..=7]);
+            }
             png::BitDepth::Eight => todo!(),
             png::BitDepth::Sixteen => todo!(),
         }
+    }
+
+    while (bv.len() / 3) % 8 != 0 {
+        bv.push(false);
     }
 
     let mut out: Box<dyn Write> = if opt.output_file == "-" {
@@ -68,20 +72,19 @@ fn run() -> anyhow::Result<()> {
 
     if opt.include_color_palette || opt.output_type == OutputType::Code {
         for (i, color) in palette.iter().enumerate() {
-            writeln!(
-                &mut out,
-                "color_palette[{}] = get_port_config_for_color(0b{:03b}, 0b{:03b}, 0b{:03b});",
+            println!(
+                "color_palette[{}] = COLOR(0b{:03b}, 0b{:03b}, 0b{:03b});",
                 i,
                 ((color.r as f64) / 32.0) as u8,
                 ((color.g as f64) / 32.0) as u8,
                 ((color.b as f64) / 32.0) as u8
-            )?;
+            );
         }
     }
     if opt.output_type == OutputType::Code {
         write!(
             &mut out,
-            "uint8_t __attribute__((section (\".rodata\"))) image[{}] = {{\n\t",
+            "const uint8_t image[{}] = {{\n\t",
             bv.as_raw_slice().len()
         )?;
     }
@@ -102,6 +105,7 @@ fn run() -> anyhow::Result<()> {
             }
         }
     }
+
     if opt.output_type == OutputType::Code {
         writeln!(
             &mut out,

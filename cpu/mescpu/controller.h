@@ -10,7 +10,8 @@
  *
  * @return: button state
  */
-uint16_t controller_get_button_by_controller_and_index(int controller, int button);
+uint16_t controller_get_button_by_controller_and_index(int controller,
+                                                       int button);
 
 /**
  * Gets array of button states by controller index
@@ -37,4 +38,4 @@ uint16_t controller_get_status(int controller);
  */
 uint16_t *controller_get_statuses(void);
 
-#endif //MES_CONTROLLER_H
+#endif // MES_CONTROLLER_H

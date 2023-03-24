@@ -29,4 +29,4 @@ void controller_configure_io(void);
  */
 void controller_setup_timers(void);
 
-#endif //MES_CONTROLLER_INTERNAL_H
+#endif // MES_CONTROLLER_INTERNAL_H
