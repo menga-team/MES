@@ -8,13 +8,17 @@ is a cartridge-based video game console. For a tutorial and documentation see ou
 
 ### Installation
 1.  Clone the repository with submodules:
-    SSH:
-        $ git clone --recursive git@github.com:menga-team/MES.git
-    HTTPS:
-        $ git clone --recursive https://github.com/menga-team/MES.git
-    If you already cloned the repository you can initialize the submodules with following command:
-        $ git submodule update --init
+
+    SSH:`$ git clone --recursive git@github.com:menga-team/MES.git`
+    
+    or
+   
+    HTTPS:`$ git clone --recursive https://github.com/menga-team/MES.git`
+
+    If you already cloned the repository you can initialize the submodules with following command:`$ git submodule update --init`
 
 2. Make libopencm3:
+```shell
     $ cd libopencm3
     $ make
+```
