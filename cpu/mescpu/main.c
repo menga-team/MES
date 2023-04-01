@@ -1,3 +1,19 @@
+/* This file is part of MES.
+ *
+ * MES is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MES is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warrantyp of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MES. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #include "gpu.h"
 #include "mes.h"
 #include "mesgraphics.h"
@@ -13,6 +29,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "rng.h"
 
 uint32_t __attribute__((section(".get_lot_base"))) (*const get_lot_base)(
     uint32_t) = &udynlink_get_lot_base;
