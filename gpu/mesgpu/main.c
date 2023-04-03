@@ -283,6 +283,20 @@ void unexpected_data(enum Stage c_stage) {
     free(buf);
 }
 
+void too_large_data(uint16_t bytes) {
+    generic_error();
+    gpu_write(front_buffer, 2, 80, 1, 0, "-OPERATION DATA TOO LARGE-");
+    char *buf = malloc(sizeof(char) * 27); // 26chars (whole line) + NUL
+    sprintf(buf, "%u > %u!", bytes, OPERATION_DATA_LENGTH);
+    gpu_write(front_buffer, 2, 88, 1, 0, buf);
+    gpu_write(front_buffer, 2, 96, 1, 0, "OPERATION:");
+    sprintf(buf, "%02x %02x %02x %02x  %02x %02x %02x %02x",
+            operation[0], operation[1], operation[2], operation[3],
+            operation[4], operation[5], operation[6], operation[7]);
+    gpu_write(front_buffer, 2, 104, 1, 0, buf);
+    free(buf);
+}
+
 void cpu_communication_timeout(void) {
     // FIXME: When a timeout is displayed the lines are in the wrong order.
     //      This is probably because the pixels get copied in a interrupt.
@@ -450,8 +464,12 @@ void new_operation(void) {
                         SCREEN_BUFFER_SIZE);
             processing_stage = WAITING_FOR_DMA;
         } else {
-            dma_recieve((uint32_t)operation_data,
-                        BUFFER_SIZE(operation[6], operation[7]));
+            uint16_t buffer_size = BUFFER_SIZE(operation[6], operation[7]);
+            if (buffer_size > OPERATION_DATA_LENGTH) {
+		too_large_data(buffer_size);
+		return;
+            }
+            dma_recieve((uint32_t)operation_data, buffer_size);
             processing_stage = WAITING_FOR_DATA;
         }
         GPIO_BSRR(GPU_READY_PORT) = GPU_READY;
@@ -460,10 +478,10 @@ void new_operation(void) {
         dma_recieve((uint32_t)operation_data, operation[5]);
         processing_stage = WAITING_FOR_DATA;
         break;
-	case OPERATION_ID_CHANGE_PALETTE:
-		dma_recieve((uint32_t)color_palette, sizeof(color_palette));
-		processing_stage = WAITING_FOR_DMA;
-		break;
+    case OPERATION_ID_CHANGE_PALETTE:
+        dma_recieve((uint32_t)color_palette, sizeof(color_palette));
+        processing_stage = WAITING_FOR_DMA;
+        break;
     case OPERATION_ID_RESET:
         gpu_reset();
         // won't be executed. vvvv

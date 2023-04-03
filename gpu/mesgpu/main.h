@@ -14,6 +14,8 @@ void invalid_operation(uint8_t *invalid_op);
 
 void unexpected_data(enum Stage c_stage);
 
+void too_large_data(uint16_t bytes);
+
 void setup_output(void);
 
 void setup_video(void);
