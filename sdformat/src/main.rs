@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use byteorder::WriteBytesExt;
 use clap::{arg, Command};
 use serde::de;
 use serde::Deserialize;
@@ -8,9 +9,11 @@ use std::fmt;
 use std::fs;
 use std::fs::File;
 use std::io::Read;
-use std::path::{Path, PathBuf};
+use std::io::Write;
+use std::path::PathBuf;
 
 const PROJECT_FILE: &str = "mesproj.json";
+const SECTOR_SIZE: usize = 512;
 
 #[derive(Deserialize, Debug)]
 struct Game {
@@ -31,6 +34,7 @@ struct MESString {
 // specified file.
 #[derive(Debug)]
 struct BinaryDataFile {
+    file_name: String,
     bytes: Vec<u8>,
 }
 
@@ -125,7 +129,10 @@ impl<'de> de::Deserialize<'de> for BinaryDataFile {
                         &"Path to a readable File.",
                     )
                 })?;
-                Ok(BinaryDataFile { bytes: buffer })
+                Ok(BinaryDataFile {
+                    file_name: value.to_string(),
+                    bytes: buffer,
+                })
             }
         }
         deserializer.deserialize_identifier(BinaryDataFileVisitor)
@@ -156,6 +163,9 @@ fn main() -> anyhow::Result<()> {
 		.arg(arg!(<PROJECT> "The directory of the project. (directory with mesproj.json file)")
 		     .value_parser(clap::value_parser!(PathBuf))
 		)
+		.arg(arg!(<OUTPUT> "The file to write the iso to.")
+		     .value_parser(clap::value_parser!(PathBuf))
+		)
 		.arg_required_else_help(true),)
 	.subcommand(
 	    Command::new("flash")
@@ -171,6 +181,7 @@ fn main() -> anyhow::Result<()> {
     match matches.subcommand() {
         Some(("iso", sub_matches)) => {
             let dir: PathBuf = sub_matches.get_one::<PathBuf>("PROJECT").unwrap().clone();
+	    let output: PathBuf = sub_matches.get_one::<PathBuf>("OUTPUT").unwrap().clone();
             env::set_current_dir(&dir)?;
             let project_file = std::fs::File::open(PROJECT_FILE);
             if let Err(e) = project_file {
@@ -185,13 +196,39 @@ fn main() -> anyhow::Result<()> {
                 project_file.read_to_string(&mut contents)?;
                 let project_file: Value = serde_json::from_str(&contents)?;
                 let game: Game = serde_json::from_value(project_file["sd_information"].to_owned())?;
-		drop(project_file);
-		drop(contents);
-                println!("{:#?}", game);
-		
+                drop(project_file);
+                drop(contents);
+                if game.icon.bytes.len() != 301 {
+                    eprintln!("Icon is not 301 bytes! Kindly check your icon because it is probably wrong.");
+                    eprintln!("If this icon was generated with mvm please open a issue.");
+                    Err(anyhow!(
+                        "Wrong icon size (palette + image); file = {}",
+                        game.icon.file_name
+                    ))?
+                }
+                let mut image: Vec<u8> = Vec::new();
+                image.extend_from_slice("MES".as_bytes());
+                image.extend_from_slice(&game.name.chars);
+                image.extend_from_slice(&game.author.chars);
+                image.write_u8(game.version.major)?;
+                image.write_u8(game.version.minor)?;
+                image.write_u8(game.version.patch)?;
+                image.extend_from_slice(&game.icon.bytes);
+                while image.len() < SECTOR_SIZE {
+                    image.write_u8(0)?;
+                }
+                image.extend_from_slice(&game.game.bytes);
+                let mut file = fs::OpenOptions::new()
+                    .create(true)
+                    .write(true)
+                    .open(output)?;
+                file.write_all(&image)?;
+                dbg!(image.len());
             }
         }
-        Some(("flash", sub_matches)) => {}
+        Some(("flash", sub_matches)) => {
+	    
+	}
         _ => unreachable!(),
     }
     Ok(())
