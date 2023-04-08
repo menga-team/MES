@@ -8,7 +8,9 @@ use std::env;
 use std::fmt;
 use std::fs;
 use std::fs::File;
+use std::io::Cursor;
 use std::io::Read;
+use std::io::Seek;
 use std::io::Write;
 use std::path::PathBuf;
 
@@ -181,7 +183,7 @@ fn main() -> anyhow::Result<()> {
     match matches.subcommand() {
         Some(("iso", sub_matches)) => {
             let dir: PathBuf = sub_matches.get_one::<PathBuf>("PROJECT").unwrap().clone();
-	    let output: PathBuf = sub_matches.get_one::<PathBuf>("OUTPUT").unwrap().clone();
+            let output: PathBuf = sub_matches.get_one::<PathBuf>("OUTPUT").unwrap().clone();
             env::set_current_dir(&dir)?;
             let project_file = std::fs::File::open(PROJECT_FILE);
             if let Err(e) = project_file {
@@ -218,6 +220,10 @@ fn main() -> anyhow::Result<()> {
                     image.write_u8(0)?;
                 }
                 image.extend_from_slice(&game.game.bytes);
+                while image.len() % SECTOR_SIZE != 0 {
+                    image.write_u8(0)?;
+                }
+
                 let mut file = fs::OpenOptions::new()
                     .create(true)
                     .write(true)
@@ -227,8 +233,42 @@ fn main() -> anyhow::Result<()> {
             }
         }
         Some(("flash", sub_matches)) => {
-	    
-	}
+            let iso_file: PathBuf = sub_matches.get_one::<PathBuf>("ISO").unwrap().clone();
+            let device: PathBuf = sub_matches.get_one::<PathBuf>("DEVICE").unwrap().clone();
+            let mut iso = fs::OpenOptions::new().read(true).open(iso_file)?;
+            let mut device = fs::OpenOptions::new().read(true).write(true).open(device)?;
+            let mut iso_buf = [0u8; SECTOR_SIZE];
+            let mut device_buf = [0u8; SECTOR_SIZE];
+            while iso.read_exact(&mut iso_buf).is_ok() {
+                if device.read_exact(&mut device_buf).is_ok() {
+                    if iso_buf == device_buf {
+                        println!(
+                            "Not writing sector {} as it is identical to the device.",
+                            (iso.stream_position()? / SECTOR_SIZE as u64)
+                        );
+                    } else {
+                        device.seek(std::io::SeekFrom::Start(
+                            iso.stream_position()? - SECTOR_SIZE as u64,
+                        ))?;
+                        println!(
+                            "Writing sector {}...",
+                            (iso.stream_position()? / SECTOR_SIZE as u64)
+                        );
+                        device.write_all(&iso_buf)?;
+                    }
+                } else {
+                    device.seek(std::io::SeekFrom::Start(
+                        iso.stream_position()? - SECTOR_SIZE as u64,
+                    ))?;
+                    println!(
+                        "Appending sector {}...",
+                        (iso.stream_position()? / SECTOR_SIZE as u64)
+                    );
+                    device.write_all(&iso_buf)?;
+                }
+            }
+            println!("Done!");
+        }
         _ => unreachable!(),
     }
     Ok(())
