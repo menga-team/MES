@@ -17,6 +17,7 @@
 #include "gpu.h"
 #include "mes.h"
 #include "mesgraphics.h"
+#include "rng.h"
 #include "sdcard.h"
 #include "timer.h"
 #include "udynlink.h"
@@ -29,13 +30,14 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "rng.h"
 
 uint32_t __attribute__((section(".get_lot_base"))) (*const get_lot_base)(
     uint32_t) = &udynlink_get_lot_base;
 
 const char *GAME_ENTRY = "start";
-const uint32_t REVISION = 0;
+const uint32_t REVISION =
+#include "../../REVISION"
+    ;
 
 // Used for testing a game without flashing a sdcard.
 #include "dummy_game.h"

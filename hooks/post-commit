@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import subprocess
+
+def colored(text, *args, **kargs):
+    return text
+
+
+if sys.stdout.isatty():
+    try:
+        from colorama import init as cl_init
+        from termcolor import colored
+
+        cl_init(autoreset=True)
+    except:
+        pass
+
+def bold(s, col):
+    return colored(s, col, attrs=['bold'])
+
+
+def yellow(s):
+    return bold(s, 'yellow')
+
+concerns_cpu = False
+changes_revision = False
+
+files = subprocess.run(["git", "diff", "@~", "@", "--name-only"], capture_output=True).stdout.decode('utf-8').rstrip().split("\n");
+
+for file in files:
+    if "cpu/mescpu" in file:
+        concerns_cpu = True
+    elif "REVISION" in file:
+        changes_revision = True
+        break
+
+if concerns_cpu and not changes_revision:
+    sys.stderr.write(yellow("[note] Incrementing REVISION as commit concerns to cpu firmware.\n"))
+    with open('REVISION', 'r+') as file:
+        new_rev = int(file.read().strip()) + 1
+        file.seek(0)
+        file.write(str(new_rev))
+
+    os.system('git add REVISION')
+    os.system('git commit --no-verify --amend --no-edit')

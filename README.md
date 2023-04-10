@@ -24,6 +24,31 @@ with following command:`git submodule update --init`
     $ make
 ```
 
+## Hacking
+
+Thank you for considering to contribute to MES!
+Here are some things before you can get started:
+
+### Style
+
+This repository contains a `.clang-format` file. Please format your
+patches with this style guide in mind.
+
+### Revisions
+
+Every CPU firmware has a revision number which is incremented on every
+change that concerns the firmware.  This revision number can be then
+used in games (e.g. For checking if the game is compatible because
+of a bug or API change).
+
+Because its easy to forget incrementing it, we provide a git hook that
+will do it for you.  To install it simply run:
+
+```shell
+$ cp hooks/post-commit .git/hooks/post-commit
+$ chmod +x .git/hooks/post-commit
+```
+
 ## License
 
 ```
