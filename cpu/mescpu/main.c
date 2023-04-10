@@ -35,6 +35,7 @@ uint32_t __attribute__((section(".get_lot_base"))) (*const get_lot_base)(
     uint32_t) = &udynlink_get_lot_base;
 
 const char *GAME_ENTRY = "start";
+
 const uint32_t REVISION =
 #include "../../REVISION"
     ;
