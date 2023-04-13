@@ -52,6 +52,9 @@ uint8_t run_game(void *adr) {
     if (p_error != UDYNLINK_OK) {
         gpu_print_text(FRONT_BUFFER, 0, 8, 2, 0, "ERROR LOADING GAME:");
         gpu_print_text(FRONT_BUFFER, 0, 16, 1, 0, error_codes[p_error]);
+        if (p_error == UDYNLINK_ERR_LOAD_UNKNOWN_SYMBOL) {
+            gpu_print_text(FRONT_BUFFER, 0, 24, 1, 0, unknown_symbol);
+        }
         return -1;
     }
 
@@ -61,9 +64,9 @@ uint8_t run_game(void *adr) {
         uint8_t (*p_main)(void) = (uint8_t(*)(void))sym.val;
         return p_main();
     } else {
-	gpu_print_text(FRONT_BUFFER, 0, 8, 2, 0, "UNABLE TO FIND ENTRYPOINT:");
-	gpu_print_text(FRONT_BUFFER, 0, 16, 1, 0, GAME_ENTRY);
-	return -1;
+        gpu_print_text(FRONT_BUFFER, 0, 8, 2, 0, "UNABLE TO FIND ENTRYPOINT:");
+        gpu_print_text(FRONT_BUFFER, 0, 16, 1, 0, GAME_ENTRY);
+        return -1;
     }
 }
 

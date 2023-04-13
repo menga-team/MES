@@ -157,6 +157,7 @@ EXTRA_SYMBOLS = ["__aeabi_dadd",
                  "pow",
                  "sqrt",
                  "fmod",
+                 "memset",
 ]
 
 elf_file = sys.argv[1]
