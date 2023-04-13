@@ -50,44 +50,8 @@ uint8_t run_game(void *adr) {
     p_game =
         udynlink_load_module(adr, NULL, 0, UDYNLINK_LOAD_MODE_XIP, &p_error);
     if (p_error != UDYNLINK_OK) {
-        gpu_print_text(FRONT_BUFFER, 0, 8, 2, 0, "ERROR LOADING GAME.");
-        char *error_str;
-        switch (p_error) {
-        case UDYNLINK_ERR_LOAD_INVALID_SIGN:
-            error_str = "p_error: INVALID_SIGN";
-            break;
-        case UDYNLINK_ERR_LOAD_RAM_LEN_LOW:
-            error_str = "p_error: RAM_LEN_LOW";
-            break;
-        case UDYNLINK_ERR_LOAD_OUT_OF_MEMORY:
-            error_str = "p_error: OUT_OF_MEMORY";
-            break;
-        case UDYNLINK_ERR_LOAD_UNABLE_TO_XIP:
-            error_str = "p_error: UNABLE_TO_XIP";
-            break;
-        case UDYNLINK_ERR_LOAD_NO_MORE_HANDLES:
-            error_str = "p_error: NO_MORE_HANDLES";
-            break;
-        case UDYNLINK_ERR_LOAD_INVALID_MODE:
-            error_str = "p_error: INVALID_MODE";
-            break;
-        case UDYNLINK_ERR_LOAD_BAD_RELOCATION_TABLE:
-            error_str = "p_error: BAD_RELOC_TABLE";
-            break;
-        case UDYNLINK_ERR_LOAD_UNKNOWN_SYMBOL:
-            error_str = "p_error: UNKNOWN_SYMBOL";
-            // print the unknown symbol...
-            gpu_print_text(FRONT_BUFFER, 0, 32, 1, 0, unknown_symbol);
-            break;
-        case UDYNLINK_ERR_LOAD_DUPLICATE_NAME:
-            error_str = "p_error: DUPLICATE_NAME";
-            break;
-        default:
-            error_str = malloc(27);
-            sprintf(error_str, "p_error: %i", p_error);
-            break;
-        }
-        gpu_print_text(FRONT_BUFFER, 0, 24, 1, 0, error_str);
+        gpu_print_text(FRONT_BUFFER, 0, 8, 2, 0, "ERROR LOADING GAME:");
+        gpu_print_text(FRONT_BUFFER, 0, 24, 1, 0, error_codes[p_error]);
         return -1;
     }
 
