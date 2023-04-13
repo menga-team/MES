@@ -18,6 +18,8 @@
 #include <string.h>
 #include <timer.h>
 #include <udynlink.h>
+#include <math.h>
+#include <rng.h>
 
 char *unknown_symbol;
 
