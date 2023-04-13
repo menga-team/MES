@@ -121,13 +121,17 @@ void gpu_write(void *buffer, uint8_t x, uint8_t y, uint8_t fg, uint8_t bg,
             }
         }
         x += 6;
+        if (x > 20) { // character wont fit anymore
+            x = 0;
+            y += 8;
+        }
         i++;
     }
 }
 
 void gpu_insert_buf(void *buffer, const uint8_t *image, const uint8_t width,
                     const uint8_t height, const uint8_t x, const uint8_t y) {
-    // TODO: Optimise
+    // TODO: Optimize
     for (uint8_t c_x = 0; c_x < width; ++c_x) {
         for (uint8_t c_y = 0; c_y < height; ++c_y) {
             gpu_set_pixel(buffer, (y + c_y) * BUFFER_WIDTH + x + c_x,

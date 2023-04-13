@@ -51,16 +51,20 @@ uint8_t run_game(void *adr) {
         udynlink_load_module(adr, NULL, 0, UDYNLINK_LOAD_MODE_XIP, &p_error);
     if (p_error != UDYNLINK_OK) {
         gpu_print_text(FRONT_BUFFER, 0, 8, 2, 0, "ERROR LOADING GAME:");
-        gpu_print_text(FRONT_BUFFER, 0, 24, 1, 0, error_codes[p_error]);
+        gpu_print_text(FRONT_BUFFER, 0, 16, 1, 0, error_codes[p_error]);
         return -1;
     }
 
     gpu_print_text(FRONT_BUFFER, 0, 8, 1, 0, "STARTING GAME...");
     udynlink_sym_t sym;
-    udynlink_lookup_symbol(p_game, GAME_ENTRY, &sym);
-    uint8_t (*p_main)(void) = (uint8_t(*)(void))sym.val;
-
-    p_main();
+    if (udynlink_lookup_symbol(p_game, GAME_ENTRY, &sym) != NULL) {
+        uint8_t (*p_main)(void) = (uint8_t(*)(void))sym.val;
+        return p_main();
+    } else {
+	gpu_print_text(FRONT_BUFFER, 0, 8, 2, 0, "UNABLE TO FIND ENTRYPOINT:");
+	gpu_print_text(FRONT_BUFFER, 0, 16, 1, 0, GAME_ENTRY);
+	return -1;
+    }
 }
 
 static void startup_animation(void) {
