@@ -45,10 +45,10 @@ void tim1_cc_isr(void) {
         // gets executed at the rising edge.
         TIM_SR(TIM1) = 0x0000; // needed for timer
 
-        uint8_t controller_bits[0] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_0);
-        uint8_t controller_bits[1] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_1);
-        uint8_t controller_bits[2] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_2);
-        uint8_t controller_bits[3] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_3);
+        controller_bits[0] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_0);
+        controller_bits[1] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_1);
+        controller_bits[2] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_2);
+        controller_bits[3] = gpio_get(CONTROLLER_PORT, CONTROLLER_PIN_3);
         for (int i = 0; i < 4; i++){
             if (controller_timer[i] >= 32){
                 active_controller[i] = 0;
