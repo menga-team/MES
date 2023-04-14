@@ -112,9 +112,6 @@ void gpu_initiate_communication(void);
 /// Send INIT every second and wait for GPU HIGH.
 void gpu_sync(void);
 
-/// Will halt execution until GPU ack operation data.
-void gpu_block_until_ack(void);
-
 /// @warning Don't use this function unless you know that you need it.
 /// @related gpu_print_text
 void gpu_print_text_blocking(uint8_t buffer, uint8_t ox, uint8_t oy,

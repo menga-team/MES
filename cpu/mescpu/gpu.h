@@ -38,6 +38,12 @@ enum Buffer { FRONT_BUFFER = 0, BACK_BUFFER = 1 } __attribute__((__packed__));
 
 typedef enum Buffer Buffer;
 
+/// Will halt execution until GPU acknowledged the operation.
+void gpu_block_until_ack(void);
+
+/// Will halt execution until n frames have passed.
+void gpu_block_frames(uint8_t n);
+
 /// Prints text on the Monitor.
 void gpu_print_text(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t foreground,
                     uint8_t background, const char *text);

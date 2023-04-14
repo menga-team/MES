@@ -299,6 +299,12 @@ void gpu_wait_for_next_ready(void) {
     gpu_block_until_ack();
 }
 
+void gpu_block_frames(uint8_t n) {
+    while(n--) {
+	gpu_wait_for_next_ready();
+    }
+}
+
 void exti15_10_isr(void) {
     exti_reset_request(EXTI15);
     if (!current_operation.data_sent) {
