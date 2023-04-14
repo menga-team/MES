@@ -290,9 +290,9 @@ void too_large_data(uint16_t bytes) {
     sprintf(buf, "%u > %u!", bytes, OPERATION_DATA_LENGTH);
     gpu_write(front_buffer, 2, 88, 1, 0, buf);
     gpu_write(front_buffer, 2, 96, 1, 0, "OPERATION:");
-    sprintf(buf, "%02x %02x %02x %02x  %02x %02x %02x %02x",
-            operation[0], operation[1], operation[2], operation[3],
-            operation[4], operation[5], operation[6], operation[7]);
+    sprintf(buf, "%02x %02x %02x %02x  %02x %02x %02x %02x", operation[0],
+            operation[1], operation[2], operation[3], operation[4],
+            operation[5], operation[6], operation[7]);
     gpu_write(front_buffer, 2, 104, 1, 0, buf);
     free(buf);
 }
@@ -466,8 +466,8 @@ void new_operation(void) {
         } else {
             uint16_t buffer_size = BUFFER_SIZE(operation[6], operation[7]);
             if (buffer_size > OPERATION_DATA_LENGTH) {
-		too_large_data(buffer_size);
-		return;
+                too_large_data(buffer_size);
+                return;
             }
             dma_recieve((uint32_t)operation_data, buffer_size);
             processing_stage = WAITING_FOR_DATA;

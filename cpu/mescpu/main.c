@@ -193,29 +193,82 @@ void invalid_location_get_lot_base(uint32_t adr) {
         ;
 }
 
-void hard_fault_handler(void) {
+void handle_hard_fault(uint32_t *stack_frame) {
     unrecoverable_error();
     gpu_print_text_blocking(FRONT_BUFFER, 2, 24, 1, 4,
                             "\xd6\xc4\xc4 H A R D  F A U L T \xc4\xc4\xb7");
     char *text_buf = malloc(27);
-    uint16_t ufsr = *(uint16_t *)0xE000ED2A;
-    sprintf(text_buf, "USFR:%04x \x1a", ufsr);
+    volatile uint32_t *cfsr = (volatile uint32_t *)0xE000ED28;
+    uint16_t ufsr = (uint16_t)(*cfsr >> 16);
+    uint8_t bfsr = (uint8_t)(*cfsr >> 8);
+    uint8_t mmfsr = (uint8_t)(*cfsr & 0xff);
+    sprintf(text_buf, "CFSR %08x", *cfsr);
     gpu_print_text_blocking(FRONT_BUFFER, 8, 32, 1, 4, text_buf);
     uint8_t line = 4;
     if (USFR_IS_UNDEFSTR(ufsr))
-        gpu_print_text_blocking(FRONT_BUFFER, 86, line++ * 8, 1, 4, "UNDEFSTR");
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "UNDEFSTR");
     if (USFR_IS_INVSTATE(ufsr))
-        gpu_print_text_blocking(FRONT_BUFFER, 86, line++ * 8, 1, 4, "INVSTATE");
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "INVSTATE");
     if (USFR_IS_INVPC(ufsr))
-        gpu_print_text_blocking(FRONT_BUFFER, 86, line++ * 8, 1, 4, "INVPC");
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "INVPC");
     if (USFR_IS_NOCP(ufsr))
-        gpu_print_text_blocking(FRONT_BUFFER, 86, line++ * 8, 1, 4, "NOCP");
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "NOCP");
     if (USFR_IS_UNALIGNED(ufsr))
-        gpu_print_text_blocking(FRONT_BUFFER, 86, line++ * 8, 1, 4,
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4,
                                 "UNALIGNED");
     if (USFR_IS_DIVBYZERO(ufsr))
-        gpu_print_text_blocking(FRONT_BUFFER, 86, line * 8, 1, 4, "DIVBYZERO");
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4,
+                                "DIVBYZERO");
+    if (MMFSR_IS_IACCVIOL(mmfsr))
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "IACCVIOL");
+    if (MMFSR_IS_DACCVIOL(mmfsr))
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "DACCVIOL");
+    if (MMFSR_IS_MUNSTKERR(mmfsr))
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4,
+                                "MUNSTKERR");
+    if (MMFSR_IS_MSTKERR(mmfsr))
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "MSTKERR");
+    if (MMFSR_IS_MLSPERR(mmfsr))
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "MLSPERR");
+    if (MMFSR_IS_MMARVALID(mmfsr))
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "MMARVALID");
+
+    uint32_t r0 = stack_frame[0];
+    uint32_t r1 = stack_frame[1];
+    uint32_t r2 = stack_frame[2];
+    uint32_t r3 = stack_frame[3];
+    uint32_t r12 = stack_frame[4];
+    uint32_t lr = stack_frame[5];
+    uint32_t pc = stack_frame[6];
+    uint32_t psr = stack_frame[7];
+    line = 7;
+    sprintf(text_buf, "r0  %08x r1 %08x", r0, r1);
+    gpu_print_text_blocking(FRONT_BUFFER, 8, line++ * 8, 1, 4, text_buf);
+    sprintf(text_buf, "r2  %08x r3 %08x", r2, r3);
+    gpu_print_text_blocking(FRONT_BUFFER, 8, line++ * 8, 1, 4, text_buf);
+    sprintf(text_buf, "r12 %08x lr %08x", r12, lr);
+    gpu_print_text_blocking(FRONT_BUFFER, 8, line++ * 8, 1, 4, text_buf);
+    sprintf(text_buf, "psr %08x pc %08x", psr, pc);
+    gpu_print_text_blocking(FRONT_BUFFER, 8, line++ * 8, 1, 4, text_buf);
+
     free(text_buf);
+    __asm__ volatile("bkpt #01");
     while (true)
         ;
 }
+
+void enter_hard_fault_handler(void) __attribute__((naked));
+
+void enter_hard_fault_handler(void) {
+    __asm__ volatile("tst lr, #4				\n"
+                     "ite eq					\n"
+                     "mrseq r0, msp				\n"
+                     "mrsne r0, psp				\n"
+                     "ldr r1, [r0, #24]				\n"
+                     "ldr r2, __hf_handler			\n"
+                     "bx r2					\n"
+
+                     "__hf_handler: .word handle_hard_fault	\n");
+}
+
+void hard_fault_handler(void) { enter_hard_fault_handler(); }

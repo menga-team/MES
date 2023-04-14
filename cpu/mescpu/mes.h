@@ -30,6 +30,13 @@
 #define USFR_IS_UNALIGNED(X) (X & 0b0000000100000000)
 #define USFR_IS_DIVBYZERO(X) (X & 0b0000001000000000)
 
+#define MMFSR_IS_IACCVIOL(X) (X & 0b00000001)
+#define MMFSR_IS_DACCVIOL(X) (X & 0b00000010)
+#define MMFSR_IS_MUNSTKERR(X) (X & 0b00001000)
+#define MMFSR_IS_MSTKERR(X) (X & 0b00010000)
+#define MMFSR_IS_MLSPERR(X) (X & 0b00100000)
+#define MMFSR_IS_MMARVALID(X) (X & 0b10000000)
+
 extern const char *GAME_ENTRY;
 extern const uint32_t REVISION;
 
@@ -44,5 +51,7 @@ void invalid_location_get_lot_base(uint32_t adr);
 void unrecoverable_error(void);
 
 uint8_t run_game(void *adr);
+
+void handle_hard_fault(uint32_t *stack_frame);
 
 #endif // MES_MAIN_H
