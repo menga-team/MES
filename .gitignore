@@ -10,6 +10,5 @@
 .DS_Store
 **.g.c
 *.pio
-*.?#?
-
+compile_commands.json
 simulations/**/cmake*
