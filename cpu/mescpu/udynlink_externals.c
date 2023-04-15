@@ -13,6 +13,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/spi.h>
 #include <libopencm3/stm32/timer.h>
+#include <libopencm3/stm32/adc.h>
 #include <malloc.h>
 #include <mes.h>
 #include <sdcard.h>
