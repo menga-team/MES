@@ -2,7 +2,8 @@
 #include "gpu.h"
 #include "stdint.h"
 #include <aeabi.h>
-#include <controller.h>
+#include <input.h>
+#include <input_internal.h>
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/cm3/systick.h>
 #include <libopencm3/stm32/dma.h>
@@ -11,6 +12,7 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/spi.h>
+#include <libopencm3/stm32/timer.h>
 #include <malloc.h>
 #include <mes.h>
 #include <sdcard.h>

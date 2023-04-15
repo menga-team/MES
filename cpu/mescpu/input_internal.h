@@ -14,35 +14,34 @@
  * along with MES. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MES_CONTROLLER_INTERNAL_H
-#define MES_CONTROLLER_INTERNAL_H
+#ifndef MES_INPUT_INTERNAL
+#define MES_INPUT_INTERNAL
+
+#include "input.h"
+#include <libopencm3/stm32/gpio.h>
+#include <stdint.h>
 
 #define CONTROLLER_PIN_0 GPIO9
 #define CONTROLLER_PIN_1 GPIO10
 #define CONTROLLER_PIN_2 GPIO11
 #define CONTROLLER_PIN_3 GPIO12
+#define CONTROLLER_PINS                                                        \
+    (CONTROLLER_PIN_0 | CONTROLLER_PIN_1 | CONTROLLER_PIN_2 | CONTROLLER_PIN_3)
 #define CLOCK_PIN GPIO_TIM1_CH1 // PA8
 #define DATA_PIN GPIO11
 
-#define SYNC_PORT GPIOB
 #define CLOCK_PORT GPIOA
 #define CONTROLLER_PORT GPIOA
-#define DATA_PORT GPIOB
 
-#define CONTROLLER_FREQ 4000
+static const uint16_t CONTROLLER_PIN_MAP[] = {
+    [CONTROLLER_1] = CONTROLLER_PIN_0,
+    [CONTROLLER_2] = CONTROLLER_PIN_1,
+    [CONTROLLER_3] = CONTROLLER_PIN_2,
+    [CONTROLLER_4] = CONTROLLER_PIN_3,
+};
 
-extern uint16_t active_controller[4];
-extern uint16_t buttons[32];
-extern int counter;
+extern volatile uint8_t controller_counters[4];
 
-/**
- * Configures PINs for communicating with controllers
- */
-void controller_configure_io(void);
+void input_setup(void);
 
-/**
- * Initialize timers needed for controllers.
- */
-void controller_setup_timers(void);
-
-#endif // MES_CONTROLLER_INTERNAL_H
+#endif // MES_INPUT_INTERNAL
