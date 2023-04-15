@@ -82,4 +82,7 @@ void gpu_draw_sdcard(Buffer buffer, uint8_t x, uint8_t y);
 /// Will update the palette.
 void gpu_update_palette(const uint16_t *new_palette);
 
+/// Will reset the palette to the standart palette.
+void gpu_reset_palette(void);
+
 #endif // MES_GPU_H

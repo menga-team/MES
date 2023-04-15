@@ -300,9 +300,20 @@ void gpu_wait_for_next_ready(void) {
 }
 
 void gpu_block_frames(uint8_t n) {
-    while(n--) {
-	gpu_wait_for_next_ready();
+    while (n--) {
+        gpu_wait_for_next_ready();
     }
+}
+
+void gpu_reset_palette(void) {
+    static const uint16_t DEFAULT_PALETTE[8] = {
+        COLOR(0b000, 0b000, 0b000), COLOR(0b111, 0b111, 0b111),
+        COLOR(0b111, 0b000, 0b000), COLOR(0b000, 0b111, 0b000),
+        COLOR(0b000, 0b000, 0b111), COLOR(0b111, 0b111, 0b000),
+        COLOR(0b111, 0b000, 0b111), COLOR(0b000, 0b111, 0b111),
+    };
+    gpu_update_palette(DEFAULT_PALETTE);
+    gpu_block_until_ack();
 }
 
 void exti15_10_isr(void) {

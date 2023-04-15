@@ -15,6 +15,8 @@
  */
 
 #include "gpu.h"
+#include "input.h"
+#include "input_internal.h"
 #include "mes.h"
 #include "mesgraphics.h"
 #include "rng.h"
@@ -126,6 +128,8 @@ int main(void) {
     timer_start();
     gpu_initiate_communication();
     gpu_sync();
+    gpu_reset_palette();
+    input_setup();
     if ((uint32_t)&get_lot_base != 0x08000150) {
         invalid_location_get_lot_base((uint32_t)&get_lot_base);
     }
