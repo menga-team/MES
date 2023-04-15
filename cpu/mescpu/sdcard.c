@@ -237,9 +237,7 @@ uint32_t sdcard_calculate_size(const uint8_t *csd) {
 }
 
 uint8_t sdcard_go_idle(void) {
-    return sdcard_send_command_blocking(SD_CMD0_GO_IDLE_STATE, 0x00000000,
-                                        rcc_ahb_frequency /
-                                            SPI_CR1_BAUDRATE_FPCLK_DIV_256);
+    return sdcard_send_command_blocking(SD_CMD0_GO_IDLE_STATE, 0x00000000, 256);
 }
 
 enum SDInitResult sdcard_init(void) {
@@ -326,7 +324,7 @@ enum SDInitResult sdcard_init(void) {
 bool sdcard_init_peripheral(void) {
     sdcard_establish_spi(SPI_CR1_BAUDRATE_FPCLK_DIV_256);
     enum SDInitResult res = sdcard_init();
-    sdcard_set_spi_baudrate(SPI_CR1_BAUDRATE_FPCLK_DIV_8); // TODO: Change
+    sdcard_set_spi_baudrate(SPI_CR1_BAUDRATE_FPCLK_DIV_2);
     char *text = malloc(27);
     sprintf(text, "sdcard_init returned: %u", res);
     gpu_print_text(FRONT_BUFFER, 0, 112, 1, 0, text);

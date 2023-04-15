@@ -6,6 +6,19 @@
 #include "stdlib.h"
 #include <stdbool.h>
 
+/**
+ * @param red: 0b000 - 0b111
+ * @param green: 0b000 - 0b111
+ * @param blue: 0b000 - 0b111
+ * Generates a port config given the 3 colors.
+ */
+#define COLOR(red, green, blue)                                                \
+    (uint16_t)(((red & 0b100) >> 1) | ((red & 0b010) << 9) |                   \
+               ((red & 0b001) << 11) | ((green & 0b100) << 10) |               \
+               ((green & 0b010) << 12) | ((green & 0b001) << 14) |             \
+               ((blue & 0b100) << 5) | ((blue & 0b010) << 5) |                 \
+               ((blue & 0b001) << 5))
+
 #define BUFFER_BPP 3
 #define BUFFER_SIZE(X, Y) (((uint16_t)ceil((float)(BUFFER_BPP * ((X) * (Y))) / 8.0) % BUFFER_BPP) * 3 + ((BUFFER_BPP * ((X) * (Y))) / 8))
 #define BUFFER_POSITION(RECT, X, Y) ((Y) * (RECT)->width + (X))

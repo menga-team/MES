@@ -231,7 +231,8 @@ void handle_hard_fault(uint32_t *stack_frame) {
     if (MMFSR_IS_MLSPERR(mmfsr))
         gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "MLSPERR");
     if (MMFSR_IS_MMARVALID(mmfsr))
-        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "MMARVALID");
+        gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4,
+                                "MMARVALID");
 
     uint32_t r0 = stack_frame[0];
     uint32_t r1 = stack_frame[1];

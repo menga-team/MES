@@ -121,7 +121,7 @@ void gpu_write(void *buffer, uint8_t x, uint8_t y, uint8_t fg, uint8_t bg,
             }
         }
         x += 6;
-        if (x > 20) { // character wont fit anymore
+        if (x > 152) { // character wont fit anymore
             x = 0;
             y += 8;
         }
