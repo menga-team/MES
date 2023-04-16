@@ -96,6 +96,7 @@
 #define INTERNAL_SHOW_STARTUP 0x01
 #define INTERNAL_ADJUST_BRIGHTNESS 0x02
 #define INTERNAL_DRAW_SDCARD 0x03
+#define INTERNAL_DRAW_CONTROLLER 0x04
 
 #define OPERATION_ID(x) x[3]
 #define OPERATION_BUFFER(x) ((x[2] == 0x00) ? front_buffer : back_buffer)

@@ -16,6 +16,7 @@
 
 #include "input.h"
 #include "input_internal.h"
+#include "libopencm3/stm32/f1/gpio.h"
 #include "libopencm3/stm32/gpio.h"
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/gpio.h>
@@ -88,8 +89,11 @@ void tim1_cc_isr(void) {
 void input_setup(void) {
     gpio_set_mode(CLOCK_PORT, GPIO_MODE_OUTPUT_50_MHZ,
                   GPIO_CNF_OUTPUT_ALTFN_PUSHPULL, CLOCK_PIN);
-    gpio_set_mode(CONTROLLER_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_FLOAT,
+    gpio_set_mode(CONTROLLER_PORT, GPIO_MODE_INPUT, GPIO_CNF_INPUT_PULL_UPDOWN,
                   CONTROLLER_PINS);
+    // pull down
+    gpio_clear(CONTROLLER_PORT, CONTROLLER_PINS);
+    
     /*
      * TIM1 generates a clock with 50% duty cycle on PIN A8.
      * 0-50   -> high

@@ -93,6 +93,9 @@ Operation gpu_operation_adjust_brightness(void);
 
 Operation gpu_operation_draw_sdcard(uint8_t bf, uint8_t x, uint8_t y);
 
+Operation gpu_operation_draw_controller(uint8_t bf, uint8_t n, uint8_t fg,
+                                        uint8_t bg, uint8_t x, uint8_t y);
+
 Operation gpu_operation_update_palette(void);
 
 /// @brief Halt execution of the programm and send data to GPU.
@@ -118,3 +121,4 @@ void gpu_print_text_blocking(uint8_t buffer, uint8_t ox, uint8_t oy,
                              uint8_t foreground, uint8_t bg, const char *text);
 
 #endif // MES_GPU_INTERNAL_H
+

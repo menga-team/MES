@@ -73,7 +73,12 @@ uint8_t run_game(void *adr) {
 }
 
 static void startup_animation(void) {
-    timer_block_ms(1000);
+    uint32_t block_until = timer_get_ms() + 1000;
+    while (timer_get_ms() < block_until) {
+        if (input_get_button(CONTROLLER_1, BUTTON_A)) {
+            return;
+        }
+    }
     gpu_wait_for_next_ready();
     gpu_show_startup();
     gpu_wait_for_next_ready();
@@ -83,6 +88,47 @@ static void startup_animation(void) {
     gpu_wait_for_next_ready();
     timer_block_ms(500);
     gpu_wait_for_next_ready();
+}
+
+static void check_controller(uint8_t controller) {
+    gpu_blank(FRONT_BUFFER, 0);
+    gpu_reset_palette();
+    char *text = (char *)malloc(27);
+    uint8_t fg;
+
+    gpu_print_text(FRONT_BUFFER, 0, 112, 1, 0,
+                   "PRESS " FONT_BUTTONA "+" FONT_BUTTONB " TO RETURN.");
+
+    while (true) {
+        bool *buttons = input_get_buttons(controller);
+        if (input_is_available(controller)) {
+            sprintf(text, "CONTROLLER%i IS CONNECTED  ", controller + 1);
+            fg = 3;
+        } else {
+            sprintf(text, "CONTROLLER%i IS DISCONNETED", controller + 1);
+            fg = 2;
+        }
+        gpu_print_text(FRONT_BUFFER, 0, 0, fg, 0, text);
+        gpu_block_until_ack();
+        gpu_wait_for_next_ready();
+        for (uint8_t i = 0; i < 8; ++i) {
+            if (buttons[i]) {
+                sprintf(text, "%-3s PRESSED ", BUTTON_CHARACTERS[i]);
+                fg = 3;
+            } else {
+                sprintf(text, "%-3s RELEASED", BUTTON_CHARACTERS[i]);
+                fg = 2;
+            }
+            gpu_print_text(FRONT_BUFFER, 0, (i + 1) * 8, fg, 0, text);
+            gpu_block_until_ack();
+        }
+        for (uint8_t i = 0; i < 4; ++i) {
+            if (input_get_button(i, BUTTON_A) &&
+                input_get_button(i, BUTTON_B)) {
+                return;
+            }
+        }
+    }
 }
 
 static void wait_for_sdcard(void) {
@@ -97,27 +143,86 @@ static void wait_for_sdcard(void) {
     bool game_ready = false;
     int8_t offset = 0;
     bool elevate = true;
+    uint8_t controller_selected = 0xff;
+    uint32_t next_sd_event = timer_get_ms();
+    bool pressed = false;
     while (!game_ready) {
-        gpu_wait_for_next_ready();
         gpu_blank(BACK_BUFFER, 0x00);
         gpu_draw_sdcard(BACK_BUFFER, 62, 36 + offset);
+        const uint8_t controllers_y = 120 - 16 - 2;
+        uint8_t controller_x = 160 - 2 - (18 * 4);
+        for (uint8_t controller = 0; controller < 4; ++controller) {
+            uint8_t fg = 3;
+            uint8_t bg = 0;
+            if (input_is_available(controller)) {
+                if (input_get_button(controller, BUTTON_SELECT)) {
+                    if (!pressed) {
+                        controller_selected = controller;
+                    }
+                    pressed = true;
+                } else if (controller_selected != 0xff &&
+                           input_get_button(controller, BUTTON_LEFT)) {
+                    if (!pressed) {
+                        controller_selected = (controller_selected - 1) & 0b11;
+                    }
+                    pressed = true;
+                } else if (controller_selected != 0xff &&
+                           input_get_button(controller, BUTTON_RIGHT)) {
+                    if (!pressed) {
+                        controller_selected = (controller_selected + 1) & 0b11;
+                    }
+                    pressed = true;
+                } else if (input_get_button(controller, BUTTON_B)) {
+                    if (!pressed) {
+                        controller_selected = 0xff;
+                    }
+                    pressed = true;
+                } else if (controller_selected != 0xff &&
+                           input_get_button(controller, BUTTON_A)) {
+                    if (!pressed) {
+                        check_controller(controller_selected);
+                        gpu_update_palette(color_palette);
+                        controller_selected = 0xff;
+                    }
+                    pressed = true;
+                } else {
+                    pressed = false;
+                }
+                fg = 6;
+            }
+
+            if (controller == controller_selected) {
+                swap(&fg, &bg);
+            }
+
+            gpu_draw_controller(BACK_BUFFER, controller, fg, bg, controller_x,
+                                controllers_y);
+            controller_x += 18;
+        }
         gpu_swap_buf();
+        gpu_block_until_ack();
 
-        if (offset > 1) {
-            elevate = false;
-            timer_block_ms(300);
-        } else if (offset < -1) {
-            elevate = true;
-            timer_block_ms(300);
+        if (timer_get_ms() >= next_sd_event) {
+            bool delayed = false;
+
+            if (elevate) {
+                offset++;
+            } else {
+                offset--;
+            }
+
+            if (offset > 1) {
+                elevate = false;
+                next_sd_event = timer_get_ms() + 300;
+                delayed = true;
+            } else if (offset < -1) {
+                elevate = true;
+                next_sd_event = timer_get_ms() + 300;
+                delayed = true;
+            }
+
+            next_sd_event = (delayed ? next_sd_event : timer_get_ms()) + 200;
         }
-
-        if (elevate) {
-            offset++;
-        } else {
-            offset--;
-        }
-
-        timer_block_ms(200);
     }
 }
 

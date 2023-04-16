@@ -73,11 +73,16 @@ void gpu_wait_for_next_ready(void);
 /// Will display a startup animation. Internal operation.
 void gpu_show_startup(void);
 
-/// Will display a brightness adjustment screen and fade it out. Internal operation.
+/// Will display a brightness adjustment screen and fade it out. Internal
+/// operation.
 void gpu_adjust_brightness(void);
 
 /// Will draw a sd-card icon at x y. Internal operation.
 void gpu_draw_sdcard(Buffer buffer, uint8_t x, uint8_t y);
+
+/// Will draw a sd-card icon at x y. Internal operation.
+void gpu_draw_controller(uint8_t bf, uint8_t n, uint8_t fg, uint8_t bg,
+                         uint8_t x, uint8_t y);
 
 /// Will update the palette.
 void gpu_update_palette(const uint16_t *new_palette);

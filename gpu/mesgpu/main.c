@@ -23,6 +23,11 @@
 #include "images/adjust_brightness.m3ifc"
 // Sdcard icon
 #include "images/sdcard.m3ifc"
+// Controller icons
+#include "images/controller1.m3ifc"
+#include "images/controller2.m3ifc"
+#include "images/controller3.m3ifc"
+#include "images/controller4.m3ifc"
 
 int main(void) {
     rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
@@ -430,6 +435,39 @@ void new_operation(void) {
             gpu_insert_buf(OPERATION_BUFFER(operation), sdcard, SDCARD_WIDTH,
                            SDCARD_HEIGHT, operation[6], operation[7]);
             break;
+        case INTERNAL_DRAW_CONTROLLER: {
+            const uint8_t *texture;
+            switch (operation[4]) {
+            case 0:
+                texture = controller1;
+                break;
+            case 1:
+                texture = controller2;
+                break;
+            case 2:
+                texture = controller3;
+                break;
+            case 3:
+                texture = controller4;
+                break;
+            default:
+                texture = controller1;
+            }
+            const uint8_t width = 16, height = 16;
+            uint8_t x = operation[6], y = operation[7];
+            for (uint8_t c_x = 0; c_x < width; ++c_x) {
+                for (uint8_t c_y = 0; c_y < height; ++c_y) {
+                    uint8_t pixel = gpu_get_pixel(texture, c_y * width + c_x);
+                    if (pixel == 1) {
+                        pixel = operation[5];
+                    } else {
+			pixel = operation[1];
+		    }
+                    gpu_set_pixel(OPERATION_BUFFER(operation),
+                                  (y + c_y) * BUFFER_WIDTH + x + c_x, pixel);
+                }
+            }
+        } break;
         default:
             invalid_operation(operation);
             break;

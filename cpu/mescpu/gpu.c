@@ -76,6 +76,11 @@ Operation gpu_operation_update_palette(void) {
     return (Operation){0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00};
 }
 
+Operation gpu_operation_draw_controller(uint8_t bf, uint8_t n, uint8_t fg,
+                                        uint8_t bg, uint8_t x, uint8_t y) {
+    return (Operation){0xff, bg, bf, 0x04, n, fg, x, y};
+}
+
 void gpu_print_text(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t foreground,
                     uint8_t background, const char *text) {
     gpu_block_until_ack();
@@ -314,6 +319,20 @@ void gpu_reset_palette(void) {
     };
     gpu_update_palette(DEFAULT_PALETTE);
     gpu_block_until_ack();
+}
+
+void gpu_draw_controller(Buffer buffer, uint8_t n, uint8_t fg, uint8_t bg,
+                         uint8_t x, uint8_t y) {
+    gpu_block_until_ack();
+    current_operation = (Queue){
+        gpu_operation_draw_controller(buffer, n, fg, bg, x, y),
+        0,
+        0,
+        true,
+        false,
+    };
+    gpu_send_blocking((uint8_t *)&current_operation.operation,
+                      sizeof(Operation));
 }
 
 void exti15_10_isr(void) {
