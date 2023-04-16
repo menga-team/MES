@@ -12,7 +12,8 @@ INVALID_SYMBOLS = ["siprintf", "hello_world", "main", "vector_table",
                    "CONTROLLER_PIN_MAP", "BUTTON_CHARACTERS",
                    "period_certification", "atanhi", "atanlo", "halF",
                    "ln2HI", "ln2LO", "Zero", "npio2_hw", "Pio2",
-                   "init_jk", "with_errno", "xflow", "finite"]
+                   "init_jk", "with_errno", "xflow", "finite",
+                   "sbrk_aligned"]
 
 EXTRA_SYMBOLS = ["__aeabi_dadd", "__aeabi_ddiv", "__aeabi_dmul",
                  "__aeabi_drsub", "__aeabi_dsub", "__aeabi_cdcmpeq",
