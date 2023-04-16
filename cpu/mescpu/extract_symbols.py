@@ -72,7 +72,8 @@ EXTRA_SYMBOLS = ["__aeabi_dadd", "__aeabi_ddiv", "__aeabi_dmul",
                  "sinh", "exp", "ldexp", "log", "log10", "pow",
                  "sqrt", "fmod", "memset", "input_get_button",
                  "input_get_buttons", "input_is_available",
-                 "input_get_availability", "input_change_freq"]
+                 "input_get_availability", "input_change_freq",
+                 "realloc"]
 
 elf_file = sys.argv[1]
 
