@@ -378,6 +378,7 @@ void new_operation(void) {
                 color_palette[i] =
                     COLOR(su_colors[i][0], su_colors[i][1], su_colors[i][2]);
 
+            gpu_write(front_buffer, 15, 100, 0, 3, "GITHUB.COM/MENGA-TEAM");
             // not going to start a timer just for that...
             for (uint32_t i = 0; i < 5000000; ++i)
                 __asm__("nop");
@@ -412,7 +413,17 @@ void new_operation(void) {
                 color_palette[i] =
                     COLOR(ab_colors[i][0], ab_colors[i][1], ab_colors[i][2]);
 
-            for (uint32_t i = 0; i < 10000000; ++i)
+            gpu_write(front_buffer, 10, 42, 3, 0, " PLEASE ADJUST YOUR     ");
+            gpu_write(front_buffer, 10, 50, 3, 0, " MONITOR OR TELEVISION  ");
+            gpu_write(front_buffer, 10, 58, 3, 0, " BRIGHTNESS SETTINGS    ");
+            gpu_write(front_buffer, 10, 66, 3, 0, " IF YOU CAN'T SEE       ");
+            gpu_write(front_buffer, 10, 74, 3, 0, " 7 DISTINCT SQUARES     ");
+
+            gpu_write(front_buffer, 10, 90, 3, 0, " PLEASE PLAY IN A       ");
+            gpu_write(front_buffer, 10, 98, 3, 0, " WELL-LIT AREA          ");
+            gpu_write(front_buffer, 10, 106, 3, 0, " FROM A SAFE DISTANCE   ");
+
+            for (uint32_t i = 0; i < 15000000; ++i)
                 __asm__("nop");
 
             // fade out
