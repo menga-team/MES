@@ -5189,6 +5189,47 @@ Copyright: Würth Elektronik</description>
 </package3d>
 </packages3d>
 </library>
+<library name="led" urn="urn:adsk.eagle:library:259">
+<description>&lt;b&gt;LEDs&lt;/b&gt;&lt;p&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;&lt;br&gt;
+Extended by Federico Battaglin &lt;author&gt;&amp;lt;federico.rd@fdpinternational.com&amp;gt;&lt;/author&gt; with DUOLED</description>
+<packages>
+<package name="CHIPLED_0805" urn="urn:adsk.eagle:footprint:15674/1" library_version="5">
+<description>&lt;b&gt;CHIPLED&lt;/b&gt;&lt;p&gt;
+Source: http://www.osram.convergy.de/ ... LG_R971.pdf</description>
+<wire x1="-0.35" y1="0.925" x2="0.35" y2="0.925" width="0.1016" layer="51" curve="162.394521"/>
+<wire x1="-0.35" y1="-0.925" x2="0.35" y2="-0.925" width="0.1016" layer="51" curve="-162.394521"/>
+<wire x1="0.575" y1="0.525" x2="0.575" y2="-0.525" width="0.1016" layer="51"/>
+<wire x1="-0.575" y1="-0.5" x2="-0.575" y2="0.925" width="0.1016" layer="51"/>
+<circle x="-0.45" y="0.85" radius="0.103" width="0.1016" layer="51"/>
+<smd name="C" x="0" y="1.05" dx="1.2" dy="1.2" layer="1"/>
+<smd name="A" x="0" y="-1.05" dx="1.2" dy="1.2" layer="1"/>
+<text x="-1.27" y="-1.27" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="2.54" y="-1.27" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
+<rectangle x1="0.3" y1="0.5" x2="0.625" y2="1" layer="51"/>
+<rectangle x1="-0.325" y1="0.5" x2="-0.175" y2="0.75" layer="51"/>
+<rectangle x1="0.175" y1="0.5" x2="0.325" y2="0.75" layer="51"/>
+<rectangle x1="-0.2" y1="0.5" x2="0.2" y2="0.675" layer="51"/>
+<rectangle x1="0.3" y1="-1" x2="0.625" y2="-0.5" layer="51"/>
+<rectangle x1="-0.625" y1="-1" x2="-0.3" y2="-0.5" layer="51"/>
+<rectangle x1="0.175" y1="-0.75" x2="0.325" y2="-0.5" layer="51"/>
+<rectangle x1="-0.325" y1="-0.75" x2="-0.175" y2="-0.5" layer="51"/>
+<rectangle x1="-0.2" y1="-0.675" x2="0.2" y2="-0.5" layer="51"/>
+<rectangle x1="-0.1" y1="0" x2="0.1" y2="0.2" layer="21"/>
+<rectangle x1="-0.6" y1="0.5" x2="-0.3" y2="0.8" layer="51"/>
+<rectangle x1="-0.625" y1="0.925" x2="-0.3" y2="1" layer="51"/>
+</package>
+</packages>
+<packages3d>
+<package3d name="CHIPLED_0805" urn="urn:adsk.eagle:package:15821/2" type="model" library_version="5">
+<description>CHIPLED
+Source: http://www.osram.convergy.de/ ... LG_R971.pdf</description>
+<packageinstances>
+<packageinstance name="CHIPLED_0805"/>
+</packageinstances>
+</package3d>
+</packages3d>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -5684,19 +5725,19 @@ design rules under a new name.</description>
 <attribute name="SF_SKU" value="COM-09190" x="58.87" y="-81.2" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="19.5" y="-11.223" size="0.6096" layer="27" font="vector" ratio="20" align="top-center"/>
 </element>
-<element name="VGA" library="L77HDE15SD1CH4RHNVGA" library_urn="urn:adsk.eagle:library:37155833" package="L77HDE15SD1CH4RHNVGA" package3d_urn="urn:adsk.eagle:package:37155836/1" value="L77HDE15SD1CH4RHNVGA" x="91" y="38.5" smashed="yes" rot="R90">
-<attribute name="ARROW_PART_NUMBER" value="L77HDE15SD1CH4RHNVGA" x="107.51" y="146.45" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="ARROW_PRICE-STOCK" value="https://www.arrow.com/en/products/l77hde15sd1ch4rhnvga/amphenol-fci?region=nac" x="107.51" y="146.45" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="DESCRIPTION" value="D-Sub High Density Connectors Dsub, Stamped Signal 3A, High Density, Right Angle PCB Thru Hole, FP=8.89mm (.350&quot;), 15 Socket, Bright Tin Shell, Flash Gold, 4-40 Rear Insert, Ground Tab with Boardlock, High Temp, Nickel Shell, VGA" x="107.51" y="146.45" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="HEIGHT" value="12.55mm" x="107.51" y="146.45" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MANUFACTURER_NAME" value="Amphenol" x="107.51" y="146.45" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MANUFACTURER_PART_NUMBER" value="L77HDE15SD1CH4RHNVGA" x="107.51" y="146.45" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MOUSER_PART_NUMBER" value="523-7HDE15SDH4RHNVGA" x="107.51" y="146.45" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MOUSER_PRICE-STOCK" value="https://www.mouser.co.uk/ProductDetail/Amphenol-Commercial-Products/L77HDE15SD1CH4RHNVGA?qs=f9yNj16SXrKPVxRw%2FcVQYg%3D%3D" x="107.51" y="146.45" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MOUSER_TESTING_PART_NUMBER" value="" x="107.51" y="146.45" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MOUSER_TESTING_PRICE-STOCK" value="" x="107.51" y="146.45" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="94.78" y="34.175" size="1.27" layer="25" rot="R90" align="center"/>
-<attribute name="VALUE" x="94.78" y="34.175" size="1.27" layer="27" rot="R90" align="center"/>
+<element name="VGA" library="L77HDE15SD1CH4RHNVGA" library_urn="urn:adsk.eagle:library:37155833" package="L77HDE15SD1CH4RHNVGA" package3d_urn="urn:adsk.eagle:package:37155836/1" value="L77HDE15SD1CH4RHNVGA" x="91" y="39.5" smashed="yes" rot="R90">
+<attribute name="ARROW_PART_NUMBER" value="L77HDE15SD1CH4RHNVGA" x="107.51" y="147.45" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="ARROW_PRICE-STOCK" value="https://www.arrow.com/en/products/l77hde15sd1ch4rhnvga/amphenol-fci?region=nac" x="107.51" y="147.45" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="DESCRIPTION" value="D-Sub High Density Connectors Dsub, Stamped Signal 3A, High Density, Right Angle PCB Thru Hole, FP=8.89mm (.350&quot;), 15 Socket, Bright Tin Shell, Flash Gold, 4-40 Rear Insert, Ground Tab with Boardlock, High Temp, Nickel Shell, VGA" x="107.51" y="147.45" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="HEIGHT" value="12.55mm" x="107.51" y="147.45" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MANUFACTURER_NAME" value="Amphenol" x="107.51" y="147.45" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MANUFACTURER_PART_NUMBER" value="L77HDE15SD1CH4RHNVGA" x="107.51" y="147.45" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MOUSER_PART_NUMBER" value="523-7HDE15SDH4RHNVGA" x="107.51" y="147.45" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MOUSER_PRICE-STOCK" value="https://www.mouser.co.uk/ProductDetail/Amphenol-Commercial-Products/L77HDE15SD1CH4RHNVGA?qs=f9yNj16SXrKPVxRw%2FcVQYg%3D%3D" x="107.51" y="147.45" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MOUSER_TESTING_PART_NUMBER" value="" x="107.51" y="147.45" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MOUSER_TESTING_PRICE-STOCK" value="" x="107.51" y="147.45" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="94.78" y="35.175" size="1.27" layer="25" rot="R90" align="center"/>
+<attribute name="VALUE" x="94.78" y="35.175" size="1.27" layer="27" rot="R90" align="center"/>
 </element>
 <element name="C6" library="rcl" library_urn="urn:adsk.eagle:library:334" package="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="100nF" x="29" y="61" smashed="yes" rot="R180">
 <attribute name="NAME" x="27.52" y="61.73" size="1.27" layer="25" rot="R180"/>
@@ -5716,11 +5757,11 @@ design rules under a new name.</description>
 <attribute name="SPICEPREFIX" value="C" x="7" y="29.25" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="VALUE" x="1.23" y="28.29" size="1.27" layer="28" rot="MR180"/>
 </element>
-<element name="C5" library="rcl" library_urn="urn:adsk.eagle:library:334" package="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="100nF" x="83" y="10.75" smashed="yes" rot="R270">
-<attribute name="NAME" x="80.77" y="11.77" size="1.27" layer="25" rot="R270"/>
-<attribute name="POPULARITY" value="88" x="83" y="10.75" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="SPICEPREFIX" value="C" x="83" y="10.75" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="VALUE" x="82.04" y="8.98" size="1.27" layer="27" rot="R90"/>
+<element name="C5" library="rcl" library_urn="urn:adsk.eagle:library:334" package="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="100nF" x="82.25" y="10.75" smashed="yes" rot="R270">
+<attribute name="NAME" x="80.02" y="11.77" size="1.27" layer="25" rot="R270"/>
+<attribute name="POPULARITY" value="88" x="82.25" y="10.75" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="SPICEPREFIX" value="C" x="82.25" y="10.75" size="1.778" layer="27" rot="R270" display="off"/>
+<attribute name="VALUE" x="81.29" y="8.98" size="1.27" layer="27" rot="R90"/>
 </element>
 <element name="C7" library="rcl" library_urn="urn:adsk.eagle:library:334" package="C0805" package3d_urn="urn:adsk.eagle:package:23617/2" value="100nF" x="63.75" y="-5.25" smashed="yes" rot="R180">
 <attribute name="NAME" x="68.02" y="-4.7" size="1.27" layer="25" rot="R180"/>
@@ -5790,24 +5831,24 @@ design rules under a new name.</description>
 <attribute name="POPULARITY" value="64" x="88.24" y="-22.76" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="86.97" y="-25.935" size="1.27" layer="27"/>
 </element>
-<element name="POWERIN" library="Connector_USB" library_urn="urn:adsk.eagle:library:27510300" package="61729-1011BLF" package3d_urn="urn:adsk.eagle:package:27659501/3" value="61729-1011" x="90.5" y="10.47" smashed="yes" rot="R90">
-<attribute name="CATEGORY" value="Connector" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="CONTACTS" value="4" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="CURRENT_RATING" value="1A" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="DESCRIPTION" value="CONN RCPT USB2.0 TYPEB 4POS R/A" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="GENDER" value="Receptacle" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MANUFACTURER" value="Amphenol ICC (FCI)" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MOUNT_TYPE" value="R/A" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="MPN" value="61729-1011BLF" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="81.5" y="10.47" size="1.270759375" layer="25" rot="R90" align="center"/>
-<attribute name="OPERATING_TEMP" value="-55°C to 85°C " x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="PART_STATUS" value="Active" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="ROHS_COMPLIANT" value="RoHS Compliant" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="SERIES" value="61729" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="SUB-CATEGORY" value="USB" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="TYPE" value="USB-B" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="VALUE" x="83" y="10.47" size="1.27003125" layer="27" rot="R90" align="center"/>
-<attribute name="VOLTAGE_RATING" value="" x="90.5" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<element name="POWERIN" library="Connector_USB" library_urn="urn:adsk.eagle:library:27510300" package="61729-1011BLF" package3d_urn="urn:adsk.eagle:package:27659501/3" value="61729-1011" x="89.75" y="10.47" smashed="yes" rot="R90">
+<attribute name="CATEGORY" value="Connector" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="CONTACTS" value="4" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="CURRENT_RATING" value="1A" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="DESCRIPTION" value="CONN RCPT USB2.0 TYPEB 4POS R/A" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="GENDER" value="Receptacle" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MANUFACTURER" value="Amphenol ICC (FCI)" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MOUNT_TYPE" value="R/A" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="61729-1011BLF" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="NAME" x="80.75" y="10.47" size="1.270759375" layer="25" rot="R90" align="center"/>
+<attribute name="OPERATING_TEMP" value="-55°C to 85°C " x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="PART_STATUS" value="Active" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="ROHS_COMPLIANT" value="RoHS Compliant" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="SERIES" value="61729" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="SUB-CATEGORY" value="USB" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="TYPE" value="USB-B" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="VALUE" x="82.25" y="10.47" size="1.27003125" layer="27" rot="R90" align="center"/>
+<attribute name="VOLTAGE_RATING" value="" x="89.75" y="10.47" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="CONTROLLERIN" library="Connector_USB" library_urn="urn:adsk.eagle:library:27510300" package="61729-1011BLF" package3d_urn="urn:adsk.eagle:package:27659501/3" value="61729-1011" x="64.99" y="-7.48" smashed="yes" rot="R180">
 <attribute name="CATEGORY" value="Connector" x="64.99" y="-7.48" size="1.778" layer="27" rot="R180" display="off"/>
@@ -5851,6 +5892,11 @@ design rules under a new name.</description>
 <attribute name="POPULARITY" value="86" x="17" y="15" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="SPICEPREFIX" value="R" x="17" y="15" size="1.778" layer="28" rot="MR180" display="off"/>
 <attribute name="VALUE" x="16.365" y="17.54" size="1.27" layer="28" rot="MR180"/>
+</element>
+<element name="LED1" library="led" library_urn="urn:adsk.eagle:library:259" package="CHIPLED_0805" package3d_urn="urn:adsk.eagle:package:15821/2" value="" x="29" y="63.8125" smashed="yes" rot="R180">
+<attribute name="NAME" x="30.27" y="65.0825" size="1.27" layer="25" rot="R270"/>
+<attribute name="POPULARITY" value="52" x="29" y="63.8125" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VALUE" x="26.46" y="65.0825" size="1.27" layer="27" rot="R270"/>
 </element>
 </elements>
 <signals>
@@ -5954,15 +6000,16 @@ design rules under a new name.</description>
 <wire x1="52.6908" y1="47.9408" x2="52.6908" y2="46.4949875" width="0.3048" layer="1"/>
 </signal>
 <signal name="GPU_READY">
-<contactref element="GPU" pad="P$37"/>
 <contactref element="CPU" pad="P$37"/>
-<wire x1="34.94" y1="19.92" x2="31.13" y2="23.73" width="0.3048" layer="1"/>
-<wire x1="31.13" y1="23.73" x2="31.13" y2="33.90625" width="0.3048" layer="1"/>
-<via x="31.13" y="33.90625" extent="1-16" drill="0.35"/>
-<wire x1="31.13" y1="33.90625" x2="31.13" y2="61.5042125" width="0.3048" layer="16"/>
-<wire x1="31.13" y1="61.5042125" x2="33.0849875" y2="63.4592" width="0.3048" layer="16"/>
-<wire x1="33.0849875" y1="63.4592" x2="73.0108" y2="63.4592" width="0.3048" layer="16"/>
-<wire x1="73.0108" y1="63.4592" x2="74.23" y2="62.24" width="0.3048" layer="16"/>
+<contactref element="LED1" pad="C"/>
+<wire x1="29.0125" y1="62.75" x2="29" y2="62.7625" width="0.3048" layer="1"/>
+<wire x1="34.94" y1="19.92" x2="31.125" y2="23.735" width="0.3048" layer="1"/>
+<wire x1="31.125" y1="23.735" x2="31.125" y2="33.96875" width="0.3048" layer="1"/>
+<via x="31.125" y="33.96875" extent="1-16" drill="0.35"/>
+<wire x1="31.125" y1="33.96875" x2="31.125" y2="62.625" width="0.3048" layer="16"/>
+<wire x1="31.125" y1="62.625" x2="31" y2="62.75" width="0.3048" layer="16"/>
+<via x="31" y="62.75" extent="1-16" drill="0.35"/>
+<wire x1="31" y1="62.75" x2="29.0125" y2="62.75" width="0.3048" layer="1"/>
 </signal>
 <signal name="RED_LSP">
 <contactref element="R6" pad="1"/>
@@ -6029,8 +6076,8 @@ design rules under a new name.</description>
 <wire x1="45.66875" y1="57.42375" x2="46.295" y2="58.05" width="0.3048" layer="1"/>
 <wire x1="49.1875" y1="56.3325" x2="49.1875" y2="57.6975" width="0.3048" layer="1"/>
 <wire x1="49.1875" y1="57.6975" x2="48.835" y2="58.05" width="0.3048" layer="1"/>
-<wire x1="85" y1="39.42" x2="85.92" y2="38.5" width="0.3048" layer="1"/>
-<wire x1="85" y1="47.298425" x2="85" y2="39.42" width="0.3048" layer="1"/>
+<wire x1="85" y1="40.42" x2="85.92" y2="39.5" width="0.3048" layer="1"/>
+<wire x1="85" y1="47.298425" x2="85" y2="40.42" width="0.3048" layer="1"/>
 <wire x1="49.1875" y1="56.3325" x2="51.9175" y2="56.3325" width="0.3048" layer="1"/>
 <wire x1="51.9175" y1="56.3325" x2="52" y2="56.25" width="0.3048" layer="1"/>
 <via x="52" y="56.25" extent="1-16" drill="0.35"/>
@@ -6071,9 +6118,9 @@ design rules under a new name.</description>
 <wire x1="60.34071875" y1="54.40928125" x2="77.0270375" y2="54.40928125" width="0.3048" layer="1"/>
 <wire x1="36.8" y1="53.31533125" x2="37.98466875" y2="54.5" width="0.3048" layer="1"/>
 <wire x1="77.0270375" y1="54.40928125" x2="84.25" y2="47.18631875" width="0.3048" layer="1"/>
-<wire x1="84.25" y1="47.18631875" x2="84.25" y2="37.73841875" width="0.3048" layer="1"/>
-<wire x1="84.25" y1="37.73841875" x2="85.77841875" y2="36.21" width="0.3048" layer="1"/>
-<wire x1="85.77841875" y1="36.21" x2="85.92" y2="36.21" width="0.3048" layer="1"/>
+<wire x1="84.25" y1="47.18631875" x2="84.25" y2="38.73841875" width="0.3048" layer="1"/>
+<wire x1="84.25" y1="38.73841875" x2="85.77841875" y2="37.21" width="0.3048" layer="1"/>
+<wire x1="85.77841875" y1="37.21" x2="85.92" y2="37.21" width="0.3048" layer="1"/>
 </signal>
 <signal name="N$21">
 <contactref element="R17" pad="1"/>
@@ -6090,8 +6137,8 @@ design rules under a new name.</description>
 <wire x1="66.605" y1="51.45" x2="69.15625" y2="51.45" width="0.3048" layer="1"/>
 <wire x1="66.6" y1="53.1675" x2="66.6" y2="51.455" width="0.3048" layer="1"/>
 <wire x1="66.6" y1="51.455" x2="66.605" y2="51.45" width="0.3048" layer="1"/>
-<wire x1="85.92" y1="33.92" x2="83.5" y2="36.34" width="0.3048" layer="1"/>
-<wire x1="83.5" y1="36.34" x2="83.5" y2="47.0742125" width="0.3048" layer="1"/>
+<wire x1="85.92" y1="34.92" x2="83.5" y2="37.34" width="0.3048" layer="1"/>
+<wire x1="83.5" y1="37.34" x2="83.5" y2="47.0742125" width="0.3048" layer="1"/>
 <wire x1="71.15875" y1="49.9325" x2="69.64125" y2="51.45" width="0.3048" layer="1"/>
 <wire x1="69.64125" y1="51.45" x2="69.15625" y2="51.45" width="0.3048" layer="1"/>
 <wire x1="83.5" y1="47.0742125" x2="79.1242125" y2="51.45" width="0.3048" layer="1"/>
@@ -6517,8 +6564,8 @@ design rules under a new name.</description>
 <contactref element="USBC1-2" pad="5"/>
 <contactref element="USBC1-2" pad="1"/>
 <contactref element="POWERIN" pad="1"/>
-<wire x1="83" y1="11.7" x2="83.02" y2="11.72" width="0.3048" layer="1"/>
-<wire x1="83.02" y1="11.72" x2="85.79" y2="11.72" width="0.3048" layer="1"/>
+<wire x1="82.25" y1="11.7" x2="82.27" y2="11.72" width="0.3048" layer="1"/>
+<wire x1="82.27" y1="11.72" x2="85.04" y2="11.72" width="0.3048" layer="1"/>
 </signal>
 <signal name="C4_DATA">
 <contactref element="USB_C3-4" pad="6"/>
@@ -7040,6 +7087,12 @@ design rules under a new name.</description>
 </signal>
 <signal name="N$9">
 <contactref element="VGA" pad="14"/>
+</signal>
+<signal name="N$1">
+<contactref element="LED1" pad="A"/>
+<contactref element="GPU" pad="P$37"/>
+<wire x1="74.23" y1="62.24" x2="71.6075" y2="64.8625" width="0.3048" layer="1"/>
+<wire x1="71.6075" y1="64.8625" x2="29" y2="64.8625" width="0.3048" layer="1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
