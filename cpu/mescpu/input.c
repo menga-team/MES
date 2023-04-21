@@ -28,6 +28,7 @@
 
 volatile bool controller_available[4] = {false};
 volatile bool controller_buttons[4][8] = {{0}};
+volatile uint16_t last_port = 0xffff;
 
 /* 0  -> awaiting sync bit
  * 1  -> sync bit
@@ -43,16 +44,16 @@ void tim1_cc_isr(void) {
     TIM_SR(TIM1) = 0x0000;
     uint16_t port = gpio_port_read(CONTROLLER_PORT);
 
-    if (!controller_available[CONTROLLER_1] && (port & CONTROLLER_PIN_0)) {
+    if (!controller_available[CONTROLLER_1] && (port & CONTROLLER_PIN_0) && ((~last_port) & CONTROLLER_PIN_0)) {
         controller_available[CONTROLLER_1] = true;
     }
-    if (!controller_available[CONTROLLER_2] && (port & CONTROLLER_PIN_1)) {
+    if (!controller_available[CONTROLLER_2] && (port & CONTROLLER_PIN_1) && ((~last_port) & CONTROLLER_PIN_1)) {
         controller_available[CONTROLLER_2] = true;
     }
-    if (!controller_available[CONTROLLER_3] && (port & CONTROLLER_PIN_2)) {
+    if (!controller_available[CONTROLLER_3] && (port & CONTROLLER_PIN_2) && ((~last_port) & CONTROLLER_PIN_2)) {
         controller_available[CONTROLLER_3] = true;
     }
-    if (!controller_available[CONTROLLER_4] && (port & CONTROLLER_PIN_3)) {
+    if (!controller_available[CONTROLLER_4] && (port & CONTROLLER_PIN_3) && ((~last_port) & CONTROLLER_PIN_3)) {
         controller_available[CONTROLLER_4] = true;
     }
 
@@ -68,6 +69,10 @@ void tim1_cc_isr(void) {
         }
         // the controller only has 8 buttons.
         if (controller_counters[i] > 9) {
+            // invalid controller signal
+            if(port & CONTROLLER_PIN_MAP[i]) {
+                controller_available[i] = false;
+            }
             continue;
         }
         // check if controller is still here.
@@ -84,6 +89,7 @@ void tim1_cc_isr(void) {
         uint8_t button = controller_counters[i] - 2;
         controller_buttons[i][button] = port & CONTROLLER_PIN_MAP[i];
     }
+    last_port = port;
 }
 
 void input_setup(void) {
