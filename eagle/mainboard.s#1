@@ -12139,28 +12139,28 @@ Updated by Yingchun, Shan 2020-01-14&lt;br&gt;
 <label x="163.83" y="130.81" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
-<net name="C1_DATA" class="0">
+<net name="C1" class="0">
 <segment>
 <pinref part="R21" gate="G$1" pin="1"/>
 <wire x1="161.29" y1="133.35" x2="163.83" y2="133.35" width="0.1524" layer="91"/>
 <label x="163.83" y="133.35" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
-<net name="C2_DATA" class="0">
+<net name="C2" class="0">
 <segment>
 <pinref part="R22" gate="G$1" pin="1"/>
 <wire x1="161.29" y1="135.89" x2="163.83" y2="135.89" width="0.1524" layer="91"/>
 <label x="163.83" y="135.89" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
-<net name="C3_DATA" class="0">
+<net name="C3" class="0">
 <segment>
 <pinref part="R24" gate="G$1" pin="1"/>
 <wire x1="161.29" y1="138.43" x2="163.83" y2="138.43" width="0.1524" layer="91"/>
 <label x="163.83" y="138.43" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
-<net name="C4_DATA" class="0">
+<net name="C4" class="0">
 <segment>
 <pinref part="R25" gate="G$1" pin="1"/>
 <wire x1="161.29" y1="140.97" x2="163.83" y2="140.97" width="0.1524" layer="91"/>
