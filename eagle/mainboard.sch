@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="50" unitdist="mil" unit="mil" style="dots" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="no" active="no"/>
@@ -13563,6 +13563,8 @@ Source: www.kingbright.com</description>
 <part name="GND19" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="GND22" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="LED1" library="led" library_urn="urn:adsk.eagle:library:259" deviceset="LED" device="CHIPLED_0805" package3d_urn="urn:adsk.eagle:package:15821/2"/>
+<part name="R5" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="R0805" package3d_urn="urn:adsk.eagle:package:23553/2" value="150"/>
+<part name="GND32" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -13704,9 +13706,16 @@ Source: www.kingbright.com</description>
 <instance part="GND13" gate="1" x="353.06" y="35.56" smashed="yes">
 <attribute name="VALUE" x="350.52" y="33.02" size="1.778" layer="96"/>
 </instance>
-<instance part="LED1" gate="G$1" x="77.47" y="92.71" smashed="yes" rot="R270">
-<attribute name="NAME" x="72.898" y="89.154" size="1.778" layer="95"/>
-<attribute name="VALUE" x="72.898" y="86.995" size="1.778" layer="96"/>
+<instance part="LED1" gate="G$1" x="78.74" y="72.39" smashed="yes">
+<attribute name="NAME" x="82.296" y="67.818" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="84.455" y="67.818" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="R5" gate="G$1" x="78.74" y="82.55" smashed="yes" rot="R270">
+<attribute name="NAME" x="80.2386" y="86.36" size="1.778" layer="95" rot="R270"/>
+<attribute name="VALUE" x="75.438" y="86.36" size="1.778" layer="96" rot="R270"/>
+</instance>
+<instance part="GND32" gate="1" x="78.74" y="60.96" smashed="yes">
+<attribute name="VALUE" x="76.2" y="58.42" size="1.778" layer="96"/>
 </instance>
 </instances>
 <busses>
@@ -13759,6 +13768,11 @@ Source: www.kingbright.com</description>
 <pinref part="R20" gate="G$1" pin="1"/>
 <wire x1="353.06" y1="40.64" x2="353.06" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="GND13" gate="1" pin="GND"/>
+</segment>
+<segment>
+<pinref part="LED1" gate="G$1" pin="C"/>
+<wire x1="78.74" y1="67.31" x2="78.74" y2="63.5" width="0.1524" layer="91"/>
+<pinref part="GND32" gate="1" pin="GND"/>
 </segment>
 </net>
 <net name="GPU_MOSI" class="0">
@@ -13816,9 +13830,13 @@ Source: www.kingbright.com</description>
 <pinref part="CPU" gate="G$1" pin="PC15"/>
 </segment>
 <segment>
-<wire x1="66.04" y1="92.71" x2="72.39" y2="92.71" width="0.1524" layer="91"/>
-<label x="66.04" y="92.71" size="1.27" layer="95" rot="R180" xref="yes"/>
-<pinref part="LED1" gate="G$1" pin="C"/>
+<label x="52.07" y="92.71" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="R5" gate="G$1" pin="1"/>
+<wire x1="78.74" y1="92.71" x2="52.07" y2="92.71" width="0.1524" layer="91"/>
+<wire x1="78.74" y1="87.63" x2="78.74" y2="92.71" width="0.1524" layer="91"/>
+<pinref part="GPU" gate="G$1" pin="PC15"/>
+<wire x1="104.14" y1="92.71" x2="78.74" y2="92.71" width="0.1524" layer="91"/>
+<junction x="78.74" y="92.71"/>
 </segment>
 </net>
 <net name="RED_LSP" class="0">
@@ -14424,9 +14442,9 @@ Source: www.kingbright.com</description>
 </net>
 <net name="N$1" class="0">
 <segment>
+<pinref part="R5" gate="G$1" pin="2"/>
 <pinref part="LED1" gate="G$1" pin="A"/>
-<pinref part="GPU" gate="G$1" pin="PC15"/>
-<wire x1="80.01" y1="92.71" x2="104.14" y2="92.71" width="0.1524" layer="91"/>
+<wire x1="78.74" y1="74.93" x2="78.74" y2="77.47" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
