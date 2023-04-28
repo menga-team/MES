@@ -41,11 +41,6 @@
 #include <stddef.h>
 
 typedef struct {
-  long long quot;
-  long long rem;
-} lldiv_t;
-
-typedef struct {
   unsigned long long quot;
   unsigned long long rem;
 } ulldiv_t;

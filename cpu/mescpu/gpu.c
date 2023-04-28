@@ -16,7 +16,6 @@
 
 #include "gpu.h"
 #include "gpu_internal.h"
-#include "mesgraphics.h"
 #include "timer.h"
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/dma.h>

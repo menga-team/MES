@@ -40,7 +40,7 @@
 extern const char *GAME_ENTRY;
 extern const uint32_t REVISION;
 
-extern char *unknown_symbol;
+extern const char *unknown_symbol;
 
 void configure_io(void);
 

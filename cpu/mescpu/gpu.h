@@ -20,19 +20,7 @@
 #include "font.h"
 #include "gpu_internal.h"
 #include <stdint.h>
-
-/**
- * @param red: 0b000 - 0b111
- * @param green: 0b000 - 0b111
- * @param blue: 0b000 - 0b111
- * Generates a port config given the 3 colors.
- */
-#define COLOR(red, green, blue)                                                \
-    (uint16_t)(((red & 0b100) >> 1) | ((red & 0b010) << 9) |                   \
-               ((red & 0b001) << 11) | ((green & 0b100) << 10) |               \
-               ((green & 0b010) << 12) | ((green & 0b001) << 14) |             \
-               ((blue & 0b100) << 5) | ((blue & 0b010) << 7) |                 \
-               ((blue & 0b001) << 9))
+#include "mesgraphics.h"
 
 enum Buffer { FRONT_BUFFER = 0, BACK_BUFFER = 1 } __attribute__((__packed__));
 

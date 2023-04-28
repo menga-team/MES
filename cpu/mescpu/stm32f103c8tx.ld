@@ -1,6 +1,7 @@
 MEMORY {
-	rom (rx)      : ORIGIN = 0x8000000, LENGTH = 128K
-	ram (xrw)      : ORIGIN = 0x20000000, LENGTH = 20K
+	rom (rx)      : ORIGIN = 0x8000000, LENGTH = 28K
+	game(rx)      : ORIGIN = 0x8006D60, LENGTH = 100K
+	ram (xrw)     : ORIGIN = 0x20000000, LENGTH = 20K
 }
 
 /* Enforce emmition of the vector table. */
@@ -12,7 +13,11 @@ ENTRY(reset_handler)
 /* Define sections. */
 SECTIONS
 {
-    .text : {
+	.game-bin : {
+	      	*(.game_arr)
+	} >game
+
+	.text : {
 		*(.vectors)	/* Vector table */
 		*(.get_lot_base) /* Function for udynlink */
 		*(.text*)	/* Program code */

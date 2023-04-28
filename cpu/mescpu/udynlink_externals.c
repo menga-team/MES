@@ -24,13 +24,13 @@
 #include <math.h>
 #include <rng.h>
 
-char *unknown_symbol;
+const char *unknown_symbol;
 
 void *udynlink_external_malloc(size_t size) { return malloc(size); }
 
 void udynlink_external_free(void *p) { return free(p); }
 
-void udynlink_external_vprintf(const char *s, va_list va) {}
+void udynlink_external_vprintf(const char UNUSED *s, va_list UNUSED va) {}
 
 uint32_t udynlink_external_resolve_symbol(const char *name) {
 #include "bin/symbols.inc"

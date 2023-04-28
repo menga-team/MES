@@ -18,7 +18,6 @@
 #include "input.h"
 #include "input_internal.h"
 #include "mes.h"
-#include "mesgraphics.h"
 #include "rng.h"
 #include "sdcard.h"
 #include "timer.h"
@@ -93,14 +92,14 @@ static void startup_animation(void) {
 static void check_controller(uint8_t controller) {
     gpu_blank(FRONT_BUFFER, 0);
     gpu_reset_palette();
-    char *text = (char *)malloc(27);
+    char *text = (char *)malloc(29);
     uint8_t fg;
 
     gpu_print_text(FRONT_BUFFER, 0, 112, 1, 0,
                    "PRESS " FONT_BUTTONA "+" FONT_BUTTONB " TO RETURN.");
 
     while (true) {
-        bool *buttons = input_get_buttons(controller);
+        volatile bool *buttons = input_get_buttons(controller);
         if (input_is_available(controller)) {
             sprintf(text, "CONTROLLER%i IS CONNECTED  ", controller + 1);
             fg = 3;
@@ -129,6 +128,7 @@ static void check_controller(uint8_t controller) {
             }
         }
     }
+    free(text);
 }
 
 static void wait_for_sdcard(void) {
@@ -192,7 +192,7 @@ static void wait_for_sdcard(void) {
             }
 
             if (controller == controller_selected) {
-                swap(&fg, &bg);
+                SWAP(&fg, &bg);
             }
 
             gpu_draw_controller(BACK_BUFFER, controller, fg, bg, controller_x,
@@ -311,7 +311,7 @@ void handle_hard_fault(uint32_t *stack_frame) {
     uint16_t ufsr = (uint16_t)(*cfsr >> 16);
     uint8_t bfsr = (uint8_t)(*cfsr >> 8);
     uint8_t mmfsr = (uint8_t)(*cfsr & 0xff);
-    sprintf(text_buf, "CFSR %08x", *cfsr);
+    sprintf(text_buf, "CFSR %08lx", *cfsr);
     gpu_print_text_blocking(FRONT_BUFFER, 8, 32, 1, 4, text_buf);
     uint8_t line = 4;
     if (USFR_IS_UNDEFSTR(ufsr))
@@ -352,13 +352,13 @@ void handle_hard_fault(uint32_t *stack_frame) {
     uint32_t pc = stack_frame[6];
     uint32_t psr = stack_frame[7];
     line = 7;
-    sprintf(text_buf, "r0  %08x r1 %08x", r0, r1);
+    sprintf(text_buf, "r0  %08lx r1 %08lx", r0, r1);
     gpu_print_text_blocking(FRONT_BUFFER, 8, line++ * 8, 1, 4, text_buf);
-    sprintf(text_buf, "r2  %08x r3 %08x", r2, r3);
+    sprintf(text_buf, "r2  %08lx r3 %08lx", r2, r3);
     gpu_print_text_blocking(FRONT_BUFFER, 8, line++ * 8, 1, 4, text_buf);
-    sprintf(text_buf, "r12 %08x lr %08x", r12, lr);
+    sprintf(text_buf, "r12 %08lx lr %08lx", r12, lr);
     gpu_print_text_blocking(FRONT_BUFFER, 8, line++ * 8, 1, 4, text_buf);
-    sprintf(text_buf, "psr %08x pc %08x", psr, pc);
+    sprintf(text_buf, "psr %08lx pc %08lx", psr, pc);
     gpu_print_text_blocking(FRONT_BUFFER, 8, line++ * 8, 1, 4, text_buf);
 
     free(text_buf);
