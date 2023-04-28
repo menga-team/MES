@@ -145,7 +145,7 @@ static void wait_for_sdcard(void) {
     bool elevate = true;
     uint8_t controller_selected = 0xff;
     uint32_t next_sd_event = timer_get_ms();
-    bool pressed = false;
+    bool pressed[4] = {false};
     while (!game_ready) {
         gpu_blank(BACK_BUFFER, 0x00);
         gpu_draw_sdcard(BACK_BUFFER, 62, 36 + offset);
@@ -156,37 +156,37 @@ static void wait_for_sdcard(void) {
             uint8_t bg = 0;
             if (input_is_available(controller)) {
                 if (input_get_button(controller, BUTTON_SELECT)) {
-                    if (!pressed) {
+                    if (!pressed[controller]) {
                         controller_selected = controller;
                     }
-                    pressed = true;
+                    pressed[controller] = true;
                 } else if (controller_selected != 0xff &&
                            input_get_button(controller, BUTTON_LEFT)) {
-                    if (!pressed) {
+                    if (!pressed[controller]) {
                         controller_selected = (controller_selected - 1) & 0b11;
                     }
-                    pressed = true;
+                    pressed[controller] = true;
                 } else if (controller_selected != 0xff &&
                            input_get_button(controller, BUTTON_RIGHT)) {
-                    if (!pressed) {
+                    if (!pressed[controller]) {
                         controller_selected = (controller_selected + 1) & 0b11;
                     }
-                    pressed = true;
+                    pressed[controller] = true;
                 } else if (input_get_button(controller, BUTTON_B)) {
-                    if (!pressed) {
+                    if (!pressed[controller]) {
                         controller_selected = 0xff;
                     }
-                    pressed = true;
+                    pressed[controller] = true;
                 } else if (controller_selected != 0xff &&
                            input_get_button(controller, BUTTON_A)) {
-                    if (!pressed) {
+                    if (!pressed[controller]) {
                         check_controller(controller_selected);
                         gpu_update_palette(color_palette);
                         controller_selected = 0xff;
                     }
-                    pressed = true;
+                    pressed[controller] = true;
                 } else {
-                    pressed = false;
+                    pressed[controller] = false;
                 }
                 fg = 6;
             }
