@@ -130,7 +130,7 @@ $(BUILD_DIR)/symbols.inc:
 	python extract_symbols.py $(PROJECT).elf > $(BUILD_DIR)/symbols.inc
 
 %.bin: %.elf
-	@printf "  OBJCOPY\t$@\n"
+	@printf "OBJCOPY\t$@\n"
 	$(Q)$(OBJCOPY) -O binary  $< $@
 
 %.lss: %.elf

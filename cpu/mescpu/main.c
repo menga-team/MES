@@ -367,7 +367,8 @@ void handle_hard_fault(uint32_t *stack_frame) {
         ;
 }
 
-void enter_hard_fault_handler(void) __attribute__((naked));
+void enter_hard_fault_handler(void) __attribute__((aligned(4)))
+__attribute__((naked));
 
 void enter_hard_fault_handler(void) {
     __asm__ volatile("tst lr, #4				\n"

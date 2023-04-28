@@ -81,19 +81,23 @@ elf_file = sys.argv[1]
 
 symbols = []
 
-with open(elf_file, "rb") as f:
-    elf = ELFFile(f)
-    for section in elf.iter_sections(type="SHT_SYMTAB"):
-        for symbol in section.iter_symbols():
-            s_type = symbol["st_info"]["type"]
-            if s_type == "STT_FUNC" or s_type == "STT_OBJECT":
-                if symbol.name in INVALID_SYMBOLS:
-                    continue
-                if '.' in symbol.name:
-                    continue
-                if str(symbol.name).startswith("_"):
-                    continue
-                symbols.append(symbol.name)
+try:
+    with open(elf_file, "rb") as f:
+        elf = ELFFile(f)
+        for section in elf.iter_sections(type="SHT_SYMTAB"):
+            for symbol in section.iter_symbols():
+                s_type = symbol["st_info"]["type"]
+                if s_type == "STT_FUNC" or s_type == "STT_OBJECT":
+                    if symbol.name in INVALID_SYMBOLS:
+                        continue
+                    if '.' in symbol.name:
+                        continue
+                    if str(symbol.name).startswith("_"):
+                        continue
+                    symbols.append(symbol.name)
+except FileNotFoundError:
+    print("// Warning: elf file not found")
+    pass
 
 e_symbols = [*symbols, *EXTRA_SYMBOLS]
 
