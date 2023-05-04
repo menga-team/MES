@@ -1,5 +1,7 @@
 use anyhow::{anyhow, Context};
 use bitvec::prelude::*;
+use byteorder::LittleEndian;
+use byteorder::WriteBytesExt;
 use png::ColorType;
 use scan_fmt::scan_fmt;
 use serde_json::Value;
@@ -7,13 +9,11 @@ use std::{
     collections::HashMap,
     fmt::Display,
     fs::File,
-    io::{self, Write, Cursor},
+    io::{self, Write},
     path::PathBuf,
     str::FromStr,
 };
 use structopt::StructOpt;
-use byteorder::WriteBytesExt;
-use byteorder::LittleEndian;
 
 fn main() {
     match run() {
@@ -107,7 +107,11 @@ fn run() -> anyhow::Result<()> {
                 }
             }
             png::BitDepth::Eight | png::BitDepth::Sixteen => {
-                Err(anyhow!("Invalid bit depth - Please make sure your indexed PNG does not use more than 8 colors."))?
+                if !opt.ignore_invalid_bit_depth {
+                    Err(anyhow!("Invalid bit depth - Please make sure your indexed PNG does not use more than 8 colors. Use the --ignore-invalid-bit-depth (-f) flag to convert anyway by using the first 3 bits."))?;
+                } else {
+		    original_bv.extend(&bytes[i].view_bits::<Msb0>()[0..=2]);
+                }
             }
         }
     }
@@ -156,7 +160,7 @@ fn run() -> anyhow::Result<()> {
         effective_palette = &palette_map;
     }
 
-    let fallback_color = Color {r: 0, g: 0, b: 0};
+    let fallback_color = Color { r: 0, g: 0, b: 0 };
     let mut sorted_colors: [&Color; 8] = [&fallback_color; 8];
 
     for (color, i) in effective_palette {
@@ -164,9 +168,9 @@ fn run() -> anyhow::Result<()> {
     }
 
     if opt.embed_color_palette {
-	for color in sorted_colors {
-	    out.write_u16::<LittleEndian>(color_to_port(color))?;
-	}
+        for color in sorted_colors {
+            out.write_u16::<LittleEndian>(color_to_port(color))?;
+        }
     }
 
     if opt.include_color_palette || opt.output_type == OutputType::Code {
@@ -283,4 +287,6 @@ struct Opt {
     include_color_palette: bool,
     #[structopt(short = "e", long = "embed-color-palette")]
     embed_color_palette: bool,
+    #[structopt(long = "ignore-invalid-bit-depth", short = "f")]
+    ignore_invalid_bit_depth: bool,
 }
