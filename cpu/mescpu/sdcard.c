@@ -22,7 +22,8 @@
 #include <malloc.h>
 #include <stdio.h>
 
-bool sd_card_available = false;
+bool sdcard_available = false;
+bool sdcard_is_hcxc = false;
 
 uint8_t sdcard_calculate_crc7(const uint8_t *data, uint32_t len) {
     uint8_t crc = 0;
@@ -293,6 +294,11 @@ enum SDInitResult sdcard_init(void) {
         return SD_CARD_GENERIC_COMMUNICATION_ERROR;
     uint8_t ocr_register[4];
     sdcard_read_buf(ocr_register, sizeof(ocr_register));
+    if (SD_OCR_IS_SDHC_OR_SDXC(ocr_register)) {
+        sdcard_is_hcxc = true;
+    } else {
+        sdcard_is_hcxc = false;
+    }
     sdcard_release();
     uint32_t start_time = timer_get_ms();
     while (r1.in_idle_state) {
@@ -328,12 +334,17 @@ bool sdcard_init_peripheral(void) {
 }
 
 void sdcard_read_sector(uint32_t sector, uint8_t *data) {
-    sector *= SD_SECTOR_SIZE;
+    if (!sdcard_is_hcxc) {
+        sector *= SD_SECTOR_SIZE;
+    }
     sdcard_send_command_blocking(SD_CMD17_READ_SINGLE_BLOCK, sector, 8);
     sdcard_read_block(data, SD_SECTOR_SIZE, 0);
 }
 
 void sdcard_write_sector(uint32_t sector, uint8_t *data) {
+    if (!sdcard_is_hcxc) {
+        sector *= SD_SECTOR_SIZE;
+    }
     sdcard_send_command_blocking(SD_CMD24_WRITE_BLOCK, sector, 8);
     sdcard_send_block(data, SD_SECTOR_SIZE);
     while (sdcard_transceive(0xff) == 0xff)
@@ -350,11 +361,11 @@ void sdcard_read_sector_partially(uint32_t sector, uint8_t *data,
 
 void sdcard_poll(void) {
     bool inserted = !(gpio_port_read(SD_HP_PORT) & SD_HP_PIN);
-    if (sd_card_available && !inserted) {
-        sd_card_available = false;
+    if (sdcard_available && !inserted) {
+        sdcard_available = false;
         return sdcard_on_eject();
-    } else if (!sd_card_available && inserted) {
-        sd_card_available = true;
+    } else if (!sdcard_available && inserted) {
+        sdcard_available = true;
         return sdcard_on_insert();
     } else {
         return;

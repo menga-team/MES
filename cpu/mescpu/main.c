@@ -174,7 +174,6 @@ static void copy_game(uint8_t sectors) {
                 error_with_message("integrity failure", "");
             }
         }
-
         page_adr += FLASH_PAGE_SIZE;
     }
     flash_lock();
@@ -271,7 +270,7 @@ static void wait_for_sdcard(void) {
 
         gpu_swap_buf();
         sdcard_poll();
-        if (sd_card_available) {
+        if (sdcard_available) {
             if (!data_loaded) {
                 bool res = sdcard_init_peripheral();
                 if (res) {
@@ -357,6 +356,8 @@ int main(void) {
         goto restart_game;
     case CODE_FREEZEFRAME:
         break;
+    default:
+        gpu_print_text(FRONT_BUFFER, 0, 0, 1, 0, "GAME CLOSED UNEXPECTEDLY!");
     }
 
     while (true)
@@ -377,6 +378,7 @@ void configure_io(void) {
     gpio_set(GPIOC, GPIO13); // clear in-built led.
 }
 
+// TODO finish function
 void error_with_message(char *title, char *text) {
     unrecoverable_error();
     char *txt = malloc(27);

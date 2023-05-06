@@ -152,7 +152,8 @@ typedef struct {
     uint8_t sectors;
 } GameImage;
 
-extern bool sd_card_available;
+extern bool sdcard_available;
+extern bool sdcard_is_hcxc;
 
 /**
  * Calculate the 7 bit CRC value of the given data.
