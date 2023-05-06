@@ -110,7 +110,7 @@ fn run() -> anyhow::Result<()> {
                 if !opt.ignore_invalid_bit_depth {
                     Err(anyhow!("Invalid bit depth - Please make sure your indexed PNG does not use more than 8 colors. Use the --ignore-invalid-bit-depth (-f) flag to convert anyway by using the first 3 bits."))?;
                 } else {
-		    original_bv.extend(&bytes[i].view_bits::<Msb0>()[0..=2]);
+		    original_bv.extend(&bytes[i].view_bits::<Lsb0>()[0..=2]);
                 }
             }
         }

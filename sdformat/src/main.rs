@@ -8,7 +8,6 @@ use std::env;
 use std::fmt;
 use std::fs;
 use std::fs::File;
-use std::io::Cursor;
 use std::io::Read;
 use std::io::Seek;
 use std::io::Write;
@@ -216,6 +215,14 @@ fn main() -> anyhow::Result<()> {
                 image.write_u8(game.version.minor)?;
                 image.write_u8(game.version.patch)?;
                 image.extend_from_slice(&game.icon.bytes);
+                image.write_u8(
+                    ((game.game.bytes.len() / SECTOR_SIZE)
+                        + if game.game.bytes.len() % SECTOR_SIZE > 0 {
+                            1
+                        } else {
+                            0
+                        }) as u8,
+                )?;
                 while image.len() < SECTOR_SIZE {
                     image.write_u8(0)?;
                 }
@@ -229,7 +236,6 @@ fn main() -> anyhow::Result<()> {
                     .write(true)
                     .open(output)?;
                 file.write_all(&image)?;
-                dbg!(image.len());
             }
         }
         Some(("flash", sub_matches)) => {

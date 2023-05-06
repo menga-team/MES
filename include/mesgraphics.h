@@ -1,12 +1,7 @@
 #ifndef MES_MESGRAPHICS_H
 #define MES_MESGRAPHICS_H
 
-#ifdef __GNUC__
-#define UNUSED __attribute__ ((unused))
-#else
-#define UNUSED
-#endif
-
+#include "utils.h"
 #include <stdint.h>
 #include <math.h>
 #include <stdbool.h>

@@ -23,6 +23,7 @@
 #include "timer.h"
 #include "udynlink.h"
 #include <libopencm3/cm3/nvic.h>
+#include <libopencm3/stm32/flash.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 #include <malloc.h>
@@ -78,15 +79,25 @@ static void startup_animation(void) {
             return;
         }
     }
-    gpu_wait_for_next_ready();
+    gpu_block_frame();
     gpu_show_startup();
-    gpu_wait_for_next_ready();
-    timer_block_ms(1000);
-    gpu_wait_for_next_ready();
+    gpu_block_frame();
+    block_until = timer_get_ms() + 1000;
+    while (timer_get_ms() < block_until) {
+        if (input_get_button(CONTROLLER_1, BUTTON_A)) {
+            return;
+        }
+    }
+    gpu_block_frame();
     gpu_adjust_brightness();
-    gpu_wait_for_next_ready();
-    timer_block_ms(500);
-    gpu_wait_for_next_ready();
+    gpu_block_frame();
+    block_until = timer_get_ms() + 500;
+    while (timer_get_ms() < block_until) {
+        if (input_get_button(CONTROLLER_1, BUTTON_A)) {
+            return;
+        }
+    }
+    gpu_block_frame();
 }
 
 static void check_controller(uint8_t controller) {
@@ -107,7 +118,7 @@ static void check_controller(uint8_t controller) {
             sprintf(text, "CONTROLLER%i IS DISCONNETED", controller + 1);
             fg = 2;
         }
-        gpu_print_text(FRONT_BUFFER, 0, 0, fg, 0, text);
+        gpu_print_text(FRONT_BUFFER, 0, 8, fg, 0, text);
         gpu_block_until_ack();
         gpu_wait_for_next_ready();
         for (uint8_t i = 0; i < 8; ++i) {
@@ -118,8 +129,8 @@ static void check_controller(uint8_t controller) {
                 sprintf(text, "%-3s RELEASED", BUTTON_CHARACTERS[i]);
                 fg = 2;
             }
-            gpu_print_text(FRONT_BUFFER, 0, (i + 1) * 8, fg, 0, text);
-            gpu_block_until_ack();
+            gpu_print_text(FRONT_BUFFER, 0, (i + 2) * 8, fg, 0, text);
+            gpu_block_ack();
         }
         for (uint8_t i = 0; i < 4; ++i) {
             if (input_get_button(i, BUTTON_A) &&
@@ -131,30 +142,83 @@ static void check_controller(uint8_t controller) {
     free(text);
 }
 
+static void copy_game(uint8_t sectors) {
+    if (SD_SECTOR_SIZE * 2 != FLASH_PAGE_SIZE) {
+        error_with_message("calc", "");
+    }
+
+    flash_unlock();
+    uint8_t *data = malloc(SD_SECTOR_SIZE * 2);
+    uint32_t page_adr = FLASH_GAME_ADR;
+    uint32_t flash_status = 0;
+    for (uint32_t i = 0; i < sectors; i += 2) {
+        // read from sd
+        sdcard_read_sector(1 + i, data);
+        sdcard_read_sector(2 + i, data + SD_SECTOR_SIZE);
+
+        if ((FLASH_GAME_ADR - FLASH_BASE) >=
+            (FLASH_PAGE_SIZE * (FLASH_PAGE_NUM_MAX + 1))) {
+            error_with_message("out of bounds", "");
+        }
+
+        flash_erase_page(page_adr);
+        flash_status = flash_get_status_flags();
+        if (flash_status != FLASH_SR_EOP) {
+            error_with_message("sr eop", "");
+        }
+
+        for (uint32_t word = 0; word < SD_SECTOR_SIZE * 2; word += 4) {
+            flash_program_word(page_adr + word, *((uint32_t *)(data + word)));
+            if (*((uint32_t *)(page_adr + word)) !=
+                *((uint32_t *)(data + word))) {
+                error_with_message("integrity failure", "");
+            }
+        }
+
+        page_adr += FLASH_PAGE_SIZE;
+    }
+    flash_lock();
+}
+
 static void wait_for_sdcard(void) {
-    uint16_t color_palette[8] = {
+    const uint16_t original_color_palette[8] = {
         COLOR(0b000, 0b000, 0b000), COLOR(0b001, 0b001, 0b010),
         COLOR(0b010, 0b010, 0b100), COLOR(0b111, 0b001, 0b001),
         COLOR(0b011, 0b011, 0b011), COLOR(0b011, 0b011, 0b101),
         COLOR(0b111, 0b111, 0b111), COLOR(0b000, 0b000, 0b000),
     };
-    gpu_wait_for_next_ready();
-    gpu_update_palette(color_palette);
-    bool game_ready = false;
+    GameImage *sector = malloc(512);
+    bool data_loaded = false;
+    gpu_update_palette(original_color_palette);
     int8_t offset = 0;
     bool elevate = true;
     uint8_t controller_selected = 0xff;
     uint32_t next_sd_event = timer_get_ms();
     bool pressed[4] = {false};
-    while (!game_ready) {
+    while (true) {
         gpu_blank(BACK_BUFFER, 0x00);
+        // sd card operation takes quite some time, we execute it on
+        // its own frame.
+        gpu_block_ack();
+        gpu_block_frame();
         gpu_draw_sdcard(BACK_BUFFER, 62, 36 + offset);
+        if (data_loaded) {
+            // FIXME?: The title screen has more fps without sdcard.
+            gpu_block_ack();
+            gpu_block_frame();
+            gpu_send_buf(BACK_BUFFER, 29, 26, 65, 42 + offset,
+                         sector->icon.image);
+        }
         const uint8_t controllers_y = 120 - 16 - 2;
         uint8_t controller_x = 160 - 2 - (18 * 4);
         for (uint8_t controller = 0; controller < 4; ++controller) {
             uint8_t fg = 3;
             uint8_t bg = 0;
             if (input_is_available(controller)) {
+                if (input_get_button(controller, BUTTON_START)) {
+                    // start the game.
+                    goto end_waiting;
+                }
                 if (input_get_button(controller, BUTTON_SELECT)) {
                     if (!pressed[controller]) {
                         controller_selected = controller;
@@ -181,7 +245,7 @@ static void wait_for_sdcard(void) {
                            input_get_button(controller, BUTTON_A)) {
                     if (!pressed[controller]) {
                         check_controller(controller_selected);
-                        gpu_update_palette(color_palette);
+                        gpu_update_palette(original_color_palette);
                         controller_selected = 0xff;
                     }
                     pressed[controller] = true;
@@ -199,8 +263,29 @@ static void wait_for_sdcard(void) {
                                 controllers_y);
             controller_x += 18;
         }
+
+        if (data_loaded) {
+            gpu_print_text(BACK_BUFFER, 2, 2, 6, 0, sector->name);
+            gpu_print_text(BACK_BUFFER, 2, 10, 6, 0, sector->authors);
+        }
+
         gpu_swap_buf();
-        gpu_block_until_ack();
+        sdcard_poll();
+        if (sd_card_available) {
+            if (!data_loaded) {
+                bool res = sdcard_init_peripheral();
+                if (res) {
+                    sdcard_read_sector(0, (uint8_t *)sector);
+                    gpu_update_palette(sector->icon.palette);
+                    data_loaded = true;
+                }
+            }
+        } else {
+            if (data_loaded) {
+                gpu_update_palette(original_color_palette);
+                data_loaded = false;
+            }
+        }
 
         if (timer_get_ms() >= next_sd_event) {
             bool delayed = false;
@@ -223,7 +308,14 @@ static void wait_for_sdcard(void) {
 
             next_sd_event = (delayed ? next_sd_event : timer_get_ms()) + 200;
         }
+
+        gpu_block_ack();
+        gpu_block_frame();
     }
+
+end_waiting:
+    copy_game(sector->sectors);
+    free(sector);
 }
 
 int main(void) {
@@ -242,14 +334,29 @@ int main(void) {
     gpu_blank(BACK_BUFFER, 0);
     gpu_swap_buf();
 
+    uint8_t exit;
+
     if (*hello_world != 0x00) {
         // run the flashed copy of the game instead.
-        run_game((void *)hello_world);
+        exit = run_game((void *)hello_world);
     } else {
         // normal startup, display a boot animation.
         startup_animation();
+    return_to_menu:
         wait_for_sdcard();
-        gpu_print_text(FRONT_BUFFER, 0, 0, 1, 0, "DYN LOADING UNIMPLEMENTED!");
+        gpu_reset_palette();
+        gpu_block_ack();
+    restart_game:
+        exit = run_game((void *)FLASH_GAME_ADR);
+    }
+
+    switch (exit) {
+    case CODE_EXIT:
+        goto return_to_menu;
+    case CODE_RESTART:
+        goto restart_game;
+    case CODE_FREEZEFRAME:
+        break;
     }
 
     while (true)
@@ -268,6 +375,15 @@ void configure_io(void) {
     gpio_set_mode(GPIOC, GPIO_MODE_OUTPUT_2_MHZ, GPIO_CNF_OUTPUT_PUSHPULL,
                   GPIO13);   // in-built
     gpio_set(GPIOC, GPIO13); // clear in-built led.
+}
+
+void error_with_message(char *title, char *text) {
+    unrecoverable_error();
+    char *txt = malloc(27);
+    sprintf(txt, "\xd6\xc4 %s-22 \xc4\xb7", title);
+    gpu_print_text_blocking(FRONT_BUFFER, 2, 24, 1, 4, txt);
+    while (true)
+        ;
 }
 
 void unrecoverable_error(void) {

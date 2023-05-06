@@ -1,6 +1,6 @@
 MEMORY {
 	rom (rx)      : ORIGIN = 0x8000000, LENGTH = 58K
-	game(rx)      : ORIGIN = 0x800E290, LENGTH = 70K
+	game(rx)      : ORIGIN = 0x800E800, LENGTH = 70K
 	ram (xrw)     : ORIGIN = 0x20000000, LENGTH = 20K
 }
 

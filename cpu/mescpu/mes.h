@@ -37,6 +37,10 @@
 #define MMFSR_IS_MLSPERR(X) (X & 0b00100000)
 #define MMFSR_IS_MMARVALID(X) (X & 0b10000000)
 
+#define FLASH_GAME_ADR 0x800E800
+#define FLASH_PAGE_NUM_MAX 127
+#define FLASH_PAGE_SIZE 0x400
+
 extern const char *GAME_ENTRY;
 extern const uint32_t REVISION;
 
@@ -49,6 +53,8 @@ void clock_peripherals(void);
 void invalid_location_get_lot_base(uint32_t adr);
 
 void unrecoverable_error(void);
+
+void error_with_message(char *title, char *text);
 
 uint8_t run_game(void *adr);
 

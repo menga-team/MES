@@ -82,7 +82,7 @@ Operation gpu_operation_draw_controller(uint8_t bf, uint8_t n, uint8_t fg,
 
 void gpu_print_text(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t foreground,
                     uint8_t background, const char *text) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     uint8_t len = 0;
     while (text[len++] != 0)
         ;
@@ -115,7 +115,7 @@ void gpu_print_text_blocking(Buffer buffer, uint8_t ox, uint8_t oy,
 }
 
 void gpu_reset(void) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     current_operation = (Queue){
         gpu_operation_reset(), 0, 0, true, false,
     };
@@ -125,7 +125,7 @@ void gpu_reset(void) {
 
 void gpu_send_buf(Buffer buffer, uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy,
                   void *pixels) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     Operation op = gpu_operation_send_buf(buffer, ox, oy, xx, yy);
     if (xx == 160 && yy == 120)
         op._4 = op._5 = op._6 = op._7 = 0;
@@ -138,7 +138,7 @@ void gpu_send_buf(Buffer buffer, uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy,
 
 void gpu_display_buf(uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy,
                      void *pixels) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     Operation op = gpu_operation_display_buf(ox, oy, xx, yy);
     if (xx == 160 && yy == 120)
         op._4 = op._5 = op._6 = op._7 = 0;
@@ -150,7 +150,7 @@ void gpu_display_buf(uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy,
 }
 
 void gpu_swap_buf(void) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     current_operation = (Queue){
         gpu_operation_swap_buf(), 0, 0, true, false,
     };
@@ -159,7 +159,7 @@ void gpu_swap_buf(void) {
 }
 
 void gpu_blank(Buffer buffer, uint8_t blank_with) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     current_operation = (Queue){
         gpu_operation_blank(buffer, blank_with), 0, 0, true, false,
     };
@@ -168,7 +168,7 @@ void gpu_blank(Buffer buffer, uint8_t blank_with) {
 }
 
 void gpu_show_startup(void) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     current_operation = (Queue){
         gpu_operation_show_startup(), 0, 0, true, false,
     };
@@ -177,7 +177,7 @@ void gpu_show_startup(void) {
 }
 
 void gpu_adjust_brightness(void) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     current_operation = (Queue){
         gpu_operation_adjust_brightness(), 0, 0, true, false,
     };
@@ -186,7 +186,7 @@ void gpu_adjust_brightness(void) {
 }
 
 void gpu_draw_sdcard(Buffer buffer, uint8_t x, uint8_t y) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     current_operation = (Queue){
         gpu_operation_draw_sdcard(buffer, x, y), 0, 0, true, false,
     };
@@ -195,7 +195,7 @@ void gpu_draw_sdcard(Buffer buffer, uint8_t x, uint8_t y) {
 }
 
 void gpu_update_palette(const uint16_t *new_palette) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     current_operation = (Queue){
         gpu_operation_update_palette(),
         (uint8_t *)new_palette,
@@ -294,18 +294,26 @@ void dma1_channel3_isr(void) {
 }
 
 void gpu_block_until_ack(void) {
+    gpu_block_ack();
+}
+
+void gpu_block_ack(void) {
     while (!current_operation.ack)
         ;
 }
 
 void gpu_wait_for_next_ready(void) {
-    current_operation.ack = false;
-    gpu_block_until_ack();
+    gpu_block_frame();
 }
 
-void gpu_block_frames(uint8_t n) {
+void gpu_block_frame(void) {
+    current_operation.ack = false;
+    gpu_block_ack();
+}
+
+void gpu_block_frames(uint32_t n) {
     while (n--) {
-        gpu_wait_for_next_ready();
+        gpu_block_frame();
     }
 }
 
@@ -317,12 +325,12 @@ void gpu_reset_palette(void) {
         COLOR(0b111, 0b000, 0b111), COLOR(0b000, 0b111, 0b111),
     };
     gpu_update_palette(DEFAULT_PALETTE);
-    gpu_block_until_ack();
+    gpu_block_ack();
 }
 
 void gpu_draw_controller(Buffer buffer, uint8_t n, uint8_t fg, uint8_t bg,
                          uint8_t x, uint8_t y) {
-    gpu_block_until_ack();
+    gpu_block_ack();
     current_operation = (Queue){
         gpu_operation_draw_controller(buffer, n, fg, bg, x, y),
         0,

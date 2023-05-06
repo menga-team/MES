@@ -17,20 +17,26 @@
 #ifndef MES_GPU_H
 #define MES_GPU_H
 
+#include <stdint.h>
 #include "font.h"
 #include "gpu_internal.h"
-#include <stdint.h>
 #include "mesgraphics.h"
+#include "utils.h"
 
 enum Buffer { FRONT_BUFFER = 0, BACK_BUFFER = 1 } __attribute__((__packed__));
 
 typedef enum Buffer Buffer;
 
 /// Will halt execution until GPU acknowledged the operation.
-void gpu_block_until_ack(void);
+/// @related gpu_block_ack
+void DEPRICATED gpu_block_until_ack(void);
+
+void gpu_block_frame(void);
+
+void gpu_block_ack(void);
 
 /// Will halt execution until n frames have passed.
-void gpu_block_frames(uint8_t n);
+void gpu_block_frames(uint32_t n);
 
 /// Prints text on the Monitor.
 void gpu_print_text(Buffer buffer, uint8_t ox, uint8_t oy, uint8_t foreground,
@@ -56,7 +62,7 @@ void gpu_display_buf(uint8_t xx, uint8_t yy, uint8_t ox, uint8_t oy,
                      void *pixels);
 
 /// Will block until next GPU READY is recieved, useful for frame timing.
-void gpu_wait_for_next_ready(void);
+void DEPRICATED gpu_wait_for_next_ready(void);
 
 /// Will display a startup animation. Internal operation.
 void gpu_show_startup(void);

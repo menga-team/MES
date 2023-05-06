@@ -26,6 +26,8 @@
 #define SD_SPI_MISO GPIO14
 #define SD_SPI_MOSI GPIO15
 #define SD_SECTOR_SIZE 512
+#define SD_HP_PORT GPIOC
+#define SD_HP_PIN GPIO14
 #define SD_CRC_POLY 0b10001001
 
 #define SD_CMD0_GO_IDLE_STATE 0
@@ -134,6 +136,24 @@ union SDResponse1 {
     uint8_t repr;
 };
 
+typedef struct {
+    char magic[3];
+    char name[26];
+    char authors[26];
+    struct {
+        uint8_t major;
+        uint8_t minor;
+        uint8_t patch;
+    } version;
+    struct {
+        uint16_t palette[8];
+        uint8_t image[285];
+    } icon;
+    uint8_t sectors;
+} GameImage;
+
+extern bool sd_card_available;
+
 /**
  * Calculate the 7 bit CRC value of the given data.
  * The data will be shifted by one bit to the left and the first bit will be set
@@ -174,6 +194,8 @@ uint32_t sdcard_calculate_size_csdv2(const uint8_t *csd);
  * @return
  */
 uint32_t sdcard_calculate_size(const uint8_t *csd);
+
+void sdcard_reset_spi(void);
 
 /**
  * Establish the SPI peripheral for communicating with the Card.
@@ -359,6 +381,12 @@ void sdcard_write_sector(uint32_t sector, uint8_t *data);
  * not improve runtime.
  */
 void sdcard_read_sector_partially(uint32_t sector, uint8_t *data, uint32_t len);
+
+/**
+ * For internal use only.
+ * Will execute sdcard_on_insert or sdcard_on_eject accordingly (if applicable).
+ */
+void sdcard_poll(void);
 
 /**
  * This function gets called when a new SD-Card was inserted.
