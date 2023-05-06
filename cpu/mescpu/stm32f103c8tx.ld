@@ -1,6 +1,6 @@
 MEMORY {
-	rom (rx)      : ORIGIN = 0x8000000, LENGTH = 28K
-	game(rx)      : ORIGIN = 0x8006D60, LENGTH = 100K
+	rom (rx)      : ORIGIN = 0x8000000, LENGTH = 58K
+	game(rx)      : ORIGIN = 0x800E290, LENGTH = 70K
 	ram (xrw)     : ORIGIN = 0x20000000, LENGTH = 20K
 }
 
@@ -14,7 +14,8 @@ ENTRY(reset_handler)
 SECTIONS
 {
 	.game-bin : {
-	      	*(.game_arr)
+	      	*(.game-bin)
+		. = ALIGN(4);
 	} >game
 
 	.text : {
