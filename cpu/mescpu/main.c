@@ -177,6 +177,7 @@ static void copy_game(uint8_t sectors) {
         }
         page_adr += FLASH_PAGE_SIZE;
     }
+    free(data);
     flash_lock();
 }
 
