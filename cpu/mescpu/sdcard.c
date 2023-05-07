@@ -253,15 +253,17 @@ enum SDInitResult sdcard_init(void) {
     sdcard_boot_sequence();
     union SDResponse1 r1;
     r1.repr = sdcard_go_idle();
-    if (r1.invalid)
+    if (r1.invalid) {
         return SD_CARD_TIMEOUT; // gets returned when to sd failed to answer for
                                 // ~1s
+    }
     if (!r1.in_idle_state) { // SD-Card should be in idle after commanding it to
                              // go in idle...
         r1.repr = sdcard_go_idle(); // From my experience, sending the command a
                                     // 2nd time sometimes does the trick.
-        if (!r1.in_idle_state)
+        if (!r1.in_idle_state) {
             return SD_CARD_RESET_ERROR; // give up...
+        }
     }
     sdcard_release();
     r1.repr = sdcard_send_command_blocking(
@@ -269,11 +271,14 @@ enum SDInitResult sdcard_init(void) {
         sdcard_args_send_if_cond(false, false, VOLTAGE_2V7_TO_3V6,
                                  SD_CHECK_PATTERN),
         2);
-    if (r1.invalid)
+    if (r1.invalid) {
         return SD_CARD_GENERIC_COMMUNICATION_ERROR;
-    if (r1.illegal_command)
-        return SD_CARD_GENERIC_COMMUNICATION_ERROR; // TODO: test with SD-Card
-                                                    // prior to 2.00
+    }
+
+    if (r1.illegal_command) {
+        sdcard_is_hcxc = false;
+        goto sd_poll_ready;
+    }
     uint8_t sd_status[4];
     sdcard_read_buf(sd_status, sizeof(sd_status));
     const bool pcie_1v2 = (sd_status[2] >> 4) & 2;
@@ -299,6 +304,7 @@ enum SDInitResult sdcard_init(void) {
     } else {
         sdcard_is_hcxc = false;
     }
+sd_poll_ready:
     sdcard_release();
     uint32_t start_time = timer_get_ms();
     while (r1.in_idle_state) {
