@@ -71,6 +71,7 @@ uint8_t run_game(void *adr) {
         gpu_print_text(FRONT_BUFFER, 0, 16, 1, 0, GAME_ENTRY);
         return -1;
     }
+    udynlink_unload_module(p_game);
 }
 
 static void startup_animation(void) {
@@ -216,7 +217,7 @@ static void wait_for_sdcard(void) {
             uint8_t fg = 3;
             uint8_t bg = 0;
             if (input_is_available(controller)) {
-                if (input_get_button(controller, BUTTON_START)) {
+                if (data_loaded && input_get_button(controller, BUTTON_START)) {
                     // start the game.
                     goto end_waiting;
                 }
@@ -386,6 +387,7 @@ void error_with_message(char *title, char *text) {
     char *txt = malloc(27);
     sprintf(txt, "\xd6\xc4 %s-22 \xc4\xb7", title);
     gpu_print_text_blocking(FRONT_BUFFER, 2, 24, 1, 4, txt);
+    free(txt);
     while (true)
         ;
 }
@@ -418,6 +420,7 @@ void invalid_location_get_lot_base(uint32_t adr) {
     gpu_print_text_blocking(FRONT_BUFFER, 8, 72, 1, 4,
                             "ensure that all code was");
     gpu_print_text_blocking(FRONT_BUFFER, 8, 80, 1, 4, "flashed correctly.");
+    free(text_buf);
     while (true)
         ;
 }

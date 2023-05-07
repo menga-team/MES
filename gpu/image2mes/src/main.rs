@@ -33,8 +33,8 @@ fn color_to_port(color: &Color) -> u16 {
         | ((green & 0b010) << 12)
         | ((green & 0b001) << 14)
         | ((blue & 0b100) << 5)
-        | ((blue & 0b010) << 7)
-        | ((blue & 0b001) << 9)
+        | ((blue & 0b010) << 5)
+        | ((blue & 0b001) << 5)
 }
 
 fn run() -> anyhow::Result<()> {
