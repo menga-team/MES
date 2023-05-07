@@ -339,9 +339,16 @@ int main(void) {
     uint32_t wait_until = timer_get_ms() + 20;
     while (wait_until > timer_get_ms()) {
         if (gpio_port_read(GPU_READY_PORT) & GPU_READY) {
-            goto return_to_menu;
+            if (hello_world[0] != 0x00) {
+                gpu_block_ack();
+                gpu_block_frame();
+                goto run_flashed_game;
+            } else {
+                goto return_to_menu;
+            }
         }
     }
+
     gpu_sync();
     gpu_reset_palette();
     if ((uint32_t)&get_lot_base != 0x08000150) {
@@ -352,8 +359,9 @@ int main(void) {
 
     uint8_t exit;
 
-    if (*hello_world != 0x00) {
+    if (hello_world[0] != 0x00) {
         // run the flashed copy of the game instead.
+    run_flashed_game:
         exit = run_game((void *)hello_world);
     } else {
         // normal startup, display a boot animation.
