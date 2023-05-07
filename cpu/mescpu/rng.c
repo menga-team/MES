@@ -45,6 +45,7 @@ void rng_init(void) {
     while (!(adc_eoc(ADC1)))
         ;
     seed *= (adc_read_regular(ADC1)+1);
+
     tinymt32_init(&tinymt, seed);
 }
 

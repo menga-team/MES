@@ -217,7 +217,7 @@ fn main() -> anyhow::Result<()> {
                 image.extend_from_slice(&game.icon.bytes);
                 image.write_u8(
                     ((game.game.bytes.len() / SECTOR_SIZE)
-                        + if game.game.bytes.len() % SECTOR_SIZE > 0 {
+                        + if (game.game.bytes.len() % SECTOR_SIZE) > 0 {
                             1
                         } else {
                             0

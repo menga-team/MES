@@ -45,6 +45,11 @@ typedef struct {
   unsigned long long rem;
 } ulldiv_t;
 
+typedef struct {
+  long long quot;
+  long long rem;
+} lldiv_t;
+
 /* Standard double precision floating-point
  * arithmetic helper functions
  */

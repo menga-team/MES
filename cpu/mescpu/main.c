@@ -18,6 +18,7 @@
 #include "input.h"
 #include "input_internal.h"
 #include "mes.h"
+#include "mesgraphics.h"
 #include "rng.h"
 #include "sdcard.h"
 #include "timer.h"
@@ -119,8 +120,8 @@ static void check_controller(uint8_t controller) {
             fg = 2;
         }
         gpu_print_text(FRONT_BUFFER, 0, 8, fg, 0, text);
-        gpu_block_until_ack();
-        gpu_wait_for_next_ready();
+        gpu_block_ack();
+        gpu_block_frame();
         for (uint8_t i = 0; i < 8; ++i) {
             if (buttons[i]) {
                 sprintf(text, "%-3s PRESSED ", BUTTON_CHARACTERS[i]);

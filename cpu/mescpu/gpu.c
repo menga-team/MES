@@ -16,6 +16,7 @@
 
 #include "gpu.h"
 #include "gpu_internal.h"
+#include "mesgraphics.h"
 #include "timer.h"
 #include <libopencm3/cm3/nvic.h>
 #include <libopencm3/stm32/dma.h>
@@ -293,18 +294,14 @@ void dma1_channel3_isr(void) {
     spi_dma_transmit_ongoing = false;
 }
 
-void gpu_block_until_ack(void) {
-    gpu_block_ack();
-}
+void gpu_block_until_ack(void) { gpu_block_ack(); }
 
 void gpu_block_ack(void) {
     while (!current_operation.ack)
         ;
 }
 
-void gpu_wait_for_next_ready(void) {
-    gpu_block_frame();
-}
+void gpu_wait_for_next_ready(void) { gpu_block_frame(); }
 
 void gpu_block_frame(void) {
     current_operation.ack = false;

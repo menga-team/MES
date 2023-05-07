@@ -20,7 +20,6 @@
 #include <stdint.h>
 #include "font.h"
 #include "gpu_internal.h"
-#include "mesgraphics.h"
 #include "utils.h"
 
 enum Buffer { FRONT_BUFFER = 0, BACK_BUFFER = 1 } __attribute__((__packed__));

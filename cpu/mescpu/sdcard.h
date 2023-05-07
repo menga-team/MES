@@ -144,13 +144,13 @@ typedef struct {
         uint8_t major;
         uint8_t minor;
         uint8_t patch;
-    } version;
+    } __attribute__((__packed__)) version;
     struct {
         uint16_t palette[8];
         uint8_t image[285];
-    } icon;
+    } __attribute__((__packed__)) icon;
     uint8_t sectors;
-} GameImage;
+} __attribute__((__packed__)) GameImage;
 
 extern bool sdcard_available;
 extern bool sdcard_is_hcxc;
