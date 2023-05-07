@@ -15,6 +15,7 @@
  */
 
 #include "gpu.h"
+#include "gpu_internal.h"
 #include "input.h"
 #include "input_internal.h"
 #include "mes.h"
@@ -320,19 +321,32 @@ end_waiting:
     free(sector);
 }
 
+static void reset(void) {
+    uint32_t *aircr = (uint32_t *)(SCB_BASE + (3 * sizeof(uint32_t)));
+    *aircr = ((0x5FA << 16) | (*aircr & (0x700)) | (1 << 2));
+}
+
 int main(void) {
     rcc_clock_setup_pll(&rcc_hse_configs[RCC_CLOCK_HSE8_72MHZ]);
     clock_peripherals();
     configure_io();
     timer_start();
+    input_setup();
     gpu_initiate_communication();
+
+    // If gpu ready is already high, that means the cpu reset so we
+    // don't need to do everything again.
+    uint32_t wait_until = timer_get_ms() + 20;
+    while (wait_until > timer_get_ms()) {
+        if (gpio_port_read(GPU_READY_PORT) & GPU_READY) {
+            goto return_to_menu;
+        }
+    }
     gpu_sync();
     gpu_reset_palette();
-    input_setup();
     if ((uint32_t)&get_lot_base != 0x08000150) {
         invalid_location_get_lot_base((uint32_t)&get_lot_base);
     }
-    sdcard_init_peripheral();
     gpu_blank(BACK_BUFFER, 0);
     gpu_swap_buf();
 
@@ -352,9 +366,12 @@ int main(void) {
         exit = run_game((void *)FLASH_GAME_ADR);
     }
 
+    gpu_block_ack();
+
     switch (exit) {
     case CODE_EXIT:
-        goto return_to_menu;
+        reset();
+        break;
     case CODE_RESTART:
         goto restart_game;
     case CODE_FREEZEFRAME:
