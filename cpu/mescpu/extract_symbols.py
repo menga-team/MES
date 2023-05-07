@@ -14,7 +14,7 @@ INVALID_SYMBOLS = ["siprintf", "hello_world", "main", "vector_table",
                    "ln2HI", "ln2LO", "Zero", "npio2_hw", "Pio2",
                    "init_jk", "with_errno", "xflow", "finite",
                    "sbrk_aligned", "last_port", "two_over_pi", "PIo2",
-                   "one", "tiny", "two"]
+                   "one", "tiny", "two", "desig_get_flash_size"]
 
 EXTRA_SYMBOLS = ["__aeabi_dadd", "__aeabi_ddiv", "__aeabi_dmul",
                  "__aeabi_drsub", "__aeabi_dsub", "__aeabi_cdcmpeq",
