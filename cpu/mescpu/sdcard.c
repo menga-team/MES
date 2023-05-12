@@ -15,6 +15,7 @@
  */
 
 #include "sdcard.h"
+#include "gpu.h"
 #include "libopencm3/stm32/gpio.h"
 #include "libopencm3/stm32/rcc.h"
 #include "libopencm3/stm32/spi.h"
@@ -249,6 +250,7 @@ uint8_t sdcard_go_idle(void) {
 }
 
 enum SDInitResult sdcard_init(void) {
+    sdcard_is_hcxc = true;
     // sd needs to be powered for around 1ms before starting.
     sdcard_boot_sequence();
     union SDResponse1 r1;
@@ -299,11 +301,6 @@ enum SDInitResult sdcard_init(void) {
         return SD_CARD_GENERIC_COMMUNICATION_ERROR;
     uint8_t ocr_register[4];
     sdcard_read_buf(ocr_register, sizeof(ocr_register));
-    if (SD_OCR_IS_SDHC_OR_SDXC(ocr_register)) {
-        sdcard_is_hcxc = true;
-    } else {
-        sdcard_is_hcxc = false;
-    }
 sd_poll_ready:
     sdcard_release();
     uint32_t start_time = timer_get_ms();
@@ -323,6 +320,13 @@ sd_poll_ready:
     if (r1.invalid)
         return SD_CARD_GENERIC_COMMUNICATION_ERROR;
     sdcard_read_buf(ocr_register, sizeof(ocr_register));
+    if (sdcard_is_hcxc) {
+        if (SD_OCR_IS_SDHC_OR_SDXC(ocr_register)) {
+            sdcard_is_hcxc = true;
+        } else {
+            sdcard_is_hcxc = false;
+        }
+    }
     return SD_CARD_NO_ERROR;
 }
 
