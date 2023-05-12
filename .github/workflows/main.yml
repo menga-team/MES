@@ -17,6 +17,9 @@ jobs:
         version: 1.0
     - name: install pip depencencies
       run: pip3 install pyelftools Jinja2
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
     - name: update submodules
       run: git submodule update --init
       shell: bash
