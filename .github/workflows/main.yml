@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: install dependencies
-      run: apt-get install binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi gcc-arm-none-eabi-source libstdc++-arm-none-eabi-dev libstdc++-arm-none-eabi-newlib python3 python3-pip
+      run: sudo apt-get install binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi gcc-arm-none-eabi-source libstdc++-arm-none-eabi-dev libstdc++-arm-none-eabi-newlib python3 python3-pip
       shell: bash
     - name: install pip depencencies
       run: pip3 install pyelftools Jinja2
