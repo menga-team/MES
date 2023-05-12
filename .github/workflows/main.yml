@@ -16,7 +16,7 @@ jobs:
         packages: binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi python3 python3-pip
         version: 1.0
     - name: install pip depencencies
-      run: pip3 install elftools
+      run: pip3 install pyelftools Jinja2
     - name: update submodules
       run: git submodule update --init
       shell: bash
