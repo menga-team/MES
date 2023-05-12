@@ -40,7 +40,7 @@ uint8_t sdcard_calculate_crc7(const uint8_t *data, uint32_t len) {
 
 uint16_t sdcard_calculate_crc16(const uint8_t *data, uint32_t len) {
     uint16_t crc = 0x00;
-    for (uint32_t i = 0; i < len; ++len) {
+    for (uint32_t i = 0; i < len; ++i) {
         crc = (uint8_t)(crc >> 8) | (crc << 8);
         crc ^= data[len];
         crc ^= (uint8_t)(crc & 0xff) >> 4;
@@ -136,7 +136,7 @@ uint16_t sdcard_read_block(uint8_t *buf, uint32_t len, uint32_t bytes_timeout) {
 }
 
 void sdcard_send_block(uint8_t *buf, uint32_t len) {
-    uint16_t crc = 0; // sdcard_calculate_crc16(buf, len);
+    uint16_t crc = sdcard_calculate_crc16(buf, len);
     sdcard_transceive(0xff);
     sdcard_transceive(SD_BLOCK_START_BYTE);
     for (uint32_t i = 0; i < len; ++i) {
@@ -343,12 +343,17 @@ bool sdcard_init_peripheral(void) {
     return true;
 }
 
-void sdcard_read_sector(uint32_t sector, uint8_t *data) {
+bool sdcard_read_sector(uint32_t sector, uint8_t *data) {
     if (!sdcard_is_hcxc) {
         sector *= SD_SECTOR_SIZE;
     }
     sdcard_send_command_blocking(SD_CMD17_READ_SINGLE_BLOCK, sector, 8);
-    sdcard_read_block(data, SD_SECTOR_SIZE, 0);
+    uint16_t crc = sdcard_read_block(data, SD_SECTOR_SIZE, 0);
+    uint16_t calculated = sdcard_calculate_crc16(data, SD_SECTOR_SIZE);
+    if (crc != calculated) {
+	return false;
+    }
+    return true;
 }
 
 void sdcard_write_sector(uint32_t sector, uint8_t *data) {

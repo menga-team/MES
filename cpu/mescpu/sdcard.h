@@ -362,8 +362,9 @@ bool sdcard_init_peripheral(void);
  * @related sdcard_read_sector_partially
  * @param sector The sector to read from, first sector is 0.
  * @param data Where the data should be stored to.
+ * @return does the CRC match with the data?
  */
-void sdcard_read_sector(uint32_t sector, uint8_t *data);
+bool sdcard_read_sector(uint32_t sector, uint8_t *data);
 
 /**
  * Will write 512 bytes of @param data into sector @param sector.

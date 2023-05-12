@@ -23,6 +23,7 @@
 #include <udynlink.h>
 #include <math.h>
 #include <rng.h>
+#include <data.h>
 
 const char *unknown_symbol;
 

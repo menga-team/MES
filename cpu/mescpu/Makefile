@@ -1,6 +1,6 @@
 # Adapted from: https://github.com/libopencm3/libopencm3-template/blob/master/rules.mk
 PROJECT		= mescpu
-CFILES		= main.c timer.c gpu.c sdcard.c input.c udynlink/udynlink/udynlink.c udynlink_externals.c rng.c TinyMT/tinymt/tinymt32.c
+CFILES		= main.c timer.c gpu.c sdcard.c input.c udynlink/udynlink/udynlink.c udynlink_externals.c rng.c data.c TinyMT/tinymt/tinymt32.c
 OPENCM3_DIR	:= ../../libopencm3
 #DEVICE		= stm32f103c8t6
 LDSCRIPT	= stm32f103c8tx.ld

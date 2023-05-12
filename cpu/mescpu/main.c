@@ -455,12 +455,12 @@ void handle_hard_fault(uint32_t *stack_frame) {
     gpu_print_text_blocking(FRONT_BUFFER, 2, 24, 1, 4,
                             "\xd6\xc4\xc4 H A R D  F A U L T \xc4\xc4\xb7");
     char *text_buf = malloc(27);
-    volatile uint32_t *cfsr = (volatile uint32_t *)0xE000ED28;
-    uint16_t ufsr = (uint16_t)(*cfsr >> 16);
-    uint8_t bfsr = (uint8_t)(*cfsr >> 8);
-    uint8_t mmfsr = (uint8_t)(*cfsr & 0xff);
-    sprintf(text_buf, "CFSR %08lx", *cfsr);
-    gpu_print_text_blocking(FRONT_BUFFER, 8, 32, 1, 4, text_buf);
+    uint32_t cfsr = *(volatile uint32_t *)0xE000ED28;
+    uint16_t ufsr = (uint16_t)(cfsr >> 16);
+    uint8_t bfsr = (uint8_t)(cfsr >> 8);
+    uint8_t mmfsr = (uint8_t)(cfsr & 0xff);
+    sprintf(text_buf, "CFSR %08x", cfsr);
+    gpu_print_text_blocking(FRONT_BUFFER, 8, 40, 1, 4, text_buf);
     uint8_t line = 4;
     if (USFR_IS_UNDEFSTR(ufsr))
         gpu_print_text_blocking(FRONT_BUFFER, 94, line++ * 8, 1, 4, "UNDEFSTR");
