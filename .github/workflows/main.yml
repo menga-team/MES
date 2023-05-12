@@ -13,7 +13,7 @@ jobs:
     - name: install dependencies
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi python3 python3-pip
+        packages: binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi gcc-arm-none-eabi-source libstdc++-arm-none-eabi-dev python3 python3-pip
         version: 1.0
     - name: install pip depencencies
       run: pip3 install pyelftools Jinja2
@@ -24,7 +24,7 @@ jobs:
       run: git submodule update --init
       shell: bash
     - name: compile libopencm3
-      run: cd libopencm3 && make TARGETS='stm32/f1'
+      run: cd libopencm3 && make TARGETS='stm32/f1' && cd ..
       shell: bash
     - name: compile gpu
       run: cd gpu/mesgpu && make mesgpu.bin && cd ../..
