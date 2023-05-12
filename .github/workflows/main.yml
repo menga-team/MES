@@ -36,4 +36,6 @@ jobs:
       uses: actions/upload-artifact@v3.1.2
       with:
         name: mes-firmware
-        path: cpu/mescpu/mescpu.bin gpu/mesgpu/mesgpu.bin    
+        path: |
+          cpu/mescpu/mescpu.bin
+          gpu/mesgpu/mesgpu.bin    
