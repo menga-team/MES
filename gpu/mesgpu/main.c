@@ -107,7 +107,7 @@ void start_communication(void) {
     rcc_periph_clock_enable(RCC_SPI1);
     spi_reset(SPI1);
     spi_set_slave_mode(SPI1);
-    spi_set_clock_polarity_1(SPI1);
+    spi_set_clock_polarity_0(SPI1);
     spi_set_clock_phase_1(SPI1);
     spi_set_dff_8bit(SPI1);
     spi_send_msb_first(SPI1);
