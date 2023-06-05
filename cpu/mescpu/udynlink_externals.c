@@ -35,6 +35,8 @@ void udynlink_external_vprintf(const char UNUSED *s, va_list UNUSED va) {}
 
 uint32_t udynlink_external_resolve_symbol(const char *name) {
 #include "bin/symbols.inc"
+	if(strcmp(name, "printf") == 0)
+		return (uint32_t)&udynlink_external_vprintf;
     unknown_symbol = name;
     return 0;
 }
