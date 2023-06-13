@@ -19,11 +19,15 @@
 
 uint8_t *data_read_block(uint32_t index) {
     uint8_t *block = malloc(SD_SECTOR_SIZE);
+    data_read_block_into(index, block);
+    return block;
+}
+
+void data_read_block_into(uint32_t index, uint8_t *buf) {
     bool match;
     do {
-        match = sdcard_read_sector(index + DATA_SECTOR_START_OFFSET, block);
+        match = sdcard_read_sector(index + DATA_SECTOR_START_OFFSET, buf);
     } while (!match);
-    return block;
 }
 
 void data_write_block(uint32_t index, uint8_t *block) {

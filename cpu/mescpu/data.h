@@ -23,6 +23,7 @@
 #define DATA_SECTOR_START_OFFSET 256
 
 uint8_t* data_read_block(uint32_t index);
+void data_read_block_into(uint32_t index, uint8_t *buf);
 
 void data_write_block(uint32_t index, uint8_t* block);
 

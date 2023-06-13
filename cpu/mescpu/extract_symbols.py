@@ -70,14 +70,14 @@ EXTRA_SYMBOLS = ["__aeabi_dadd", "__aeabi_ddiv", "__aeabi_dmul",
                  "sdcard_write_sector",
                  "sdcard_read_sector_partially", "sdcard_on_insert",
                  "sdcard_on_eject", "data_read_block",
-                 "data_write_block", "rng_init", "rng_u32", "atan",
-                 "cos", "sin", "tan", "tanh", "frexp", "modf", "ceil",
-                 "fabs", "floor", "acos", "asin", "atan2", "cosh",
-                 "sinh", "exp", "ldexp", "log", "log10", "pow",
-                 "sqrt", "fmod", "memset", "input_get_button",
-                 "input_get_buttons", "input_is_available",
-                 "input_get_availability", "input_change_freq",
-                 "realloc"]
+                 "data_read_block_into", "data_write_block",
+                 "rng_init", "rng_u32", "atan", "cos", "sin", "tan",
+                 "tanh", "frexp", "modf", "ceil", "fabs", "floor",
+                 "acos", "asin", "atan2", "cosh", "sinh", "exp",
+                 "ldexp", "log", "log10", "pow", "sqrt", "fmod",
+                 "memset", "input_get_button", "input_get_buttons",
+                 "input_is_available", "input_get_availability",
+                 "input_change_freq", "realloc"]
 
 elf_file = sys.argv[1]
 
