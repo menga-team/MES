@@ -170,10 +170,10 @@ else
 endif
 
 scanline.g.c:
-	python generators/scanline_generator.py > scanline.g.c
+	python3 generators/scanline_generator.py > scanline.g.c
 
 font.h:
-	python ../../utils/pngtoarray.py images/menga68.png > font.h
+	python3 ../../utils/pngtoarray.py images/menga68.png > font.h
 
 clean:
 	rm -rf $(BUILD_DIR) $(GENERATED_BINS) $(GENERATED_CODE)

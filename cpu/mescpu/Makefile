@@ -127,7 +127,7 @@ $(PROJECT).elf: $(OBJS) $(LDSCRIPT) $(LIBDEPS)
 	$(Q)$(LD) $(TGT_LDFLAGS) $(LDFLAGS) $(OBJS) $(LDLIBS) -o $@
 
 $(BUILD_DIR)/symbols.inc:
-	python extract_symbols.py $(PROJECT).elf > $(BUILD_DIR)/symbols.inc
+	python3 extract_symbols.py $(PROJECT).elf > $(BUILD_DIR)/symbols.inc
 
 %.bin: %.elf
 	@printf "OBJCOPY\t$@\n"
@@ -140,7 +140,7 @@ $(BUILD_DIR)/symbols.inc:
 	$(OBJDUMP) -S $< > $@
 
 remove-game:
-	python create_dummy_game.py dummy_game > dummy_game.h
+	python3 create_dummy_game.py dummy_game > dummy_game.h
 
 %.flash: %.bin
 	@printf "  FLASH\t$<\n"
