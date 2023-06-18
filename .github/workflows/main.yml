@@ -19,12 +19,10 @@ jobs:
       shell: bash
     - name: install pip depencencies
       run: pip3 install pyelftools Jinja2
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
+        submodules: recursive
         fetch-depth: 0
-    - name: update submodules
-      run: git submodule update --init
-      shell: bash
     - name: compile libopencm3
       run: cd libopencm3 && make TARGETS='stm32/f1' && cd ..
       shell: bash
