@@ -28,7 +28,7 @@ jobs:
       run: cd gpu/mesgpu && make mesgpu.bin && cd ../..
       shell: bash
     - name: compile cpu
-      run: cd cpu/mescpu && mkdir -p bin && touch bin/symbols.inc && make mescpu.elf && python3 extract_symbols.py mescpu.elf > bin/symbols.inc && make mescpu.bin && cd ../..
+      run: cd cpu/mescpu && mkdir -p bin && echo "" > bin/symbols.inc && make mescpu.elf && python3 extract_symbols.py mescpu.elf > bin/symbols.inc && make mescpu.bin && cd ../..
       shell: bash
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v3.1.2

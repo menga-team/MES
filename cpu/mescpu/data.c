@@ -17,6 +17,7 @@
 #include "data.h"
 #include "sdcard.h"
 #include <stdint.h>
+#include <stdlib.h>
 
 uint8_t *data_read_block(uint32_t index) {
     uint8_t *block = malloc(SD_SECTOR_SIZE);

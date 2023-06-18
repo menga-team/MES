@@ -459,7 +459,7 @@ void handle_hard_fault(uint32_t *stack_frame) {
     uint16_t ufsr = (uint16_t)(cfsr >> 16);
     uint8_t bfsr = (uint8_t)(cfsr >> 8);
     uint8_t mmfsr = (uint8_t)(cfsr & 0xff);
-    sprintf(text_buf, "CFSR %08x", cfsr);
+    sprintf(text_buf, "CFSR %08lx", cfsr);
     gpu_print_text_blocking(FRONT_BUFFER, 8, 40, 1, 4, text_buf);
     uint8_t line = 4;
     if (USFR_IS_UNDEFSTR(ufsr))
