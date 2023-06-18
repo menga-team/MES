@@ -454,7 +454,7 @@ void handle_hard_fault(uint32_t *stack_frame) {
     unrecoverable_error();
     gpu_print_text_blocking(FRONT_BUFFER, 2, 24, 1, 4,
                             "\xd6\xc4\xc4 H A R D  F A U L T \xc4\xc4\xb7");
-    char *text_buf = malloc(27);
+    char text_buf[27];
     uint32_t cfsr = *(volatile uint32_t *)0xE000ED28;
     uint16_t ufsr = (uint16_t)(cfsr >> 16);
     uint8_t bfsr = (uint8_t)(cfsr >> 8);
@@ -509,7 +509,6 @@ void handle_hard_fault(uint32_t *stack_frame) {
     sprintf(text_buf, "psr %08lx pc %08lx", psr, pc);
     gpu_print_text_blocking(FRONT_BUFFER, 8, line++ * 8, 1, 4, text_buf);
 
-    free(text_buf);
     __asm__ volatile("bkpt #01");
     while (true)
         ;

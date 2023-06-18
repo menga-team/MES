@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 bool sdcard_available = false;
+bool sdcard_ready = false;
 bool sdcard_is_hcxc = false;
 
 uint8_t sdcard_calculate_crc7(const uint8_t *data, uint32_t len) {
@@ -250,6 +251,7 @@ uint8_t sdcard_go_idle(void) {
 }
 
 enum SDInitResult sdcard_init(void) {
+    sdcard_ready = false;
     sdcard_is_hcxc = true;
     // sd needs to be powered for around 1ms before starting.
     sdcard_boot_sequence();
@@ -327,6 +329,7 @@ sd_poll_ready:
             sdcard_is_hcxc = false;
         }
     }
+    sdcard_ready = true;
     return SD_CARD_NO_ERROR;
 }
 

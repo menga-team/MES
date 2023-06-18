@@ -16,18 +16,32 @@
 
 #include "data.h"
 #include "sdcard.h"
+#include <stdint.h>
 
 uint8_t *data_read_block(uint32_t index) {
     uint8_t *block = malloc(SD_SECTOR_SIZE);
-    data_read_block_into(index, block);
-    return block;
+    if (data_read_block_into(index, block)) {
+        return block;
+    } else {
+        return 0;
+    }
 }
 
-void data_read_block_into(uint32_t index, uint8_t *buf) {
+bool data_read_block_into(uint32_t index, uint8_t *buf) {
+    if (!sdcard_ready) {
+        if (sdcard_init_peripheral() != SD_CARD_NO_ERROR) {
+            return false;
+        }
+    }
+
     bool match;
+    uint8_t tries = 0;
     do {
         match = sdcard_read_sector(index + DATA_SECTOR_START_OFFSET, buf);
-    } while (!match);
+        tries++;
+    } while (!match && tries < DATA_MAX_TRIES);
+
+    return match;
 }
 
 void data_write_block(uint32_t index, uint8_t *block) {

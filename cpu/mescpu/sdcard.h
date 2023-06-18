@@ -105,7 +105,7 @@ enum SDInitResult {
     SD_CARD_GENERIC_COMMUNICATION_ERROR = 3,
     SD_CARD_TARGET_VOLTAGE_UNSUPPORTED = 4,
     SD_CARD_WAKEUP_TIMEOUT = 5
-} __attribute__((__packed__));
+};
 
 /**
  * Voltage bitmap enum.
@@ -153,6 +153,7 @@ typedef struct {
 } __attribute__((__packed__)) GameImage;
 
 extern bool sdcard_available;
+extern bool sdcard_ready;
 extern bool sdcard_is_hcxc;
 
 /**
