@@ -9,9 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+	image: fedora:38
     steps:
     - name: install dependencies
-      run: sudo apt-get install binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi gcc-arm-none-eabi-source libstdc++-arm-none-eabi-dev libstdc++-arm-none-eabi-newlib python3 python3-pip
+      run: dnf -y install arm-none-eabi-binutils-cs arm-none-eabi-gcc-cs arm-none-eabi-newlib python3 python3-pip
       shell: bash
     - name: install pip depencencies
       run: pip3 install pyelftools Jinja2
