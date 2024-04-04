@@ -43,7 +43,7 @@ uint16_t sdcard_calculate_crc16(const uint8_t *data, uint32_t len) {
     uint16_t crc = 0x00;
     for (uint32_t i = 0; i < len; ++i) {
         crc = (uint8_t)(crc >> 8) | (crc << 8);
-        crc ^= data[len];
+        crc ^= data[i];
         crc ^= (uint8_t)(crc & 0xff) >> 4;
         crc ^= (crc << 8) << 4;
         crc ^= ((crc & 0xff) << 4) << 1;
