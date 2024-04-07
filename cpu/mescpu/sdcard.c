@@ -279,31 +279,32 @@ enum SDInitResult sdcard_init(void) {
         return SD_CARD_GENERIC_COMMUNICATION_ERROR;
     }
 
+    uint8_t ocr_register[4];
+
     if (r1.illegal_command) {
         sdcard_is_hcxc = false;
-        goto sd_poll_ready;
+    } else {
+        uint8_t sd_status[4];
+        sdcard_read_buf(sd_status, sizeof(sd_status));
+        const bool pcie_1v2 = (sd_status[2] >> 4) & 2;
+        const bool pcie = (sd_status[2] >> 4) & 1;
+        const enum SDVoltageSupplied vhs = sd_status[2] & 0xf;
+        const uint8_t pattern = sd_status[3];
+        if (pattern != SD_CHECK_PATTERN)
+            return SD_CARD_GENERIC_COMMUNICATION_ERROR;
+        if (vhs != VOLTAGE_2V7_TO_3V6)
+            return SD_CARD_TARGET_VOLTAGE_UNSUPPORTED;
+        if (pcie)
+            return SD_CARD_GENERIC_COMMUNICATION_ERROR;
+        if (pcie_1v2)
+            return SD_CARD_GENERIC_COMMUNICATION_ERROR;
+        sdcard_release();
+        r1.repr = sdcard_send_command_blocking(SD_CMD58_READ_OCR,
+                                               0x00000000, 2);
+        if (r1.invalid)
+            return SD_CARD_GENERIC_COMMUNICATION_ERROR;
+        sdcard_read_buf(ocr_register, sizeof(ocr_register));
     }
-    uint8_t sd_status[4];
-    sdcard_read_buf(sd_status, sizeof(sd_status));
-    const bool pcie_1v2 = (sd_status[2] >> 4) & 2;
-    const bool pcie = (sd_status[2] >> 4) & 1;
-    const enum SDVoltageSupplied vhs = sd_status[2] & 0xf;
-    const uint8_t pattern = sd_status[3];
-    if (pattern != SD_CHECK_PATTERN)
-        return SD_CARD_GENERIC_COMMUNICATION_ERROR;
-    if (vhs != VOLTAGE_2V7_TO_3V6)
-        return SD_CARD_TARGET_VOLTAGE_UNSUPPORTED;
-    if (pcie)
-        return SD_CARD_GENERIC_COMMUNICATION_ERROR;
-    if (pcie_1v2)
-        return SD_CARD_GENERIC_COMMUNICATION_ERROR;
-    sdcard_release();
-    r1.repr = sdcard_send_command_blocking(SD_CMD58_READ_OCR, 0x00000000, 2);
-    if (r1.invalid)
-        return SD_CARD_GENERIC_COMMUNICATION_ERROR;
-    uint8_t ocr_register[4];
-    sdcard_read_buf(ocr_register, sizeof(ocr_register));
-sd_poll_ready:
     sdcard_release();
     uint32_t start_time = timer_get_ms();
     while (r1.in_idle_state) {
